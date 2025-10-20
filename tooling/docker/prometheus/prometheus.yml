@@ -1,0 +1,31 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'carapace'
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Sui node metrics (running locally via CLI)
+  - job_name: 'sui-node'
+    static_configs:
+      - targets: ['host.docker.internal:9184']
+
+  # Carapace API
+  - job_name: 'carapace-api'
+    static_configs:
+      - targets: ['host.docker.internal:3500']
+
+  # PostgreSQL exporter (optional, requires postgres_exporter)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+
+  # Redis exporter (optional, requires redis_exporter)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']

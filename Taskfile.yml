@@ -1,0 +1,322 @@
+version: '3'
+
+vars:
+  SUI_NETWORK: localnet
+  SUI_CONFIG_DIR: ~/.sui/sui_config
+  MOVE_DIR: ./move
+
+tasks:
+  # Development
+  dev:
+    desc: Start all development services
+    cmds:
+      - task: docker:up
+      - bun run dev
+
+  dev:web:
+    desc: Start Next.js web app only
+    dir: apps/web
+    cmds:
+      - bun run dev
+
+  dev:api:
+    desc: Start Express API only
+    dir: apps/api
+    cmds:
+      - bun run dev
+
+  # Installation
+  install:
+    desc: Install all dependencies
+    cmds:
+      - bun install
+      - task: sui:check
+
+  # Docker
+  docker:up:
+    desc: Start Docker services
+    dir: tooling/docker
+    cmds:
+      - docker compose up -d
+      - echo "Waiting for services to be healthy..."
+      - sleep 5
+      - docker compose ps
+
+  docker:down:
+    desc: Stop Docker services
+    dir: tooling/docker
+    cmds:
+      - docker compose down
+
+  docker:restart:
+    desc: Restart Docker services
+    cmds:
+      - task: docker:down
+      - task: docker:up
+
+  docker:logs:
+    desc: View Docker logs
+    dir: tooling/docker
+    cmds:
+      - docker compose logs -f {{.CLI_ARGS}}
+
+  docker:clean:
+    desc: Clean Docker volumes and rebuild
+    dir: tooling/docker
+    cmds:
+      - docker compose down -v
+      - docker compose up -d --build
+
+  # Sui
+  sui:check:
+    desc: Check Sui CLI installation
+    cmds:
+      - sui --version || echo "⚠️  Sui CLI not installed. Install from https://docs.sui.io/build/install"
+
+  sui:init:
+    desc: Initialize Sui environment
+    cmds:
+      - task: sui:check
+      - sui client active-env || sui client new-env --alias localnet --rpc http://127.0.0.1:9000
+      - sui client switch --env localnet
+      - sui client active-address || sui client new-address ed25519
+      - task: sui:faucet
+
+  sui:faucet:
+    desc: Request tokens from faucet
+    cmds:
+      - sui client faucet || echo "⚠️  Faucet request failed. Make sure local network is running."
+
+  sui:addresses:
+    desc: List Sui addresses
+    cmds:
+      - sui client addresses
+
+  sui:balance:
+    desc: Check SUI balance
+    cmds:
+      - sui client gas
+
+  sui:envs:
+    desc: List Sui environments
+    cmds:
+      - sui client envs
+
+  # Move contracts
+  move:build:
+    desc: Build all Move contracts
+    dir: "{{.MOVE_DIR}}"
+    cmds:
+      - sui move build
+
+  move:test:
+    desc: Test all Move contracts
+    dir: "{{.MOVE_DIR}}"
+    cmds:
+      - sui move test
+
+  move:test:verbose:
+    desc: Test Move contracts with verbose output
+    dir: "{{.MOVE_DIR}}"
+    cmds:
+      - sui move test --verbose
+
+  move:test:coverage:
+    desc: Test Move contracts with coverage
+    dir: "{{.MOVE_DIR}}"
+    cmds:
+      - sui move test --coverage
+
+  move:publish:local:
+    desc: Publish Move contracts to local network
+    dir: "{{.MOVE_DIR}}"
+    cmds:
+      - task: sui:init
+      - sui client publish --gas-budget 100000000 --verify-deps
+
+  move:publish:testnet:
+    desc: Publish Move contracts to testnet
+    dir: "{{.MOVE_DIR}}"
+    cmds:
+      - sui client switch --env testnet
+      - sui client publish --gas-budget 100000000 --verify-deps
+
+  move:publish:mainnet:
+    desc: Publish Move contracts to mainnet
+    dir: "{{.MOVE_DIR}}"
+    cmds:
+      - echo "⚠️  WARNING Publishing to MAINNET"
+      - 'read -p "Are you sure? (yes/no): " confirm && [ "$confirm" = "yes" ]'
+      - sui client switch --env mainnet
+      - sui client publish --gas-budget 100000000 --verify-deps
+
+  move:clean:
+    desc: Clean Move build artifacts
+    dir: "{{.MOVE_DIR}}"
+    cmds:
+      - rm -rf build/
+
+  # Testing
+  test:
+    desc: Run all tests
+    cmds:
+      - task: test:move
+      - bun test
+
+  test:move:
+    desc: Run Move contract tests
+    cmds:
+      - task: move:test
+
+  test:unit:
+    desc: Run unit tests
+    cmds:
+      - bun test
+
+  test:integration:
+    desc: Run integration tests
+    cmds:
+      - bun test --grep "integration"
+
+  test:e2e:
+    desc: Run E2E tests
+    cmds:
+      - cd apps/web && bun run test:e2e
+
+  test:coverage:
+    desc: Run tests with coverage
+    cmds:
+      - bun test --coverage
+
+  # Building
+  build:
+    desc: Build all packages
+    cmds:
+      - bun run build
+
+  build:web:
+    desc: Build web app
+    dir: apps/web
+    cmds:
+      - bun run build
+
+  build:api:
+    desc: Build API
+    dir: apps/api
+    cmds:
+      - bun run build
+
+  # Linting & Formatting
+  lint:
+    desc: Lint all code
+    cmds:
+      - bun run lint
+
+  lint:fix:
+    desc: Fix linting issues
+    cmds:
+      - bun run lint --fix
+
+  format:
+    desc: Format code with Prettier
+    cmds:
+      - bun run format
+
+  format:check:
+    desc: Check code formatting
+    cmds:
+      - bun run format --check
+
+  typecheck:
+    desc: TypeScript type checking
+    cmds:
+      - bun run typecheck
+
+  # Database
+  db:migrate:
+    desc: Run database migrations
+    cmds:
+      - cd apps/api && bun run db:migrate
+
+  db:seed:
+    desc: Seed database
+    cmds:
+      - cd apps/api && bun run db:seed
+
+  db:reset:
+    desc: Reset database
+    cmds:
+      - cd apps/api && bun run db:reset
+
+  db:console:
+    desc: Open database console
+    cmds:
+      - docker compose exec postgres psql -U carapace -d carapace
+
+  # Monitoring
+  logs:
+    desc: View application logs
+    cmds:
+      - task: docker:logs
+
+  grafana:
+    desc: Open Grafana dashboard
+    cmds:
+      - open http://localhost:3030
+
+  prometheus:
+    desc: Open Prometheus dashboard
+    cmds:
+      - open http://localhost:9090
+
+  # Cleanup
+  clean:
+    desc: Clean all build artifacts
+    cmds:
+      - task: move:clean
+      - rm -rf node_modules
+      - rm -rf apps/*/node_modules
+      - rm -rf packages/*/node_modules
+      - rm -rf apps/*/.next
+      - rm -rf apps/*/dist
+
+  clean:all:
+    desc: Clean everything including Docker volumes
+    cmds:
+      - task: clean
+      - task: docker:clean
+
+  # Utilities
+  reset:
+    desc: Complete reset of the project
+    cmds:
+      - task: clean:all
+      - task: install
+      - task: sui:init
+      - task: docker:up
+
+  status:
+    desc: Show status of all services
+    cmds:
+      - echo "=== Docker Services ==="
+      - cd tooling/docker && docker compose ps
+      - echo ""
+      - echo "=== Sui Environment ==="
+      - sui client active-env || echo "Not configured"
+      - echo ""
+      - echo "=== Sui Active Address ==="
+      - sui client active-address || echo "No active address"
+      - echo ""
+      - echo "=== Sui Balance ==="
+      - sui client gas || echo "No balance"
+
+  # Setup
+  setup:
+    desc: Complete project setup
+    cmds:
+      - echo "🐢 Setting up Carapace..."
+      - task: install
+      - task: docker:up
+      - task: sui:init
+      - echo ""
+      - echo "✅ Setup complete! Run 'task dev' to start development."

@@ -1,0 +1,90 @@
+services:
+  # Note: Sui local network is run via CLI (sui start --with-faucet --force-regenesis)
+  # Not included in Docker to avoid platform compatibility issues
+
+  # PostgreSQL for indexing and analytics
+  postgres:
+    image: postgres:16-alpine
+    container_name: carapace-postgres
+    environment:
+      POSTGRES_DB: carapace
+      POSTGRES_USER: carapace
+      POSTGRES_PASSWORD: carapace_dev_password
+    ports:
+      - "3502:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - carapace-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carapace"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: carapace-redis
+    ports:
+      - "3503:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - carapace-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Grafana for monitoring
+  grafana:
+    image: grafana/grafana:latest
+    container_name: carapace-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: grafana-clock-panel
+    ports:
+      - "3504:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - carapace-network
+    depends_on:
+      - postgres
+
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: carapace-prometheus
+    ports:
+      - "3505:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - carapace-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  grafana-data:
+    driver: local
+  prometheus-data:
+    driver: local
+
+networks:
+  carapace-network:
+    driver: bridge

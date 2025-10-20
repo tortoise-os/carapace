@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun run dev)",
+      "Bash(curl -s http://localhost:3500/health)",
+      "mcp__magicui__getUIComponents"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

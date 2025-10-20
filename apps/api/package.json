@@ -1,0 +1,31 @@
+{
+  "name": "@carapace/api",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Carapace API Server",
+  "main": "./src/index.ts",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "start": "bun src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "bun src/db/migrate.ts",
+    "db:seed": "bun src/db/seed.ts"
+  },
+  "dependencies": {
+    "@carapace/sdk": "workspace:*",
+    "@mysten/sui.js": "^0.54.1",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "postgres": "^3.4.3",
+    "ioredis": "^5.3.2",
+    "zod": "^3.22.4",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "typescript": "^5.6.2"
+  }
+}

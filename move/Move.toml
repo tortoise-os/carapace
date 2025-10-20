@@ -1,0 +1,10 @@
+[package]
+name = "carapace"
+version = "0.1.0"
+edition = "2024.beta"
+
+[dependencies]
+# Sui framework dependencies (Sui, MoveStdlib, etc.) are automatically included
+
+[addresses]
+carapace = "0x0"
