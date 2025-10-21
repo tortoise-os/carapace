@@ -4,12 +4,14 @@
 
 import { SuiClient } from '@mysten/sui.js/client';
 import { PoolClient } from './pool-client';
+import { TokenMetadataService } from './services/token-metadata';
 import { NETWORK_CONFIGS, DEFAULT_PACKAGE_IDS } from './config';
 import type { CarapaceSDKOptions, Network, PackageIds } from './types';
 
 export class CarapaceSDK {
   public client: SuiClient;
   public pool: PoolClient;
+  public tokenMetadata: TokenMetadataService;
   public packageIds: PackageIds;
   public network: Network;
 
@@ -29,6 +31,7 @@ export class CarapaceSDK {
 
     // Initialize clients
     this.pool = new PoolClient(this.client, this.packageIds.carapace);
+    this.tokenMetadata = new TokenMetadataService(this.client);
   }
 
   /**
@@ -42,5 +45,7 @@ export class CarapaceSDK {
 
 // Re-export types and utilities
 export * from './types';
+export * from './types/token';
 export * from './config';
 export { PoolClient } from './pool-client';
+export { TokenMetadataService } from './services/token-metadata';

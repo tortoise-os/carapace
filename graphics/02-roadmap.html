@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TortoiseOS Roadmap</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1400px;
+            width: 100%;
+        }
+        .logo {
+            text-align: center;
+            font-size: 64px;
+            margin-bottom: 8px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 42px;
+            margin: 0 0 16px 0;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 48px;
+        }
+        .timeline {
+            position: relative;
+            padding: 32px 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #3b82f6, #8b5cf6, #ec4899, #f59e0b);
+        }
+        .phase {
+            display: flex;
+            margin-bottom: 48px;
+            position: relative;
+        }
+        .phase:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+        .phase-content {
+            width: 45%;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            border: 3px solid;
+        }
+        .phase:nth-child(1) .phase-content { border-color: #3b82f6; }
+        .phase:nth-child(2) .phase-content { border-color: #8b5cf6; }
+        .phase:nth-child(3) .phase-content { border-color: #ec4899; }
+        .phase:nth-child(4) .phase-content { border-color: #f59e0b; }
+        .phase-number {
+            position: absolute;
+            left: 50%;
+            top: 24px;
+            transform: translateX(-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 20px;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .phase:nth-child(1) .phase-number { border-color: #3b82f6; color: #3b82f6; }
+        .phase:nth-child(2) .phase-number { border-color: #8b5cf6; color: #8b5cf6; }
+        .phase:nth-child(3) .phase-number { border-color: #ec4899; color: #ec4899; }
+        .phase:nth-child(4) .phase-number { border-color: #f59e0b; color: #f59e0b; }
+        .phase-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            color: #1a202c;
+        }
+        .phase-timeline {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        .phase-items {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .phase-items li {
+            padding: 8px 0;
+            color: #2d3748;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+        .phase-items li::before {
+            content: '✓';
+            margin-right: 12px;
+            color: white;
+            background: #48bb78;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+        .phase:nth-child(1) .phase-items li::before { background: #3b82f6; }
+        .phase:nth-child(2) .phase-items li::before { background: #8b5cf6; }
+        .phase:nth-child(3) .phase-items li::before { background: #ec4899; }
+        .phase:nth-child(4) .phase-items li::before { background: #f59e0b; }
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 12px;
+        }
+        .badge-live { background: #48bb78; color: white; }
+        .badge-next { background: #3b82f6; color: white; }
+        .badge-future { background: #cbd5e0; color: #4a5568; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🐢</div>
+        <h1>TortoiseOS Roadmap</h1>
+        <p class="subtitle">4 Phases • Infinite Possibilities</p>
+
+        <div class="timeline">
+            <div class="phase">
+                <div class="phase-number">1</div>
+                <div class="phase-content">
+                    <h3 class="phase-title">
+                        Carapace Foundation
+                        <span class="badge badge-live">LIVE NOW</span>
+                    </h3>
+                    <p class="phase-timeline">Q4 2025 • 8-12 weeks</p>
+                    <ul class="phase-items">
+                        <li>TortoiseSwap AMM with ML fees</li>
+                        <li>TortoiseVault auto-compounder</li>
+                        <li>Full-stack infrastructure</li>
+                        <li>Goal: $1M+ TVL</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="phase">
+                <div class="phase-number">2</div>
+                <div class="phase-content">
+                    <h3 class="phase-title">
+                        Expansion
+                        <span class="badge badge-next">Q1 2026</span>
+                    </h3>
+                    <p class="phase-timeline">Q1 2026 • 3 months</p>
+                    <ul class="phase-items">
+                        <li>TortoiseUSD - NFT-backed stablecoin</li>
+                        <li>TortoiseArb - AI arbitrage bot</li>
+                        <li>Enhanced liquidity features</li>
+                        <li>Multi-strategy vaults</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="phase">
+                <div class="phase-number">3</div>
+                <div class="phase-content">
+                    <h3 class="phase-title">
+                        Cross-Chain & RWA
+                        <span class="badge badge-future">Q2 2026</span>
+                    </h3>
+                    <p class="phase-timeline">Q2 2026 • 4 months</p>
+                    <ul class="phase-items">
+                        <li>TortoiseBridgeX - Cross-chain bridge</li>
+                        <li>RWA Vault - Real-world assets</li>
+                        <li>BTCfi Aggregator</li>
+                        <li>Institutional features</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="phase">
+                <div class="phase-number">4</div>
+                <div class="phase-content">
+                    <h3 class="phase-title">
+                        Advanced Products
+                        <span class="badge badge-future">Q3 2026</span>
+                    </h3>
+                    <p class="phase-timeline">Q3 2026 • 4 months</p>
+                    <ul class="phase-items">
+                        <li>Privacy Vault with zkProofs</li>
+                        <li>AI-Powered Prediction Markets</li>
+                        <li>Orderbook DEX Launcher</li>
+                        <li>Advanced derivatives</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

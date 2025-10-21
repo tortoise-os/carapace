@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TortoiseOS Hero</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 32px;
+            padding: 64px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+        }
+        .logo {
+            font-size: 120px;
+            margin-bottom: 24px;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        h1 {
+            font-size: 72px;
+            margin: 0 0 24px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+            position: relative;
+            letter-spacing: -2px;
+        }
+        .tagline {
+            font-size: 32px;
+            color: #94a3b8;
+            margin-bottom: 48px;
+            font-weight: 600;
+            position: relative;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin: 48px 0;
+            position: relative;
+        }
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.3s;
+        }
+        .feature:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateY(-4px);
+        }
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        .feature-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+        .feature-desc {
+            font-size: 16px;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+        .badges {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 48px;
+            position: relative;
+        }
+        .badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .badge-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+        }
+        .footer {
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+            color: #64748b;
+            font-size: 16px;
+            position: relative;
+        }
+        .footer strong {
+            color: #cbd5e1;
+        }
+        .sui-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(56, 189, 248, 0.2);
+            border: 2px solid #38bdf8;
+            color: #38bdf8;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🐢</div>
+        <h1>TortoiseOS</h1>
+        <p class="tagline">AI-Powered DeFi Infrastructure on Sui</p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🔄</div>
+                <h3 class="feature-title">TortoiseSwap</h3>
+                <p class="feature-desc">AMM with ML-adaptive fees & flash swaps</p>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">🏦</div>
+                <h3 class="feature-title">TortoiseVault</h3>
+                <p class="feature-desc">Auto-compounder with RL in TEE</p>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">🤖</div>
+                <h3 class="feature-title">AI-Native</h3>
+                <p class="feature-desc">TensorFlow.js + PyTorch + Walrus</p>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Sui-Optimized</h3>
+                <p class="feature-desc">Parallel execution & shared objects</p>
+            </div>
+        </div>
+
+        <div class="badges">
+            <div class="badge badge-success">
+                <span>✅</span>
+                <span>LIVE ON TESTNET</span>
+            </div>
+            <div class="badge">
+                <span>🚀</span>
+                <span>95% COMPLETE</span>
+            </div>
+        </div>
+
+        <div class="sui-badge">
+            💙 Built on Sui Network
+        </div>
+
+        <div class="footer">
+            <strong>Phase 1 (NOW):</strong> TortoiseSwap + Vault<br>
+            <strong>Phase 2-4:</strong> Stablecoin • Bridge • Privacy • Predictions<br>
+            <br>
+            <strong>Slow and steady wins the race.</strong>
+        </div>
+    </div>
+</body>
+</html>

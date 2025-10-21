@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Button } from '@carapace/ui';
 import { ArrowDownUp, Loader2 } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { parseTokenAmount, formatTokenAmount } from '@/lib/utils';
@@ -32,7 +30,7 @@ export function SwapInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const [priceImpact, setPriceImpact] = useState<number>(0);
   const [fee, setFee] = useState<string>('0');
-  const [poolId, setPoolId] = useState<string>('');
+  const [poolId, _setPoolId] = useState<string>('');
 
   // Fetch quote when amount changes
   useEffect(() => {
@@ -86,10 +84,7 @@ export function SwapInterface() {
       // Sign and execute
       signAndExecuteTransaction(
         {
-          transaction: {
-            kind: 'bytes',
-            data: transaction,
-          },
+          transaction,
         },
         {
           onSuccess: (result) => {

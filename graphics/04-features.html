@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TortoiseOS Features</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1300px;
+            width: 100%;
+        }
+        .logo {
+            text-align: center;
+            font-size: 64px;
+            margin-bottom: 8px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 42px;
+            margin: 0 0 16px 0;
+            background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 48px;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+        .feature-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-radius: 20px;
+            padding: 32px;
+            border: 3px solid #10b981;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+        }
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .feature-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+            color: #065f46;
+        }
+        .feature-desc {
+            font-size: 16px;
+            color: #047857;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .feature-points {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .feature-points li {
+            padding: 10px 0;
+            color: #065f46;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+        .feature-points li::before {
+            content: '✓';
+            margin-right: 12px;
+            color: white;
+            background: #10b981;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+        .comparison {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 20px;
+            padding: 32px;
+            border: 3px solid #f59e0b;
+            margin-top: 32px;
+        }
+        .comparison-title {
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            margin: 0 0 24px 0;
+            color: #92400e;
+        }
+        .vs-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 24px;
+            align-items: center;
+        }
+        .vs-side {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        .vs-label {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .vs-label.traditional { color: #dc2626; }
+        .vs-label.tortoise { color: #16a34a; }
+        .vs-divider {
+            font-size: 42px;
+            font-weight: 900;
+            color: #f59e0b;
+            text-align: center;
+        }
+        .vs-items {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .vs-items li {
+            padding: 8px 0;
+            font-size: 15px;
+        }
+        .vs-side.bad .vs-items li::before {
+            content: '✗';
+            color: #dc2626;
+            margin-right: 8px;
+            font-weight: 900;
+        }
+        .vs-side.good .vs-items li::before {
+            content: '✓';
+            color: #16a34a;
+            margin-right: 8px;
+            font-weight: 900;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🐢</div>
+        <h1>Why TortoiseOS?</h1>
+        <p class="subtitle">The First AI-Native DeFi Platform on Sui</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">🔄</span>
+                <h3 class="feature-title">TortoiseSwap AMM</h3>
+                <p class="feature-desc">Intelligent constant product market maker with ML-powered fee optimization</p>
+                <ul class="feature-points">
+                    <li>Dynamic fees (0.20-0.40%)</li>
+                    <li>ML volatility predictions</li>
+                    <li>Flash swap support</li>
+                    <li>Capital efficient</li>
+                    <li>Composable with Sui ecosystem</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🏦</span>
+                <h3 class="feature-title">TortoiseVault</h3>
+                <p class="feature-desc">Auto-compounding yield aggregator powered by reinforcement learning in TEE</p>
+                <ul class="feature-points">
+                    <li>RL-optimized allocations</li>
+                    <li>Multi-strategy portfolios</li>
+                    <li>Secure TEE execution</li>
+                    <li>Gas-optimized compounding</li>
+                    <li>Risk-adjusted returns</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🤖</span>
+                <h3 class="feature-title">AI Integration</h3>
+                <p class="feature-desc">First-class AI/ML integration for intelligent automation and optimization</p>
+                <ul class="feature-points">
+                    <li>TensorFlow.js fee optimizer</li>
+                    <li>PyTorch RL strategy agent</li>
+                    <li>Walrus model storage</li>
+                    <li>Nautilus TEE security</li>
+                    <li>Continuous learning</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">⚡</span>
+                <h3 class="feature-title">Built on Sui</h3>
+                <p class="feature-desc">Leveraging Sui's unique architecture for maximum performance and composability</p>
+                <ul class="feature-points">
+                    <li>Parallel execution</li>
+                    <li>Shared object model</li>
+                    <li>Move security guarantees</li>
+                    <li>Low gas costs</li>
+                    <li>Sub-second finality</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="comparison">
+            <h3 class="comparison-title">🆚 Traditional DeFi vs TortoiseOS</h3>
+            <div class="vs-grid">
+                <div class="vs-side bad">
+                    <div class="vs-label traditional">❌ Traditional DeFi</div>
+                    <ul class="vs-items">
+                        <li>Static fees miss opportunities</li>
+                        <li>Manual strategy adjustments</li>
+                        <li>Slow to adapt to markets</li>
+                        <li>Gas-inefficient operations</li>
+                        <li>Limited composability</li>
+                    </ul>
+                </div>
+
+                <div class="vs-divider">VS</div>
+
+                <div class="vs-side good">
+                    <div class="vs-label tortoise">✅ TortoiseOS</div>
+                    <ul class="vs-items">
+                        <li>AI-optimized dynamic fees</li>
+                        <li>Automated RL strategies</li>
+                        <li>Real-time market adaptation</li>
+                        <li>Batched, optimized execution</li>
+                        <li>Full Sui composability</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

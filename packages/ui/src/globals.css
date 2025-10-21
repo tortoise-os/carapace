@@ -1,0 +1,288 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Spacing & Layout */
+  --radius: 0.5rem;
+
+  /* Green Beach Brand Colors - Primary Theme */
+  --brand-teal: 178 98% 34%;        /* #02AAB0 - Primary brand color */
+  --brand-cyan: 173 100% 40%;       /* #00CDAC - Accent brand color */
+  --brand-deep-teal: 182 95% 28%;   /* Darker, richer teal */
+  --brand-turquoise: 175 90% 45%;   /* Mid-range turquoise */
+  --brand-seafoam: 168 85% 50%;     /* Lighter seafoam green */
+  --brand-aqua: 170 100% 48%;       /* Bright aqua blue-green */
+
+  /* Accent Colors - Different Color Families */
+  --accent-blue: 217 91% 60%;       /* Bright blue #4C9AFF */
+  --accent-indigo: 239 84% 67%;     /* Indigo #6C63FF */
+  --accent-purple: 271 91% 65%;     /* Vibrant purple #A855F7 */
+  --accent-violet: 258 90% 66%;     /* Deep violet #8B5CF6 */
+  --accent-orange: 25 95% 53%;      /* Vibrant orange #FF6B35 */
+  --accent-amber: 38 92% 50%;       /* Amber/gold #F59E0B */
+  --accent-rose: 350 89% 60%;       /* Rose/pink #FB7185 */
+  --accent-emerald: 160 84% 39%;    /* Emerald green #10B981 */
+
+  /* Light Mode - Clean & Professional */
+  --background: 0 0% 100%;           /* Pure white */
+  --foreground: 0 0% 10%;            /* Near black for text */
+
+  --card: 0 0% 100%;                 /* White cards */
+  --card-foreground: 0 0% 10%;       /* Dark text on cards */
+
+  --popover: 0 0% 100%;              /* White popovers */
+  --popover-foreground: 0 0% 10%;    /* Dark text in popovers */
+
+  --primary: var(--brand-teal);      /* Primary brand teal */
+  --primary-foreground: 0 0% 100%;   /* White text on primary */
+
+  --secondary: 0 0% 96%;             /* Light gray */
+  --secondary-foreground: 0 0% 10%;  /* Dark text on secondary */
+
+  --muted: 0 0% 96%;                 /* Muted background */
+  --muted-foreground: 0 0% 45%;      /* Muted text */
+
+  --accent: var(--brand-cyan);       /* Accent cyan */
+  --accent-foreground: 0 0% 100%;    /* White text on accent */
+
+  --destructive: 0 84% 60%;          /* Red for errors */
+  --destructive-foreground: 0 0% 100%; /* White text on destructive */
+
+  --border: 0 0% 90%;                /* Subtle borders */
+  --input: 0 0% 90%;                 /* Input borders */
+  --ring: var(--brand-teal);         /* Focus ring - brand teal */
+
+  --chart-1: 178 70% 45%;
+  --chart-2: 173 80% 50%;
+  --chart-3: 168 90% 55%;
+  --chart-4: 163 85% 50%;
+  --chart-5: 158 75% 45%;
+}
+
+.dark {
+  /* Dark Mode - Sleek & Modern */
+  --background: 0 0% 8%;             /* Very dark background */
+  --foreground: 0 0% 98%;            /* Off-white for text */
+
+  --card: 0 0% 10%;                  /* Dark cards */
+  --card-foreground: 0 0% 98%;       /* Light text on cards */
+
+  --popover: 0 0% 10%;               /* Dark popovers */
+  --popover-foreground: 0 0% 98%;    /* Light text in popovers */
+
+  --primary: var(--brand-teal);      /* Same brand teal */
+  --primary-foreground: 0 0% 100%;   /* White text on primary */
+
+  --secondary: 0 0% 15%;             /* Dark gray */
+  --secondary-foreground: 0 0% 98%;  /* Light text on secondary */
+
+  --muted: 0 0% 15%;                 /* Muted dark background */
+  --muted-foreground: 0 0% 65%;      /* Muted light text */
+
+  --accent: var(--brand-cyan);       /* Same accent cyan */
+  --accent-foreground: 0 0% 100%;    /* White text on accent */
+
+  --destructive: 0 63% 50%;          /* Darker red for dark mode */
+  --destructive-foreground: 0 0% 100%; /* White text on destructive */
+
+  --border: 0 0% 20%;                /* Subtle dark borders */
+  --input: 0 0% 20%;                 /* Input borders */
+  --ring: var(--brand-teal);         /* Focus ring - brand teal */
+
+  --chart-1: 178 70% 45%;
+  --chart-2: 173 80% 50%;
+  --chart-3: 168 90% 55%;
+  --chart-4: 163 85% 50%;
+  --chart-5: 158 75% 45%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-secondary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/20 rounded-lg;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/30;
+  }
+}
+
+@layer components {
+  /* Brand Gradient Utilities - Primary Theme */
+  .bg-brand-gradient {
+    background: linear-gradient(135deg, hsl(var(--brand-teal)), hsl(var(--brand-cyan)));
+  }
+
+  .bg-brand-gradient-deep {
+    background: linear-gradient(135deg, hsl(var(--brand-deep-teal)), hsl(var(--brand-teal)));
+  }
+
+  .bg-brand-gradient-ocean {
+    background: linear-gradient(135deg, hsl(var(--brand-turquoise)), hsl(var(--brand-aqua)));
+  }
+
+  .bg-brand-gradient-seafoam {
+    background: linear-gradient(135deg, hsl(var(--brand-seafoam)), hsl(var(--brand-turquoise)));
+  }
+
+  .bg-brand-gradient-aqua {
+    background: linear-gradient(135deg, hsl(var(--brand-cyan)), hsl(var(--brand-seafoam)));
+  }
+
+  /* Accent Gradients - Different Color Families */
+  .bg-accent-gradient-blue {
+    background: linear-gradient(135deg, hsl(var(--accent-blue)), hsl(var(--accent-indigo)));
+  }
+
+  .bg-accent-gradient-purple {
+    background: linear-gradient(135deg, hsl(var(--accent-purple)), hsl(var(--accent-violet)));
+  }
+
+  .bg-accent-gradient-orange {
+    background: linear-gradient(135deg, hsl(var(--accent-orange)), hsl(var(--accent-amber)));
+  }
+
+  .bg-accent-gradient-rose {
+    background: linear-gradient(135deg, hsl(var(--accent-rose)), hsl(var(--accent-purple)));
+  }
+
+  .bg-accent-gradient-emerald {
+    background: linear-gradient(135deg, hsl(var(--accent-emerald)), hsl(var(--brand-seafoam)));
+  }
+
+  .text-brand-gradient {
+    background: linear-gradient(135deg, hsl(var(--brand-teal)), hsl(var(--brand-cyan)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-brand-gradient-deep {
+    background: linear-gradient(135deg, hsl(var(--brand-deep-teal)), hsl(var(--brand-teal)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-brand-gradient-ocean {
+    background: linear-gradient(135deg, hsl(var(--brand-turquoise)), hsl(var(--brand-aqua)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Card Styling */
+  .card {
+    @apply bg-card text-card-foreground rounded-lg border shadow-sm;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-md;
+  }
+
+  /* Button Variants */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+
+  .btn-ghost {
+    @apply hover:bg-accent hover:text-accent-foreground;
+  }
+
+  /* Input Styling */
+  .input {
+    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2;
+    @apply text-sm ring-offset-background;
+    @apply file:border-0 file:bg-transparent file:text-sm file:font-medium;
+    @apply placeholder:text-muted-foreground;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
+  }
+}
+
+@layer utilities {
+  /* Text Utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Brand Gradient Effects */
+  .gradient-hover {
+    @apply relative transition-all duration-300;
+  }
+
+  .gradient-hover::before {
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300 rounded-lg;
+    content: '';
+    background: linear-gradient(135deg, hsl(var(--brand-teal)), hsl(var(--brand-cyan)));
+    z-index: -1;
+  }
+
+  .gradient-hover:hover::before {
+    @apply opacity-10;
+  }
+
+  /* Glass Effect */
+  .glass {
+    @apply backdrop-blur-md bg-background/80 border border-border/50;
+  }
+
+  /* Elevation/Shadows */
+  .elevation-sm {
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+
+  .elevation-md {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+
+  .elevation-lg {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+}

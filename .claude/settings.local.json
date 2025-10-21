@@ -3,7 +3,21 @@
     "allow": [
       "Bash(bun run dev)",
       "Bash(curl -s http://localhost:3500/health)",
-      "mcp__magicui__getUIComponents"
+      "mcp__magicui__getUIComponents",
+      "Read(//Users/decebaldobrica/.cursor/**)",
+      "Read(//Users/decebaldobrica/Library/**)",
+      "Read(//Users/decebaldobrica/.boltai/**)",
+      "mcp__magicui__getBackgrounds",
+      "mcp__magicui__getTextAnimations",
+      "mcp__magicui__getSpecialEffects",
+      "mcp__magicui__getButtons",
+      "mcp__magicui__getAnimations",
+      "Bash(bun add:*)",
+      "Bash(bun run build)",
+      "WebFetch(domain:magicui.design)",
+      "WebFetch(domain:github.com)",
+      "Bash(tree:*)",
+      "Bash(bun install:*)"
     ],
     "deny": [],
     "ask": []

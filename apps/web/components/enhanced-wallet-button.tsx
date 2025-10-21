@@ -1,15 +1,15 @@
 'use client';
 
 import { ConnectButton, useCurrentAccount } from '@mysten/dapp-kit';
-import { Button } from '@/components/ui/button';
-import { Copy, ExternalLink, LogOut } from 'lucide-react';
 import {
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@carapace/ui';
+import { Copy, ExternalLink, LogOut } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export function EnhancedWalletButton() {
@@ -45,11 +45,8 @@ export function EnhancedWalletButton() {
   if (!account) {
     return (
       <ConnectButton
-        connectText={
-          <Button className="rounded-2xl font-medium h-10 px-4">
-            Connect
-          </Button>
-        }
+        connectText="Connect Wallet"
+        className="rounded-2xl font-medium h-10 px-4 bg-secondary text-secondary-foreground hover:bg-secondary/80"
       />
     );
   }

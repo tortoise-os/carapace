@@ -2,9 +2,13 @@
 
 import { useState } from 'react';
 import { useCurrentAccount } from '@mysten/dapp-kit';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import {
+  Input,
+  Button,
+  MagicCard,
+  BorderBeam,
+  ShimmerButton,
+} from '@carapace/ui';
 import { ArrowDown, ChevronDown, Settings } from 'lucide-react';
 
 interface Token {
@@ -34,21 +38,22 @@ export function EnhancedSwapInterface() {
   };
 
   return (
-    <Card className="w-full max-w-[480px] p-4 shadow-lg border">
+    <MagicCard className="w-full max-w-[480px] p-6 shadow-2xl">
+      <BorderBeam size={120} duration={8} />
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base font-medium">Swap</h2>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <Settings className="h-4 w-4" />
+        <h2 className="text-xl font-bold text-foreground">Swap</h2>
+        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-accent/10 hover:text-accent">
+          <Settings className="h-5 w-5" />
         </Button>
       </div>
 
       {/* From Token */}
       <div className="bg-muted rounded-2xl p-4 mb-1">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-muted-foreground">You pay</span>
+          <span className="text-sm text-muted-foreground font-semibold uppercase tracking-wide">You pay</span>
           {account && (
-            <span className="text-sm text-muted-foreground">Balance: 0.00</span>
+            <span className="text-sm text-muted-foreground font-semibold">Balance: 0.00</span>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -57,19 +62,20 @@ export function EnhancedSwapInterface() {
             placeholder="0"
             value={amountIn}
             onChange={(e) => setAmountIn(e.target.value)}
-            className="border-0 bg-transparent text-4xl font-medium h-auto p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="border-0 bg-transparent text-4xl font-bold h-auto p-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground"
           />
           <Button
             variant="secondary"
-            className="shrink-0 h-10 px-3 rounded-full font-medium gap-1 hover:bg-secondary"
+            className="shrink-0 h-10 px-3 rounded-full font-semibold gap-1 hover:bg-accent/10 hover:text-accent transition-all"
           >
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600" />
+            {/* SUI token: Ocean gradient (primary blockchain token, wave theme) */}
+            <div className="w-6 h-6 rounded-full bg-brand-gradient-ocean shadow-md" />
             <span>{tokenIn.symbol}</span>
-            <ChevronDown className="h-4 w-4 opacity-50" />
+            <ChevronDown className="h-4 w-4 opacity-70" />
           </Button>
         </div>
         {amountIn && (
-          <div className="text-sm text-muted-foreground mt-2">$0.00</div>
+          <div className="text-sm text-muted-foreground font-semibold mt-2">$0.00</div>
         )}
       </div>
 
@@ -88,9 +94,9 @@ export function EnhancedSwapInterface() {
       {/* To Token */}
       <div className="bg-muted rounded-2xl p-4 mb-4">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-muted-foreground">You receive</span>
+          <span className="text-sm text-muted-foreground font-semibold uppercase tracking-wide">You receive</span>
           {account && (
-            <span className="text-sm text-muted-foreground">Balance: 0.00</span>
+            <span className="text-sm text-muted-foreground font-semibold">Balance: 0.00</span>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -99,19 +105,19 @@ export function EnhancedSwapInterface() {
             placeholder="0"
             value={amountOut}
             readOnly
-            className="border-0 bg-transparent text-4xl font-medium h-auto p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="border-0 bg-transparent text-4xl font-bold h-auto p-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground"
           />
           <Button
             variant="secondary"
-            className="shrink-0 h-10 px-3 rounded-full font-medium gap-1 hover:bg-secondary"
+            className="shrink-0 h-10 px-3 rounded-full font-semibold gap-1 hover:bg-accent/10 hover:text-accent transition-all"
           >
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-400 to-pink-600" />
+            <div className="w-6 h-6 rounded-full bg-brand-gradient-seafoam shadow-md" />
             <span>{tokenOut.symbol}</span>
-            <ChevronDown className="h-4 w-4 opacity-50" />
+            <ChevronDown className="h-4 w-4 opacity-70" />
           </Button>
         </div>
         {amountOut && (
-          <div className="text-sm text-muted-foreground mt-2">$0.00</div>
+          <div className="text-sm text-muted-foreground font-semibold mt-2">$0.00</div>
         )}
       </div>
 
@@ -152,13 +158,23 @@ export function EnhancedSwapInterface() {
           Connect Wallet
         </Button>
       ) : (
-        <Button
-          className="w-full h-14 text-base font-semibold rounded-2xl"
-          disabled={!amountIn || parseFloat(amountIn) === 0}
-        >
-          {!amountIn || parseFloat(amountIn) === 0 ? 'Enter an amount' : 'Swap'}
-        </Button>
+        !amountIn || parseFloat(amountIn) === 0 ? (
+          <Button
+            className="w-full h-14 text-base font-semibold rounded-2xl"
+            disabled
+          >
+            Enter an amount
+          </Button>
+        ) : (
+          <ShimmerButton
+            className="w-full h-14 text-base font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-shadow"
+            shimmerColor="rgba(0, 255, 241, 0.8)"
+            background="linear-gradient(135deg, hsl(var(--brand-teal)), hsl(var(--brand-cyan)))"
+          >
+            Swap
+          </ShimmerButton>
+        )
       )}
-    </Card>
+    </MagicCard>
   );
 }

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TortoiseOS Tech Stack</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            max-width: 1200px;
+            width: 100%;
+        }
+        .logo {
+            text-align: center;
+            font-size: 64px;
+            margin-bottom: 8px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 42px;
+            margin: 0 0 16px 0;
+            background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 48px;
+        }
+        .stack-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+        .stack-category {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 16px;
+            padding: 28px;
+            border-left: 6px solid;
+        }
+        .stack-category:nth-child(1) { border-color: #3b82f6; }
+        .stack-category:nth-child(2) { border-color: #8b5cf6; }
+        .stack-category:nth-child(3) { border-color: #ec4899; }
+        .stack-category:nth-child(4) { border-color: #f59e0b; }
+        .stack-category:nth-child(5) { border-color: #10b981; }
+        .stack-category:nth-child(6) { border-color: #ef4444; }
+        .category-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        .category-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+            color: #1a202c;
+        }
+        .tech-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .tech-item {
+            background: white;
+            padding: 14px 18px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        .tech-item:hover {
+            transform: translateX(4px);
+        }
+        .tech-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 16px;
+        }
+        .tech-badge {
+            background: #48bb78;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .stats {
+            margin-top: 48px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        .stat-value {
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">⚡</div>
+        <h1>TortoiseOS Tech Stack</h1>
+        <p class="subtitle">Built for Speed, Security & Scale</p>
+
+        <div class="stack-grid">
+            <div class="stack-category">
+                <div class="category-icon">⛓️</div>
+                <h3 class="category-title">Blockchain</h3>
+                <div class="tech-items">
+                    <div class="tech-item">
+                        <span class="tech-name">Sui Move</span>
+                        <span class="tech-badge">CORE</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">@mysten/sui.js</span>
+                        <span class="tech-badge">SDK</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Shared Objects</span>
+                        <span class="tech-badge">PATTERN</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stack-category">
+                <div class="category-icon">🎨</div>
+                <h3 class="category-title">Frontend</h3>
+                <div class="tech-items">
+                    <div class="tech-item">
+                        <span class="tech-name">Next.js 14</span>
+                        <span class="tech-badge">FRAMEWORK</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">React 18</span>
+                        <span class="tech-badge">UI</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Magic UI</span>
+                        <span class="tech-badge">DESIGN</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Tailwind CSS</span>
+                        <span class="tech-badge">STYLING</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stack-category">
+                <div class="category-icon">⚙️</div>
+                <h3 class="category-title">Backend</h3>
+                <div class="tech-items">
+                    <div class="tech-item">
+                        <span class="tech-name">Bun Runtime</span>
+                        <span class="tech-badge">FAST</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Express.js</span>
+                        <span class="tech-badge">API</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">TypeScript</span>
+                        <span class="tech-badge">TYPE-SAFE</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Zod</span>
+                        <span class="tech-badge">VALIDATION</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stack-category">
+                <div class="category-icon">💾</div>
+                <h3 class="category-title">Data Layer</h3>
+                <div class="tech-items">
+                    <div class="tech-item">
+                        <span class="tech-name">PostgreSQL 16</span>
+                        <span class="tech-badge">DATABASE</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Redis</span>
+                        <span class="tech-badge">CACHE</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Event Indexer</span>
+                        <span class="tech-badge">REALTIME</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stack-category">
+                <div class="category-icon">🤖</div>
+                <h3 class="category-title">AI/ML</h3>
+                <div class="tech-items">
+                    <div class="tech-item">
+                        <span class="tech-name">TensorFlow.js</span>
+                        <span class="tech-badge">ML</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">PyTorch</span>
+                        <span class="tech-badge">RL</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Walrus Storage</span>
+                        <span class="tech-badge">MODELS</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Nautilus TEE</span>
+                        <span class="tech-badge">SECURE</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stack-category">
+                <div class="category-icon">📊</div>
+                <h3 class="category-title">DevOps</h3>
+                <div class="tech-items">
+                    <div class="tech-item">
+                        <span class="tech-name">Docker Compose</span>
+                        <span class="tech-badge">INFRA</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Grafana</span>
+                        <span class="tech-badge">MONITOR</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Prometheus</span>
+                        <span class="tech-badge">METRICS</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value">16/16</div>
+                <div class="stat-label">Tests Passing</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3K+</div>
+                <div class="stat-label">Lines of Code</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">95%</div>
+                <div class="stat-label">Complete</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Errors</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
