@@ -7,6 +7,7 @@ export * from "./components/ui/border-beam";
 export * from "./components/ui/border-number";
 export * from "./components/ui/button";
 export * from "./components/ui/card";
+export * from "./components/ui/dialog";
 export * from "./components/ui/dot-pattern";
 export * from "./components/ui/drawer";
 export * from "./components/ui/dropdown-menu";

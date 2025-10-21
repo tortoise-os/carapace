@@ -47,10 +47,19 @@ export function EnhancedWalletButton() {
 
   if (!account) {
     return (
-      <ConnectButton
-        connectText="Connect Wallet"
-        className="rounded-2xl font-medium h-10 px-4 bg-secondary text-secondary-foreground hover:bg-secondary/80"
-      />
+      <>
+        <Button
+          variant="secondary"
+          className="rounded-2xl font-medium h-10 px-4"
+          onClick={() => setShowWalletSelector(true)}
+        >
+          Connect Wallet
+        </Button>
+        <WalletSelectorModal
+          open={showWalletSelector}
+          onOpenChange={setShowWalletSelector}
+        />
+      </>
     );
   }
 
@@ -78,7 +87,7 @@ export function EnhancedWalletButton() {
           </a>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer text-destructive">
+        <DropdownMenuItem onClick={() => disconnect()} className="cursor-pointer text-destructive">
           <LogOut className="mr-2 h-4 w-4" />
           Disconnect
         </DropdownMenuItem>

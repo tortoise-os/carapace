@@ -4,6 +4,7 @@ import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   Input,
@@ -128,6 +129,9 @@ export function TokenSelectorModal({
       <DialogContent className="sm:max-w-[500px] p-0 gap-0">
         <DialogHeader className="p-6 pb-4">
           <DialogTitle>Select a token</DialogTitle>
+          <DialogDescription>
+            Search and select a token to swap
+          </DialogDescription>
         </DialogHeader>
 
         {/* Search */}

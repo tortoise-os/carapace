@@ -15,16 +15,19 @@ import { ArrowDown, ChevronDown, Settings, Loader2 } from 'lucide-react';
 import { apiClient, type SwapQuote, type Pool } from '@/lib/api-client';
 import { toast } from 'sonner';
 import { SuiClient } from '@mysten/sui/client';
+import { SwapSettingsDialog } from './swap-settings-dialog';
+import { TokenSelectorModal } from './token-selector-modal';
 
 interface Token {
   symbol: string;
+  name: string;
   address: string;
   decimals: number;
 }
 
 const TOKENS: Token[] = [
-  { symbol: 'SUI', address: '0x2::sui::SUI', decimals: 9 },
-  { symbol: 'USDC', address: '0x5678::usdc::USDC', decimals: 6 },
+  { symbol: 'SUI', name: 'Sui', address: '0x2::sui::SUI', decimals: 9 },
+  { symbol: 'USDC', name: 'USD Coin', address: '0x5678::usdc::USDC', decimals: 6 },
 ];
 
 export function EnhancedSwapInterface() {
@@ -42,6 +45,10 @@ export function EnhancedSwapInterface() {
   const [quote, setQuote] = useState<SwapQuote | null>(null);
   const [isLoadingQuote, setIsLoadingQuote] = useState(false);
   const [isSwapping, setIsSwapping] = useState(false);
+
+  const [showSettings, setShowSettings] = useState(false);
+  const [showTokenSelector, setShowTokenSelector] = useState(false);
+  const [selectingTokenType, setSelectingTokenType] = useState<'in' | 'out'>('in');
 
   // Fetch pools on mount
   useEffect(() => {
@@ -95,6 +102,19 @@ export function EnhancedSwapInterface() {
     setTokenOut(tokenIn);
     setAmountIn(amountOut);
     setAmountOut('');
+  };
+
+  const handleSelectToken = (token: Token) => {
+    if (selectingTokenType === 'in') {
+      setTokenIn(token);
+    } else {
+      setTokenOut(token);
+    }
+  };
+
+  const openTokenSelector = (type: 'in' | 'out') => {
+    setSelectingTokenType(type);
+    setShowTokenSelector(true);
   };
 
   const handleSwap = async () => {
@@ -195,7 +215,13 @@ export function EnhancedSwapInterface() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-foreground">Swap</h2>
-        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-accent/10 hover:text-accent">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 hover:bg-accent/10 hover:text-accent"
+          onClick={() => setShowSettings(true)}
+          aria-label="Swap settings"
+        >
           <Settings className="h-5 w-5" />
         </Button>
       </div>
@@ -219,6 +245,7 @@ export function EnhancedSwapInterface() {
           <Button
             variant="secondary"
             className="shrink-0 h-10 px-3 rounded-full font-semibold gap-1 hover:bg-accent/10 hover:text-accent transition-all"
+            onClick={() => openTokenSelector('in')}
           >
             <TokenIcon
               symbol={tokenIn.symbol}
@@ -265,6 +292,7 @@ export function EnhancedSwapInterface() {
           <Button
             variant="secondary"
             className="shrink-0 h-10 px-3 rounded-full font-semibold gap-1 hover:bg-accent/10 hover:text-accent transition-all"
+            onClick={() => openTokenSelector('out')}
           >
             <TokenIcon
               symbol={tokenOut.symbol}
@@ -364,6 +392,15 @@ export function EnhancedSwapInterface() {
           )}
         </ShimmerButton>
       )}
+
+      {/* Dialogs */}
+      <SwapSettingsDialog open={showSettings} onOpenChange={setShowSettings} />
+      <TokenSelectorModal
+        open={showTokenSelector}
+        onOpenChange={setShowTokenSelector}
+        onSelectToken={handleSelectToken}
+        selectedToken={selectingTokenType === 'in' ? tokenIn : tokenOut}
+      />
     </MagicCard>
   );
 }
