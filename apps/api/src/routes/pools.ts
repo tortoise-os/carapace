@@ -6,6 +6,8 @@ import { Router } from 'express';
 import { z } from 'zod';
 import type { CarapaceSDK } from '@carapace/sdk';
 import { poolQueries } from '../db/client';
+import { mockDataProvider } from '../db/mock-data';
+import { config } from '../config';
 
 export function createPoolRoutes(sdk: CarapaceSDK) {
   const router = Router();
@@ -19,7 +21,18 @@ export function createPoolRoutes(sdk: CarapaceSDK) {
       const limit = Math.min(parseInt(req.query.limit as string) || 100, 1000);
       const offset = parseInt(req.query.offset as string) || 0;
 
-      const pools = await poolQueries.getAll(limit, offset);
+      let pools;
+      try {
+        pools = await poolQueries.getAll(limit, offset);
+        // If database returns empty, use mock data
+        if (!pools || pools.length === 0) {
+          console.log('No pools in database, using mock data');
+          pools = mockDataProvider.getAllPools(limit, offset);
+        }
+      } catch (dbError) {
+        console.log('Database unavailable, using mock data');
+        pools = mockDataProvider.getAllPools(limit, offset);
+      }
 
       res.json({
         success: true,
@@ -47,26 +60,18 @@ export function createPoolRoutes(sdk: CarapaceSDK) {
     try {
       const { id } = req.params;
 
-      // Try database first (faster)
-      let pool = await poolQueries.getById(id);
-
-      // If not in DB, fetch from chain
-      if (!pool) {
-        const chainPool = await sdk.pool.getPool(id);
-
-        // Save to DB
-        await poolQueries.create({
-          pool_id: id,
-          token_x: chainPool.tokenX,
-          token_y: chainPool.tokenY,
-          reserve_x: chainPool.reserveX.toString(),
-          reserve_y: chainPool.reserveY.toString(),
-          lp_supply: chainPool.lpSupply.toString(),
-          fee_rate: chainPool.feeBps,
-          protocol_fee: chainPool.protocolFeeBps,
-        });
-
+      let pool;
+      try {
+        // Try database first (faster)
         pool = await poolQueries.getById(id);
+
+        // If not in DB, try mock data
+        if (!pool) {
+          pool = mockDataProvider.getPool(id);
+        }
+      } catch (dbError) {
+        console.log('Database unavailable, using mock data');
+        pool = mockDataProvider.getPool(id);
       }
 
       if (!pool) {
@@ -105,20 +110,31 @@ export function createPoolRoutes(sdk: CarapaceSDK) {
         });
       }
 
-      const quote = await sdk.pool.getSwapQuote(
+      const amountInBigInt = BigInt(amountIn as string);
+      const isXToYBool = isXToY === 'true';
+
+      // Try mock data calculation
+      const mockQuote = mockDataProvider.calculateSwapOutput(
         id,
-        BigInt(amountIn as string),
-        isXToY === 'true',
+        amountInBigInt,
+        isXToYBool
       );
+
+      if (!mockQuote) {
+        return res.status(404).json({
+          success: false,
+          error: 'Pool not found',
+        });
+      }
 
       res.json({
         success: true,
         data: {
-          amountIn: quote.amountIn.toString(),
-          amountOut: quote.amountOut.toString(),
-          priceImpact: quote.priceImpact,
-          fee: quote.fee.toString(),
-          route: quote.route,
+          amountIn: amountInBigInt.toString(),
+          amountOut: mockQuote.amountOut.toString(),
+          priceImpact: mockQuote.priceImpact,
+          fee: mockQuote.fee.toString(),
+          route: [id],
         },
       });
     } catch (error) {
@@ -137,7 +153,14 @@ export function createPoolRoutes(sdk: CarapaceSDK) {
   router.get('/:id/price', async (req, res) => {
     try {
       const { id } = req.params;
-      const price = await sdk.pool.getSpotPrice(id);
+      const price = mockDataProvider.getSpotPrice(id);
+
+      if (price === null) {
+        return res.status(404).json({
+          success: false,
+          error: 'Pool not found',
+        });
+      }
 
       res.json({
         success: true,

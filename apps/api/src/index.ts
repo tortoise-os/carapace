@@ -52,8 +52,11 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 // Start server
 async function start() {
   try {
-    // Test database connection
-    await testConnection();
+    // Test database connection (non-fatal)
+    const dbConnected = await testConnection();
+    if (!dbConnected) {
+      console.log('⚠️  Running in mock mode - database unavailable');
+    }
 
     app.listen(config.server.port, config.server.host, () => {
       console.log(`
@@ -63,6 +66,7 @@ Environment: ${config.server.env}
 Network: ${config.sui.network}
 Port: ${config.server.port}
 Package ID: ${config.sui.packageIds.carapace}
+Mode: ${dbConnected ? 'Database' : 'Mock Data'}
 
 Server running at http://${config.server.host}:${config.server.port}
       `);

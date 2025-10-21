@@ -5,6 +5,7 @@ import './globals.css';
 import { SuiProvider } from '@/providers/sui-provider';
 import { ThemeProvider, ThemeToggle } from '@carapace/ui';
 import { EnhancedWalletButton } from '@/components/enhanced-wallet-button';
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -118,6 +119,7 @@ export default function RootLayout({
               </div>
             </footer>
           </div>
+          <Toaster position="top-right" richColors />
         </SuiProvider>
         </ThemeProvider>
       </body>

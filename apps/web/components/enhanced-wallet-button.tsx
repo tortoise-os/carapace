@@ -1,6 +1,6 @@
 'use client';
 
-import { ConnectButton, useCurrentAccount } from '@mysten/dapp-kit';
+import { useCurrentAccount, useDisconnectWallet } from '@mysten/dapp-kit';
 import {
   Button,
   DropdownMenu,
@@ -11,11 +11,14 @@ import {
 } from '@carapace/ui';
 import { Copy, ExternalLink, LogOut } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { WalletSelectorModal } from '@/components/wallet/wallet-selector-modal';
 
 export function EnhancedWalletButton() {
   const account = useCurrentAccount();
+  const { mutate: disconnect } = useDisconnectWallet();
   const [copied, setCopied] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showWalletSelector, setShowWalletSelector] = useState(false);
 
   useEffect(() => {
     setMounted(true);

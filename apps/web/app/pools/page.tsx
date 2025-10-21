@@ -1,40 +1,27 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Plus, TrendingUp, Droplet } from 'lucide-react';
-import { BlurFade, MagicCard, Button, DotPattern, ShimmerButton } from '@carapace/ui';
-
-// Mock pool data
-const pools = [
-  {
-    id: 1,
-    token0: { symbol: 'SUI', icon: '🌊' },
-    token1: { symbol: 'USDC', icon: '💵' },
-    tvl: '$2.5M',
-    volume24h: '$1.2M',
-    apr: '24.5%',
-    fee: '0.25%',
-  },
-  {
-    id: 2,
-    token0: { symbol: 'SUI', icon: '🌊' },
-    token1: { symbol: 'USDT', icon: '💰' },
-    tvl: '$1.8M',
-    volume24h: '$850K',
-    apr: '18.2%',
-    fee: '0.25%',
-  },
-  {
-    id: 3,
-    token0: { symbol: 'USDC', icon: '💵' },
-    token1: { symbol: 'USDT', icon: '💰' },
-    tvl: '$3.2M',
-    volume24h: '$2.1M',
-    apr: '12.8%',
-    fee: '0.20%',
-  },
-];
+import { BlurFade, MagicCard, Button, DotPattern, ShimmerButton, TokenIcon } from '@carapace/ui';
+import { apiClient, type Pool } from '@/lib/api-client';
+import { LiquidityDialog } from '@/components/liquidity/liquidity-dialog';
 
 export default function PoolsPage() {
+  const [pools, setPools] = useState<Pool[]>([]);
+  const [selectedPool, setSelectedPool] = useState<Pool | null>(null);
+  const [dialogMode, setDialogMode] = useState<'add' | 'remove'>('add');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Fetch pools from API
+  useEffect(() => {
+    apiClient.getPools().then(setPools).catch(console.error);
+  }, []);
+
+  const openLiquidityDialog = (pool: Pool, mode: 'add' | 'remove') => {
+    setSelectedPool(pool);
+    setDialogMode(mode);
+    setIsDialogOpen(true);
+  };
   return (
     <div className="relative min-h-screen py-12">
       <DotPattern className="opacity-10" />
@@ -79,67 +66,80 @@ export default function PoolsPage() {
 
         {/* Pools Grid */}
         <div className="grid grid-cols-1 gap-6">
-          {pools.map((pool, i) => (
-            <BlurFade key={pool.id} delay={0.3 + i * 0.1}>
-              <MagicCard className="p-6 card group/card">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  {/* Pool Info */}
-                  <div className="flex items-center gap-4 group-hover/card:scale-[1.01] transition-transform">
-                    <div className="flex -space-x-3">
-                      {/* Token 0: Ocean gradient for SUI (wave emoji 🌊) */}
-                      <div className="w-14 h-14 rounded-full bg-brand-gradient-ocean flex items-center justify-center text-2xl border-4 border-card shadow-lg">
-                        {pool.token0.icon}
-                      </div>
-                      {/* Token 1: Seafoam gradient for stablecoins (money emoji 💵💰) */}
-                      <div className="w-14 h-14 rounded-full bg-brand-gradient-seafoam flex items-center justify-center text-2xl border-4 border-card shadow-lg">
-                        {pool.token1.icon}
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-foreground">
-                        {pool.token0.symbol} / {pool.token1.symbol}
-                      </h3>
-                      <p className="text-sm text-muted-foreground font-semibold">Fee: {pool.fee}</p>
-                    </div>
-                  </div>
+          {pools.map((pool, i) => {
+            const tokenXSymbol = pool.token_x.split('::').pop() || 'Token X';
+            const tokenYSymbol = pool.token_y.split('::').pop() || 'Token Y';
+            const tvl = ((Number(pool.reserve_x) / 1e9 * 1.5 + Number(pool.reserve_y) / 1e6)).toFixed(2);
+            const feePercent = (pool.fee_rate / 100).toFixed(2);
 
-                  {/* Stats */}
-                  <div className="flex flex-wrap gap-8 group-hover/card:scale-[1.01] transition-transform">
-                    <div>
-                      <div className="text-sm text-muted-foreground font-semibold mb-1 uppercase tracking-wide">TVL</div>
-                      <div className="text-lg font-bold text-foreground">{pool.tvl}</div>
+            return (
+              <BlurFade key={pool.pool_id} delay={0.3 + i * 0.1}>
+                <MagicCard className="p-6 card group/card">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    {/* Pool Info */}
+                    <div className="flex items-center gap-4 group-hover/card:scale-[1.01] transition-transform">
+                      <div className="flex -space-x-3">
+                        <TokenIcon
+                          symbol={tokenXSymbol}
+                          size="lg"
+                          gradient="bg-brand-gradient-ocean"
+                          className="border-4 border-card shadow-lg"
+                        />
+                        <TokenIcon
+                          symbol={tokenYSymbol}
+                          size="lg"
+                          gradient="bg-brand-gradient-seafoam"
+                          className="border-4 border-card shadow-lg"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-foreground">
+                          {tokenXSymbol} / {tokenYSymbol}
+                        </h3>
+                        <p className="text-sm text-muted-foreground font-semibold">Fee: {feePercent}%</p>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-sm text-muted-foreground font-semibold mb-1 uppercase tracking-wide">Volume (24h)</div>
-                      <div className="text-lg font-bold text-foreground">{pool.volume24h}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-muted-foreground font-semibold mb-1 uppercase tracking-wide">APR</div>
-                      <div className="text-lg font-bold text-brand-gradient">{pool.apr}</div>
-                    </div>
-                  </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-3">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="hover:scale-110 hover:shadow-xl transition-all duration-200 font-bold hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
-                    >
-                      Remove
-                    </Button>
-                    <ShimmerButton
-                      shimmerColor="rgba(0, 255, 241, 0.9)"
-                      background="linear-gradient(135deg, hsl(var(--brand-teal)), hsl(var(--brand-cyan)))"
-                      className="px-6 hover:scale-110 hover:shadow-2xl transition-all duration-200 font-bold"
-                    >
-                      Add Liquidity
-                    </ShimmerButton>
+                    {/* Stats */}
+                    <div className="flex flex-wrap gap-8 group-hover/card:scale-[1.01] transition-transform">
+                      <div>
+                        <div className="text-sm text-muted-foreground font-semibold mb-1 uppercase tracking-wide">TVL</div>
+                        <div className="text-lg font-bold text-foreground">${tvl}M</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-muted-foreground font-semibold mb-1 uppercase tracking-wide">Reserve {tokenXSymbol}</div>
+                        <div className="text-lg font-bold text-foreground">{(Number(pool.reserve_x) / 1e9).toFixed(2)}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-muted-foreground font-semibold mb-1 uppercase tracking-wide">Reserve {tokenYSymbol}</div>
+                        <div className="text-lg font-bold text-foreground">{(Number(pool.reserve_y) / 1e6).toFixed(2)}</div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={() => openLiquidityDialog(pool, 'remove')}
+                        className="hover:scale-110 hover:shadow-xl transition-all duration-200 font-bold hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
+                      >
+                        Remove
+                      </Button>
+                      <ShimmerButton
+                        shimmerColor="rgba(0, 255, 241, 0.9)"
+                        background="linear-gradient(135deg, hsl(var(--brand-teal)), hsl(var(--brand-cyan)))"
+                        className="px-6 hover:scale-110 hover:shadow-2xl transition-all duration-200 font-bold"
+                        onClick={() => openLiquidityDialog(pool, 'add')}
+                      >
+                        Add Liquidity
+                      </ShimmerButton>
+                    </div>
                   </div>
-                </div>
-              </MagicCard>
-            </BlurFade>
-          ))}
+                </MagicCard>
+              </BlurFade>
+            );
+          })}
         </div>
 
         {/* Empty State Message */}
@@ -159,6 +159,16 @@ export default function PoolsPage() {
           </BlurFade>
         )}
       </div>
+
+      {/* Liquidity Dialog */}
+      {selectedPool && (
+        <LiquidityDialog
+          pool={selectedPool}
+          mode={dialogMode}
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+        />
+      )}
     </div>
   );
 }
