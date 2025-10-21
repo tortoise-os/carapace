@@ -1,7 +1,7 @@
 'use client';
 
 import { Plus, TrendingUp, Droplet } from 'lucide-react';
-import { BlurFade, MagicCard, BorderBeam, Button, DotPattern, ShimmerButton } from '@carapace/ui';
+import { BlurFade, MagicCard, Button, DotPattern, ShimmerButton } from '@carapace/ui';
 
 // Mock pool data
 const pools = [

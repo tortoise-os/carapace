@@ -286,11 +286,11 @@ cat apps/web/.env
 
 ## 📚 Documentation
 
-- **Full deployment details:** [TESTNET_DEPLOYMENT.md](./TESTNET_DEPLOYMENT.md)
-- **Step-by-step deployment:** [DEPLOYMENT.md](./DEPLOYMENT.md)
-- **Build summary:** [BUILD_SUMMARY.md](./BUILD_SUMMARY.md)
-- **Clean build info:** [CLEAN_BUILD.md](./CLEAN_BUILD.md)
-- **Implementation plan:** [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)
+- **Full deployment details:** [TESTNET_DEPLOYMENT.md](TESTNET_DEPLOYMENT.md)
+- **Step-by-step deployment:** [DEPLOYMENT.md](DEPLOYMENT.md)
+- **Build summary:** [BUILD_SUMMARY.md](BUILD_SUMMARY.md)
+- **Clean build info:** [CLEAN_BUILD.md](CLEAN_BUILD.md)
+- **Implementation plan:** [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
 - **Project README:** [README.md](./README.md)
 
 ---
@@ -326,4 +326,4 @@ Happy building! 🐢🚀
 3. **May reset** - Testnet can be reset at any time
 4. **For testing** - Do not use for production
 
-Ready to ship to mainnet? See [DEPLOYMENT.md](./DEPLOYMENT.md) for mainnet deployment guide.
+Ready to ship to mainnet? See [DEPLOYMENT.md](DEPLOYMENT.md) for mainnet deployment guide.

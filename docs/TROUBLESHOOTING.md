@@ -26,7 +26,7 @@ cp apps/indexer/.env.example apps/indexer/.env
 task docker:up
 ```
 
-**Reference:** [PORT_MAPPING.md](./PORT_MAPPING.md)
+**Reference:** [PORT_MAPPING.md](PORT_MAPPING.md)
 
 ---
 
@@ -414,9 +414,9 @@ bun run dev &
    - Database: `docker logs carapace-postgres`
    - Redis: `docker logs carapace-redis`
 3. **Check documentation:**
-   - [PORT_MAPPING.md](./PORT_MAPPING.md)
-   - [QUICKSTART.md](./QUICKSTART.md)
-   - [DEPLOYMENT.md](./DEPLOYMENT.md)
+   - [PORT_MAPPING.md](PORT_MAPPING.md)
+   - [QUICKSTART.md](QUICKSTART.md)
+   - [DEPLOYMENT.md](DEPLOYMENT.md)
 4. **Port references:**
    - API: 3500
    - Web: 3501

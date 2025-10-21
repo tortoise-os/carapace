@@ -4,10 +4,7 @@ import {
   TextAnimate,
   RetroGrid,
   DotPattern,
-  BlurFade,
-  MagicCard,
-  ShimmerButton,
-  BorderBeam
+  BlurFade
 } from '@carapace/ui';
 
 export default function Home() {
