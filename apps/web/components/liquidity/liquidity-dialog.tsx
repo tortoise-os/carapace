@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
-import { Transaction } from '@mysten/sui/transactions';
+import { useCurrentAccount } from '@mysten/dapp-kit';
 import {
   Dialog,
   DialogContent,
@@ -15,7 +14,7 @@ import {
   TokenIcon,
 } from '@carapace/ui';
 import { Plus, Minus, Loader2 } from 'lucide-react';
-import { apiClient, type Pool } from '@/lib/api-client';
+import type { Pool } from '@/lib/api-client';
 import { toast } from 'sonner';
 
 interface LiquidityDialogProps {
@@ -27,7 +26,6 @@ interface LiquidityDialogProps {
 
 export function LiquidityDialog({ pool, mode, open, onOpenChange }: LiquidityDialogProps) {
   const account = useCurrentAccount();
-  const { mutate: signAndExecute } = useSignAndExecuteTransaction();
 
   const [amountX, setAmountX] = useState('');
   const [amountY, setAmountY] = useState('');

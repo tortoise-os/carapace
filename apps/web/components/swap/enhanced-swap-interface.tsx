@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClient } from '@mysten/dapp-kit';
-import { Transaction } from '@mysten/sui/transactions';
 import {
   Input,
   Button,
@@ -14,10 +13,11 @@ import {
 import { ArrowDown, ChevronDown, Settings, Loader2 } from 'lucide-react';
 import { apiClient, type SwapQuote, type Pool } from '@/lib/api-client';
 import { toast } from 'sonner';
-import { SuiClient } from '@mysten/sui/client';
 import { SwapSettingsDialog } from './swap-settings-dialog';
 import { TokenSelectorModal } from './token-selector-modal';
 import { useCarapaceSDK } from '@/providers/sui-provider';
+import { useTokenBalance } from '@/lib/hooks/use-token-balance';
+import { useTokenPrice, formatUSD } from '@/lib/hooks/use-token-price';
 
 interface Token {
   symbol: string;
@@ -55,6 +55,14 @@ export function EnhancedSwapInterface() {
   const [showSettings, setShowSettings] = useState(false);
   const [showTokenSelector, setShowTokenSelector] = useState(false);
   const [selectingTokenType, setSelectingTokenType] = useState<'in' | 'out'>('in');
+
+  // Fetch token balances
+  const tokenInBalance = useTokenBalance(tokenIn.address, tokenIn.decimals);
+  const tokenOutBalance = useTokenBalance(tokenOut.address, tokenOut.decimals);
+
+  // Fetch token prices
+  const tokenInPrice = useTokenPrice(tokenIn.symbol);
+  const tokenOutPrice = useTokenPrice(tokenOut.symbol);
 
   // Fetch pools on mount
   useEffect(() => {
@@ -123,6 +131,12 @@ export function EnhancedSwapInterface() {
     setShowTokenSelector(true);
   };
 
+  const handleMaxClick = () => {
+    if (tokenInBalance.formattedBalance) {
+      setAmountIn(tokenInBalance.formattedBalance);
+    }
+  };
+
   const handleSwap = async () => {
     if (!account || !quote || !amountIn) {
       toast.error('Missing requirements', {
@@ -150,7 +164,6 @@ export function EnhancedSwapInterface() {
 
       // Use real pool (SUI/SUI for now)
       const poolId = REAL_POOL_ID;
-      const isXToY = tokenIn.address === '0x2::sui::SUI' && tokenOut.address === '0x2::sui::SUI';
 
       // Calculate amounts
       const amountInSmallest = BigInt(Math.floor(parseFloat(amountIn) * Math.pow(10, tokenIn.decimals)));
@@ -166,7 +179,7 @@ export function EnhancedSwapInterface() {
         account.address, // sender address for output coin transfer
         minAmountOut,
         {
-          gasBudget: 10_000_000,
+          gasBudget: 10_000_000n,
         }
       );
 
@@ -181,6 +194,9 @@ export function EnhancedSwapInterface() {
             setAmountIn('');
             setAmountOut('');
             setQuote(null);
+            // Refresh balances
+            tokenInBalance.refetch();
+            tokenOutBalance.refetch();
           },
           onError: (error) => {
             console.error('Swap failed:', error);
@@ -223,7 +239,19 @@ export function EnhancedSwapInterface() {
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm text-muted-foreground font-semibold uppercase tracking-wide">You pay</span>
           {account && (
-            <span className="text-sm text-muted-foreground font-semibold">Balance: 0.00</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground font-semibold">
+                Balance: {tokenInBalance.isLoading ? '...' : tokenInBalance.formattedBalance}
+              </span>
+              {tokenInBalance.balance > 0n && (
+                <button
+                  onClick={handleMaxClick}
+                  className="text-xs text-accent hover:text-accent/80 font-semibold px-2 py-1 rounded bg-accent/10 hover:bg-accent/20 transition-colors"
+                >
+                  MAX
+                </button>
+              )}
+            </div>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -249,7 +277,11 @@ export function EnhancedSwapInterface() {
           </Button>
         </div>
         {amountIn && (
-          <div className="text-sm text-muted-foreground font-semibold mt-2">$0.00</div>
+          <div className="text-sm text-muted-foreground font-semibold mt-2">
+            {tokenInPrice.isLoading
+              ? '...'
+              : formatUSD(parseFloat(amountIn) * tokenInPrice.price)}
+          </div>
         )}
       </div>
 
@@ -270,7 +302,9 @@ export function EnhancedSwapInterface() {
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm text-muted-foreground font-semibold uppercase tracking-wide">You receive</span>
           {account && (
-            <span className="text-sm text-muted-foreground font-semibold">Balance: 0.00</span>
+            <span className="text-sm text-muted-foreground font-semibold">
+              Balance: {tokenOutBalance.isLoading ? '...' : tokenOutBalance.formattedBalance}
+            </span>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -296,7 +330,11 @@ export function EnhancedSwapInterface() {
           </Button>
         </div>
         {amountOut && (
-          <div className="text-sm text-muted-foreground font-semibold mt-2">$0.00</div>
+          <div className="text-sm text-muted-foreground font-semibold mt-2">
+            {tokenOutPrice.isLoading
+              ? '...'
+              : formatUSD(parseFloat(amountOut) * tokenOutPrice.price)}
+          </div>
         )}
       </div>
 

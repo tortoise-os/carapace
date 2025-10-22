@@ -651,6 +651,175 @@
 
 ---
 
+### Phase 1M: Heimdahl.xyz Data Integration (Ongoing)
+
+**Priority: HIGH** - Enhanced data infrastructure for AI/ML and analytics
+**Reference**: [Heimdahl.xyz Documentation](https://heimdahl.xyz)
+
+> Heimdall.xyz is a blockchain data indexing and aggregation platform offering real-time access to on-chain events via high-performance REST APIs, WebSocket streams, and CLI tools. Supports multi-chain data sourcing with millisecond-latency updates—ideal for DeFi monitoring, RL model training, and cross-chain operations.
+
+#### 1M.1 Real-Time Monitoring for TortoiseSwap (Phase 1 - Core)
+
+**Goal**: Feed live liquidity events into RL fee optimizer for dynamic fee adjustments
+
+- [ ] **CLI-based event monitoring (Weeks 1-2)**
+  - [ ] Verify Heimdahl Sui support or request beta access via [contact form](https://forms.gle/YeNyCconLAWH21Bu6)
+  - [ ] Install Heimdahl CLI: `npm install -g @heimdahl/cli`
+  - [ ] Track pool Transfer/Mint/Burn events on testnet
+  - [ ] Create Taskfile.yml script for automated event queries
+  - [ ] Pipe event data to Bun backend for real-time processing
+
+- [ ] **Integration with RL fee optimizer**
+  - [ ] Parse liquidity events (add/remove liquidity, swaps)
+  - [ ] Feed real-time data into TEE-based RL model
+  - [ ] Implement batch epoch triggers based on volatility signals
+  - [ ] Add fallback to Sui JSON-RPC if Heimdahl unavailable
+
+- [ ] **Cross-chain liquidity monitoring**
+  - [ ] Track USDT/USDC transfers across EVM chains and Sui
+  - [ ] Detect arbitrage opportunities for TortoiseArb (Phase 2 prep)
+  - [ ] Aggregate multi-chain data for unified dashboard
+
+- [ ] **Infrastructure setup**
+  - [ ] Docker-compose orchestration for CLI + backend integration
+  - [ ] WebSocket subscription for sub-second event streams
+  - [ ] API key management and rate limiting
+  - [ ] Monitoring dashboard in Next.js frontend
+
+**Files to Create/Modify**:
+- `apps/api/src/services/heimdahl/event-monitor.ts` (create)
+- `apps/api/src/services/heimdahl/cli-wrapper.ts` (create)
+- `Taskfile.yml` (add Heimdahl event query tasks)
+- `apps/web/components/analytics/liquidity-monitor.tsx` (create)
+
+**Expected Impact**: 20-30% better capital efficiency in flash swaps; real-time MEV protection via batch epochs (Phase 1J integration)
+
+#### 1M.2 AI-Driven Yield Optimization in TortoiseVault (Phase 2 - Scale/Arb)
+
+**Goal**: Use aggregated on-chain data for RL model training and rebalancing decisions
+
+- [ ] **Historical data aggregation (Weeks 4-6)**
+  - [ ] Query aggregated Transfer events from vault escrows via REST API
+  - [ ] Fetch DAI/USDC/USDT-equivalent asset flows on Sui
+  - [ ] Store datasets in Walrus for TEE-accessible training data
+  - [ ] Implement fixed-point precision for PnL calculations (Phase 1J integration)
+
+- [ ] **Real-time vault analytics**
+  - [ ] WebSocket streams for deposit/withdrawal events
+  - [ ] Calculate unrealized PnL with 6-decimal fixed-point math (Percolator pattern)
+  - [ ] Pre-compound margin ratio checks (Phase 1J cross-pool netting)
+  - [ ] Anomaly detection via RL signals in TEE
+
+- [ ] **Multi-chain exposure netting**
+  - [ ] Aggregate Sui vault positions + EVM RWA positions (if Phase 3 active)
+  - [ ] Net exposures across chains for risk management
+  - [ ] Liquidation prediction via off-chain RL (Phase 1J integration)
+  - [ ] Circuit breakers for >10% price deviations
+
+- [ ] **Automated rebalancing**
+  - [ ] CLI scripts in Taskfile.yml for daily model retraining
+  - [ ] Store aggregated datasets in Walrus (hash verification)
+  - [ ] Trigger rebalancing via capability-gated transactions
+  - [ ] Monitor rebalancing performance vs. benchmarks
+
+**Files to Create/Modify**:
+- `apps/api/src/services/heimdahl/vault-analytics.ts` (create)
+- `packages/sdk/src/heimdahl-client.ts` (create)
+- `apps/api/src/services/ml/dataset-aggregator.ts` (create)
+- `move/sources/vault/rebalancing.move` (update with Heimdahl triggers)
+
+**Expected Impact**: 15% enhanced auto-compounding yields through predictive analytics; reduced liquidation risk
+
+#### 1M.3 Security and Compliance Upgrades (Phase 2 - Ongoing)
+
+**Goal**: Minimize oracle risks and provide audit trails for all vault/pool interactions
+
+- [ ] **Event auditing and replay protection**
+  - [ ] Stream all vault deposit/withdraw events for anomaly detection
+  - [ ] Store event logs in PostgreSQL for compliance
+  - [ ] Add replay protection nonces to event signatures (Phase 1J pattern)
+  - [ ] Integrate with OtterSec-style fuzzing for security validation
+
+- [ ] **Oracle manipulation resistance**
+  - [ ] Use Heimdahl's direct node sourcing to verify oracle prices
+  - [ ] Compare Pyth/Switchboard prices against Heimdahl on-chain events
+  - [ ] Detect price manipulation via cross-oracle discrepancies
+  - [ ] Circuit breakers for oracle staleness (>30 seconds)
+
+- [ ] **Compliance monitoring for stablecoin flows**
+  - [ ] Track USDC/USDT flows across Sui and EVM chains
+  - [ ] Flag large transfers (>$100K) for manual review
+  - [ ] Export audit logs for regulatory hooks (BTCfi Phase 3)
+  - [ ] Add API key auth with non-replay nonces (Phase 1J security)
+
+**Files to Create/Modify**:
+- `apps/api/src/services/security/audit-logger.ts` (create)
+- `apps/api/src/services/heimdahl/oracle-verifier.ts` (create)
+- `apps/api/src/middleware/auth-middleware.ts` (update with API key validation)
+
+**Expected Impact**: Reduced exploit surface; faster audit cycles with verifiable data logs
+
+#### 1M.4 Cross-Chain Arbitrage Signals (Phase 2 - TortoiseArb)
+
+**Goal**: Detect arbitrage opportunities across Sui and EVM chains for TortoiseArb module
+
+- [ ] **Multi-chain event aggregation**
+  - [ ] Subscribe to WebSocket streams for Ethereum, Arbitrum, Base, and Sui
+  - [ ] Aggregate USDT/USDC/SUI price data across chains
+  - [ ] Calculate cross-chain price discrepancies in real-time
+  - [ ] Store arbitrage opportunities in Redis cache (30s TTL)
+
+- [ ] **Arbitrage signal generation**
+  - [ ] Detect >0.5% price gaps between chains
+  - [ ] Calculate profitability after gas/bridge fees
+  - [ ] Prioritize signals by liquidity depth and execution speed
+  - [ ] Push alerts to TortoiseArb execution engine
+
+- [ ] **Integration with bridge protocols**
+  - [ ] Study Wormhole/LayerZero integration patterns
+  - [ ] Build transaction builders for cross-chain swaps
+  - [ ] Implement slippage protection across bridges
+  - [ ] Monitor bridge performance and downtime
+
+**Files to Create/Modify**:
+- `apps/api/src/services/arbitrage/signal-detector.ts` (create)
+- `apps/api/src/services/heimdahl/multi-chain-client.ts` (create)
+- `packages/sdk/src/arbitrage-client.ts` (create)
+- `apps/web/app/(dashboard)/arbitrage/page.tsx` (create)
+
+**Expected Impact**: Unlock TortoiseArb functionality; capture cross-chain arbitrage opportunities with <2s execution time
+
+#### 1M.5 Heimdahl SDK Integration (Ongoing)
+
+**Goal**: Leverage Heimdahl's JS/Golang SDKs for frontend/CLI automation
+
+- [ ] **JavaScript SDK integration**
+  - [ ] Add Heimdahl JS SDK to `packages/sdk/`
+  - [ ] Wrap event queries in React hooks (`useHeimdahlEvents`)
+  - [ ] Real-time dashboard updates via WebSocket subscriptions
+  - [ ] Error handling and reconnection logic
+
+- [ ] **CLI automation tools**
+  - [ ] Fork Heimdahl CLI for custom Sui node integration (if needed)
+  - [ ] Create custom scripts for testnet monitoring
+  - [ ] Automate daily data exports for RL model training
+  - [ ] Add to CI/CD pipeline for integration testing
+
+- [ ] **Testing and validation**
+  - [ ] Unit tests for Heimdahl client wrappers
+  - [ ] Integration tests with testnet event streams
+  - [ ] Performance benchmarks (latency, throughput)
+  - [ ] Fallback testing when Heimdahl unavailable
+
+**Files to Create/Modify**:
+- `packages/sdk/src/heimdahl/` (create directory)
+- `apps/web/lib/hooks/use-heimdahl-events.ts` (create)
+- `scripts/heimdahl-monitor.sh` (create for CLI automation)
+
+**Expected Impact**: Unified data layer for Tortoise-OS; improved developer experience with standardized APIs
+
+---
+
 ### Phase 1L: Competitive Intelligence & Market Positioning (Ongoing)
 
 **Priority: MEDIUM** - Strategic awareness
@@ -763,63 +932,111 @@
 
 ---
 
+## Heimdahl.xyz Integration Roadmap
+
+| Phase | Heimdahl Feature | Tortoise-OS Improvement | Effort Level | Timeline | Dependencies |
+|-------|------------------|------------------------|--------------|----------|--------------|
+| **Phase 1 (Core)** | CLI Event Queries | Real-time swap monitoring for RL fees | Low (scripting) | Weeks 1-2 | Phase 1A completion |
+| **Phase 2 (Scale/Arb)** | WebSocket Streams | Cross-chain arb signals in TortoiseArb | Medium (backend hooks) | Weeks 4-6 | Phase 1M.1 completion |
+| **Phase 3 (RWA)** | REST Aggregation | Multi-chain PnL for yield netting | High (TEE integration) | Weeks 8-12 | Phase 1F, 1J completion |
+| **Ongoing** | JS/Golang SDK | Frontend/CLI testing automation | Low | Post-testnet launch | Phase 1M.1-1M.4 |
+
+### Heimdahl Integration Priorities
+
+**Immediate (Weeks 1-2)**:
+1. Verify Heimdahl Sui support status
+2. Install CLI and test on Sui testnet
+3. Set up event monitoring scripts in Taskfile.yml
+4. Create Bun backend wrapper for event streams
+
+**Short-term (Weeks 4-6)**:
+1. Integrate WebSocket streams for real-time liquidity monitoring
+2. Build historical data aggregation for RL model training
+3. Implement security audit logging with event replay protection
+
+**Medium-term (Weeks 8-12)**:
+1. Deploy cross-chain arbitrage signal detection
+2. Integrate multi-chain exposure netting for vault strategies
+3. Automate rebalancing triggers based on Heimdahl analytics
+
+**Long-term (Post-testnet)**:
+1. Fork Heimdahl CLI for custom Sui node integration (if needed)
+2. Build Tortoise-OS-specific data layer on top of Heimdahl
+3. Open-source custom Sui integrations back to Heimdahl community
+
+---
+
 ## Milestone Timeline
 
-### Month 1: Core Functionality + Repository Studies
+### Month 1: Core Functionality + Repository Studies + Heimdahl Setup
 - **Week 1-2**: Smart contract completion & deployment (Phase 1A)
   - **Parallel study**: Avocado DEX + Cetus CLMM (see schedule above)
   - Include fixed-point math library from Avocado (Phase 1J)
   - Enhanced object derivation (Phase 1J)
   - Basic invariant checks (Phase 1J)
   - Flash swap implementation from Cetus
+  - **Heimdahl setup**: Verify Sui support, install CLI (Phase 1M.1)
 - **Week 3**: SDK integration & transaction execution (Phase 1A)
   - Apply Cetus SDK patterns
+  - **Heimdahl integration**: Create event monitoring scripts in Taskfile.yml (Phase 1M.1)
 - **Week 4**: Token management & pool analytics (Phase 1B-C)
   - Navi oracle pattern review
+  - **Heimdahl testing**: Test CLI event queries on testnet pools (Phase 1M.1)
 
-### Month 2: Advanced Features + Vault + Percolator
+### Month 2: Advanced Features + Vault + Percolator + Heimdahl Analytics
 - **Week 1 (Week 5)**: Pool creation & multi-hop swaps (Phase 1C-D)
+  - **Heimdahl WebSocket**: Begin WebSocket stream integration (Phase 1M.1)
 - **Week 2 (Week 6)**: Vault UI & auto-compounding (Phase 1E)
   - **Parallel study**: Navi Lending full analysis (see schedule)
   - Apply isolated pool patterns to vault strategies
+  - **Heimdahl vault data**: Start historical data aggregation for vault analytics (Phase 1M.2)
 - **Week 3 (Week 7)**: Percolator innovations - Part 1 (Phase 1J)
   - **Parallel study**: Turbos sharding architecture
   - Risk management & liquidation framework
   - Fixed-point math integration
   - Cross-pool netting design
+  - **Heimdahl RL integration**: Feed WebSocket events into RL fee optimizer (Phase 1M.1)
 - **Week 4 (Week 8)**: Percolator innovations - Part 2 (Phase 1J)
   - Batch processing for MEV protection (Turbos + Percolator patterns)
   - ARG implementation
   - Sharding architecture design (Turbos + Percolator hybrid)
+  - **Heimdahl security**: Implement audit logging and replay protection (Phase 1M.3)
 
-### Month 3: AI Integration & Security
+### Month 3: AI Integration & Security + Heimdahl Multi-Chain
 - **Week 1-2 (Weeks 10-11)**: AI/ML fee optimization & vault strategies (Phase 1F)
   - **Parallel study**: Sui-AI-Agent-Kit full analysis (see schedule)
   - Scoped capabilities for AI (Phase 1J + 1F + AI Agent Kit)
   - MCP tools integration
   - Non-replay protection
   - Walrus Storage + TEE setup
+  - **Heimdahl RL training**: Use aggregated data for RL model training (Phase 1M.2)
 - **Week 3 (Week 12)**: Testing & security hardening (Phase 1G)
   - Comprehensive invariant testing
   - Percolator enhancement validation
   - AI Agent Kit MCP automation testing
+  - **Heimdahl multi-chain**: Begin cross-chain arbitrage signal detection (Phase 1M.4)
 - **Week 4 (Week 13)**: Performance optimization (Phase 1G)
   - Shard testing infrastructure
   - Memory optimization benchmarks
   - RL prototype validation
+  - **Heimdahl SDK**: Integrate JS SDK for frontend dashboards (Phase 1M.5)
 
-### Month 4: Testnet & Final Preparation
+### Month 4: Testnet & Final Preparation + Heimdahl Production
 - **Week 1**: Final Percolator integration testing (Phase 1J)
   - Cross-pool netting validation
   - Batch processing performance
   - Liquidation detection stress tests
+  - **Heimdahl stress testing**: Validate event stream performance under high load (Phase 1M.5)
 - **Week 2**: Security audit preparation begins (Phase 1K)
   - Pre-audit security hardening
   - Move Registry integration
   - Formal verification setup
+  - **Heimdahl audit logs**: Prepare event audit trails for security review (Phase 1M.3)
 - **Week 3**: DevOps & monitoring setup (Phase 1H)
+  - **Heimdahl production**: Deploy Heimdahl monitoring to production infrastructure (Phase 1M.1)
 - **Week 4**: Testnet launch & documentation (Phase 1I)
   - Begin competitive analysis tracking (Phase 1L)
+  - **Heimdahl analytics**: Launch real-time analytics dashboard with Heimdahl data (Phase 1M.5)
 
 ### Month 5: Security Audit & Mainnet Preparation
 - **Week 1**: Complete security audit preparation (Phase 1K)
@@ -895,6 +1112,37 @@
 - [ ] Zero capability replay attacks in audit
 - [ ] 100% invariant check coverage in Move contracts
 
+### Heimdahl Integration KPIs (Phase 1M)
+- [ ] **Real-time monitoring performance**
+  - [ ] Event latency < 500ms from on-chain to backend
+  - [ ] 99.9% uptime for WebSocket connections
+  - [ ] Zero missed critical events (swaps, liquidations)
+  - [ ] Support 1000+ events/second throughput
+
+- [ ] **RL model accuracy improvements**
+  - [ ] 15% increase in vault APY via predictive rebalancing
+  - [ ] 20-30% better capital efficiency in flash swaps
+  - [ ] < 5% prediction error for liquidity volatility
+  - [ ] Daily model retraining with <10min data fetch time
+
+- [ ] **Security and compliance**
+  - [ ] 100% of vault/pool events logged for audit
+  - [ ] Zero event replay attacks in testing
+  - [ ] Oracle price verification matches Heimdahl data >99.9%
+  - [ ] Stablecoin flow alerts within 1 minute of large transfers
+
+- [ ] **Cross-chain arbitrage (Phase 2)**
+  - [ ] Detect arbitrage opportunities with <2s latency
+  - [ ] >0.5% profit threshold after fees
+  - [ ] 80%+ successful arbitrage execution rate
+  - [ ] Support 3+ chains (Sui, Ethereum, Arbitrum minimum)
+
+- [ ] **Infrastructure and reliability**
+  - [ ] Graceful fallback to Sui JSON-RPC if Heimdahl unavailable
+  - [ ] CLI automation scripts run without errors in CI/CD
+  - [ ] SDK integration test coverage >90%
+  - [ ] Real-time dashboard updates with <1s refresh rate
+
 ---
 
 ## Risk Mitigation
@@ -930,13 +1178,15 @@
 
 **Note:** Refer to [IMPLEMENTATION_CHECKLIST.md](./IMPLEMENTATION_CHECKLIST.md) for detailed tracking of all tasks.
 
-### This Week (Priority Tasks - Top 6 Focus)
+### This Week (Priority Tasks - Top 8 Focus)
 1. **[Repository Study] Clone all 5 Sui DeFi repositories locally** (Checklist 5.1)
 2. **[Repository Study] Deep dive into Avocado DEX - audit constant product math** (Checklist 5.1)
 3. **[Phase 1J] Port fixed-point math library from Avocado to Carapace** (Checklist 1.3)
 4. Complete AMM pool.move swap functions (audit vs Avocado)
 5. **[Phase 1J] Implement enhanced object derivation patterns** (Checklist 4.1)
-6. **[Phase 1L] Monitor MMT Finance launch (Oct 30, 2025)** (Checklist 5.2)
+6. **[Phase 1M] Verify Heimdahl Sui support status and request beta access** (Phase 1M.1)
+7. **[Phase 1M] Install Heimdahl CLI and test basic event queries** (Phase 1M.1)
+8. **[Phase 1L] Monitor MMT Finance launch (Oct 30, 2025)** (Checklist 5.2)
 
 ### Next Week
 1. **[Repository Study] Study Cetus CLMM - flash swaps and SDK architecture** (Checklist 5.1)
@@ -944,15 +1194,19 @@
 3. Replace preview mode with real transactions
 4. Deploy contracts to local Sui network
 5. Build SDK transaction builders (using Cetus patterns)
-6. **[Phase 1L] Attend EnsoFi community calls for architecture insights** (Checklist 5.2)
+6. **[Phase 1M] Create Taskfile.yml scripts for Heimdahl event monitoring** (Phase 1M.1)
+7. **[Phase 1M] Build Bun backend wrapper for Heimdahl event streams** (Phase 1M.1)
+8. **[Phase 1L] Attend EnsoFi community calls for architecture insights** (Checklist 5.2)
 
-### Next Two Weeks (Phase 1J Foundation + Code Review)
+### Next Two Weeks (Phase 1J Foundation + Code Review + Heimdahl Testing)
 1. **[Repository Study] Review Navi oracle patterns for Phase 1B prep** (Checklist 5.1)
 2. Design batch processing architecture (Checklist 2.1)
 3. Prototype capability token system (Checklist 4.2)
 4. Create fixed-point math test suite (compare Avocado vs Carapace) (Checklist 1.3)
 5. Document PDA-like object derivation for vault escrows
-6. **[Phase 1K] Begin security audit preparation checklist** (See AUDIT_PREPARATION_CHECKLIST.md)
+6. **[Phase 1M] Test Heimdahl CLI event queries on testnet pools** (Phase 1M.1)
+7. **[Phase 1M] Design WebSocket integration architecture** (Phase 1M.1)
+8. **[Phase 1K] Begin security audit preparation checklist** (See AUDIT_PREPARATION_CHECKLIST.md)
 
 ---
 
@@ -966,6 +1220,7 @@
 - **Phase 1J** integrates battle-tested innovations from Percolator (perpetuals DEX on Solana)
 - **Phase 1K** provides comprehensive security audit preparation framework
 - **Phase 1L** tracks competitive landscape and market positioning
+- **Phase 1M** integrates Heimdahl.xyz for real-time blockchain data indexing and analytics
 - **Sui DeFi references** provide production Sui Move implementations to study
 - See [PERCOLATOR_RESEARCH.md](./PERCOLATOR_RESEARCH.md) for Solana learnings
 - See [SUI_DEFI_REFERENCES.md](./SUI_DEFI_REFERENCES.md) for Sui-specific patterns
@@ -974,9 +1229,12 @@
 - See [IMPLEMENTATION_CHECKLIST.md](./IMPLEMENTATION_CHECKLIST.md) for actionable development tasks
 - See [AUDIT_PREPARATION_CHECKLIST.md](./AUDIT_PREPARATION_CHECKLIST.md) for detailed audit prep
 - Percolator enhancements prioritize security, MEV protection, and scalability
+- Heimdahl.xyz integration enhances data infrastructure for AI/ML, cross-chain operations, and security monitoring
 - Repository studies run in parallel with development (see "Repository Study Schedule")
 - Some Phase 1J features (sharding, cross-pool netting) will be fully deployed in Phase 2
+- Some Phase 1M features (cross-chain arbitrage) will be fully utilized in Phase 2 (TortoiseArb)
 - **Budget**: Allocate $300-400K for comprehensive security program (audits + bug bounty)
+- **Heimdahl Note**: If Sui support isn't live, contact Heimdahl via https://forms.gle/YeNyCconLAWH21Bu6 for beta access
 
 ## Key Phase 1J Integration Points
 
@@ -996,6 +1254,32 @@
 - Cross-pool netting in production
 - Memory-optimized allocation at scale
 
+## Key Phase 1M (Heimdahl) Integration Points
+
+### Immediate Integration (Weeks 1-2)
+- Verify Heimdahl Sui support and request beta access if needed
+- Install CLI and test basic event queries on testnet
+- Create Taskfile.yml automation scripts
+- Build Bun backend wrapper for event streams
+
+### Short-Term Integration (Weeks 4-6)
+- WebSocket stream integration for real-time monitoring
+- Feed liquidity events into RL fee optimizer (Phase 1F integration)
+- Historical data aggregation for vault analytics
+- Audit logging and replay protection (Phase 1J/1K integration)
+
+### Mid-Term Integration (Weeks 8-12)
+- Cross-chain arbitrage signal detection (Phase 2 prep)
+- Multi-chain exposure netting for vault strategies
+- Oracle price verification and manipulation resistance
+- Automated rebalancing triggers based on analytics
+
+### Long-Term Integration (Phase 2+)
+- Fork Heimdahl CLI for custom Sui node integration (if needed)
+- Full cross-chain arbitrage execution (TortoiseArb)
+- Multi-chain RWA position tracking (Phase 3)
+- Custom Tortoise-OS data layer on Heimdahl foundation
+
 ## Repository Integration Summary
 
 | Repository | Primary Phase | Key Learnings | Integration Priority |
@@ -1005,6 +1289,7 @@
 | **Navi Lending** | Phase 1B, 1E | Oracle aggregation, risk management, liquidations | 🔴 CRITICAL (Week 5-6) |
 | **Turbos Finance** | Phase 1J | Sharding, batch settlement, gas optimization | 🔴 CRITICAL (Week 7-8) |
 | **Sui-AI-Agent-Kit** | Phase 1F | MCP tools, capability systems, TEE integration | 🔴 CRITICAL (Week 10-11) |
+| **Heimdahl.xyz** | Phase 1M | Real-time event indexing, multi-chain data, WebSocket streams | 🔴 CRITICAL (Week 1-2) |
 
 ### Quick Reference: Feature Adoption
 
@@ -1018,6 +1303,10 @@
 | Batch processing | Turbos | `move/sources/amm/batch.move` | Phase 1J |
 | MCP tools | AI Agent Kit | `apps/api/src/services/mcp/` | Phase 1F |
 | Capability tokens | AI Agent Kit + Percolator | `move/sources/vault/capabilities.move` | Phase 1F + 1J |
+| Event monitoring | Heimdahl.xyz | `apps/api/src/services/heimdahl/` | Phase 1M (Week 1-2) |
+| WebSocket streams | Heimdahl.xyz | `packages/sdk/src/heimdahl-client.ts` | Phase 1M (Week 5) |
+| Cross-chain data | Heimdahl.xyz | `apps/api/src/services/arbitrage/` | Phase 1M (Week 12) |
+| Audit logging | Heimdahl.xyz | `apps/api/src/services/security/audit-logger.ts` | Phase 1M (Week 8) |
 
 ---
 
