@@ -37,17 +37,23 @@ export class PoolClient {
 
     const fields = poolObject.data.content.fields as any;
 
+    // Extract token types from pool type
+    const poolType = poolObject.data.content.type;
+    const typeMatch = poolType.match(/Pool<(.+),\s*(.+)>/);
+    const tokenX = typeMatch ? typeMatch[1]!.trim() : '' as X;
+    const tokenY = typeMatch ? typeMatch[2]!.trim() : '' as Y;
+
     return {
       poolId,
-      tokenX: fields.reserve_x.type as X,
-      tokenY: fields.reserve_y.type as Y,
-      reserveX: BigInt(fields.reserve_x.fields.value || '0'),
-      reserveY: BigInt(fields.reserve_y.fields.value || '0'),
-      lpSupply: BigInt(fields.lp_supply.fields.value || '0'),
+      tokenX,
+      tokenY,
+      reserveX: BigInt(fields.reserve_x || '0'),
+      reserveY: BigInt(fields.reserve_y || '0'),
+      lpSupply: BigInt(fields.lp_supply?.fields?.value || '0'),
       feeBps: Number(fields.fee_bps || '0'),
       protocolFeeBps: Number(fields.protocol_fee_bps || '0'),
-      protocolFeeX: BigInt(fields.protocol_fee_x.fields.value || '0'),
-      protocolFeeY: BigInt(fields.protocol_fee_y.fields.value || '0'),
+      protocolFeeX: BigInt(fields.protocol_fee_x || '0'),
+      protocolFeeY: BigInt(fields.protocol_fee_y || '0'),
     };
   }
 
@@ -149,14 +155,16 @@ export class PoolClient {
   /**
    * Create a new pool
    */
-  createPool<X extends CoinType, Y extends CoinType>(
+  createPool(
+    typeX: string,
+    typeY: string,
     options?: TxOptions,
   ): TransactionBlock {
     const tx = new TransactionBlock();
 
     tx.moveCall({
       target: `${this.packageId}::pool::create_pool`,
-      typeArguments: [X as string, Y as string],
+      typeArguments: [typeX, typeY],
       arguments: [],
     });
 
@@ -170,10 +178,12 @@ export class PoolClient {
   /**
    * Add liquidity to pool
    */
-  addLiquidity<X extends CoinType, Y extends CoinType>(
+  addLiquidity(
     poolId: ObjectId,
-    coinX: ObjectId,
-    coinY: ObjectId,
+    typeX: string,
+    typeY: string,
+    coinX: ObjectId | null,
+    coinY: ObjectId | null,
     amountX: bigint,
     amountY: bigint,
     minLiquidity: bigint = 0n,
@@ -181,13 +191,34 @@ export class PoolClient {
   ): TransactionBlock {
     const tx = new TransactionBlock();
 
-    // Split coins to exact amounts
-    const [coinXSplit] = tx.splitCoins(tx.object(coinX), [tx.pure(amountX)]);
-    const [coinYSplit] = tx.splitCoins(tx.object(coinY), [tx.pure(amountY)]);
+    // For SUI tokens, use gas coin
+    const isSuiX = typeX === '0x2::sui::SUI';
+    const isSuiY = typeY === '0x2::sui::SUI';
+
+    let coinXSplit;
+    let coinYSplit;
+
+    if (isSuiX && isSuiY) {
+      // Both are SUI, split from gas
+      [coinXSplit] = tx.splitCoins(tx.gas, [tx.pure(amountX)]);
+      [coinYSplit] = tx.splitCoins(tx.gas, [tx.pure(amountY)]);
+    } else if (isSuiX) {
+      // X is SUI, use gas
+      [coinXSplit] = tx.splitCoins(tx.gas, [tx.pure(amountX)]);
+      [coinYSplit] = tx.splitCoins(tx.object(coinY!), [tx.pure(amountY)]);
+    } else if (isSuiY) {
+      // Y is SUI, use gas
+      [coinXSplit] = tx.splitCoins(tx.object(coinX!), [tx.pure(amountX)]);
+      [coinYSplit] = tx.splitCoins(tx.gas, [tx.pure(amountY)]);
+    } else {
+      // Neither is SUI
+      [coinXSplit] = tx.splitCoins(tx.object(coinX!), [tx.pure(amountX)]);
+      [coinYSplit] = tx.splitCoins(tx.object(coinY!), [tx.pure(amountY)]);
+    }
 
     tx.moveCall({
       target: `${this.packageId}::pool::add_liquidity`,
-      typeArguments: [X as string, Y as string],
+      typeArguments: [typeX, typeY],
       arguments: [
         tx.object(poolId),
         coinXSplit,
@@ -206,8 +237,10 @@ export class PoolClient {
   /**
    * Remove liquidity from pool
    */
-  removeLiquidity<X extends CoinType, Y extends CoinType>(
+  removeLiquidity(
     poolId: ObjectId,
+    typeX: string,
+    typeY: string,
     lpToken: ObjectId,
     lpAmount: bigint,
     minAmountX: bigint = 0n,
@@ -220,7 +253,7 @@ export class PoolClient {
 
     tx.moveCall({
       target: `${this.packageId}::pool::remove_liquidity`,
-      typeArguments: [X as string, Y as string],
+      typeArguments: [typeX, typeY],
       arguments: [
         tx.object(poolId),
         lpSplit,
@@ -239,8 +272,10 @@ export class PoolClient {
   /**
    * Swap X for Y
    */
-  swapXToY<X extends CoinType, Y extends CoinType>(
+  swapXToY(
     poolId: ObjectId,
+    typeX: string,
+    typeY: string,
     coinX: ObjectId,
     amountIn: bigint,
     minAmountOut: bigint = 0n,
@@ -252,7 +287,7 @@ export class PoolClient {
 
     tx.moveCall({
       target: `${this.packageId}::pool::swap_x_to_y`,
-      typeArguments: [X as string, Y as string],
+      typeArguments: [typeX, typeY],
       arguments: [
         tx.object(poolId),
         coinSplit,
@@ -270,8 +305,10 @@ export class PoolClient {
   /**
    * Swap Y for X
    */
-  swapYToX<X extends CoinType, Y extends CoinType>(
+  swapYToX(
     poolId: ObjectId,
+    typeX: string,
+    typeY: string,
     coinY: ObjectId,
     amountIn: bigint,
     minAmountOut: bigint = 0n,
@@ -283,7 +320,7 @@ export class PoolClient {
 
     tx.moveCall({
       target: `${this.packageId}::pool::swap_y_to_x`,
-      typeArguments: [X as string, Y as string],
+      typeArguments: [typeX, typeY],
       arguments: [
         tx.object(poolId),
         coinSplit,

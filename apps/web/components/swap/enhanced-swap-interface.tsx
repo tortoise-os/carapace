@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { SuiClient } from '@mysten/sui/client';
 import { SwapSettingsDialog } from './swap-settings-dialog';
 import { TokenSelectorModal } from './token-selector-modal';
+import { useCarapaceSDK } from '@/providers/sui-provider';
 
 interface Token {
   symbol: string;
@@ -30,9 +31,14 @@ const TOKENS: Token[] = [
   { symbol: 'USDC', name: 'USD Coin', address: '0x5678::usdc::USDC', decimals: 6 },
 ];
 
+// Real pool ID from testnet deployment
+const REAL_POOL_ID = '0x163fb7a120e23832f366d8ea0d3939062c6269d2797975e82e9bf7b5f9afc7e4';
+
 export function EnhancedSwapInterface() {
   const account = useCurrentAccount();
+  const suiClient = useSuiClient();
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
+  const sdk = useCarapaceSDK();
 
   const [tokenIn, setTokenIn] = useState<Token>(TOKENS[0]!);
   const [tokenOut, setTokenOut] = useState<Token>(TOKENS[1]!);
@@ -118,35 +124,19 @@ export function EnhancedSwapInterface() {
   };
 
   const handleSwap = async () => {
-    if (!account || !currentPool || !quote || !amountIn) {
+    if (!account || !quote || !amountIn) {
+      toast.error('Missing requirements', {
+        description: 'Please connect wallet and enter an amount',
+      });
       return;
     }
 
     setIsSwapping(true);
 
     try {
-      // Show preview of what would happen
-      toast.info('Swap Preview', {
-        description: `This would swap ${amountIn} ${tokenIn.symbol} for ${amountOut} ${tokenOut.symbol}`,
-        duration: 5000,
+      toast.info('Executing swap', {
+        description: `Swapping ${amountIn} ${tokenIn.symbol} for ${amountOut} ${tokenOut.symbol}`,
       });
-
-      // To enable actual swaps, you need to:
-      // 1. Deploy the Carapace smart contracts to Sui testnet/mainnet
-      // 2. Create actual liquidity pools on-chain
-      // 3. Get coin objects from user's wallet using:
-      //    - await suiClient.getCoins({ owner: account.address, coinType: tokenIn.address })
-      // 4. Build transaction using the SDK's pool client
-      // 5. Sign and execute with the wallet
-
-      toast.warning('Blockchain Integration Required', {
-        description: 'Smart contracts need to be deployed to enable actual swaps. Currently showing preview only.',
-        duration: 8000,
-      });
-
-      // Example of what the full implementation would look like:
-      /*
-      const suiClient = useSuiClient();
 
       // Get user's coins
       const coins = await suiClient.getCoins({
@@ -158,50 +148,51 @@ export function EnhancedSwapInterface() {
         throw new Error(`No ${tokenIn.symbol} coins found in wallet`);
       }
 
-      // Use SDK to build transaction
-      const sdk = new CarapaceSDK({
-        client: suiClient,
-        packageIds: { carapace: 'DEPLOYED_PACKAGE_ID' }
-      });
+      // Use real pool (SUI/SUI for now)
+      const poolId = REAL_POOL_ID;
+      const isXToY = tokenIn.address === '0x2::sui::SUI' && tokenOut.address === '0x2::sui::SUI';
 
-      const isXToY = currentPool.token_x === tokenIn.address;
+      // Calculate amounts
       const amountInSmallest = BigInt(Math.floor(parseFloat(amountIn) * Math.pow(10, tokenIn.decimals)));
-      const minAmountOut = BigInt(quote.amountOut) * 995n / 1000n;
+      const minAmountOut = BigInt(quote.amountOut) * 995n / 1000n; // 0.5% slippage
 
-      const tx = isXToY
-        ? sdk.pool.swapXToY(
-            currentPool.pool_id,
-            coins.data[0].coinObjectId,
-            amountInSmallest,
-            minAmountOut
-          )
-        : sdk.pool.swapYToX(
-            currentPool.pool_id,
-            coins.data[0].coinObjectId,
-            amountInSmallest,
-            minAmountOut
-          );
+      // Build transaction - for SUI/SUI pool, we use swapXToY
+      const tx = sdk.pool.swapXToY(
+        poolId,
+        tokenIn.address,
+        tokenOut.address,
+        coins.data[0]!.coinObjectId,
+        amountInSmallest,
+        minAmountOut,
+        {
+          gasBudget: 10_000_000,
+        }
+      );
 
       // Sign and execute
       signAndExecute(
         { transaction: tx },
         {
           onSuccess: (result) => {
-            toast.success('Swap successful!');
+            toast.success('Swap successful!', {
+              description: `Transaction: ${result.digest.slice(0, 10)}...`,
+            });
             setAmountIn('');
             setAmountOut('');
             setQuote(null);
           },
           onError: (error) => {
-            toast.error('Swap failed', { description: error.message });
+            console.error('Swap failed:', error);
+            toast.error('Swap failed', {
+              description: error instanceof Error ? error.message : 'Unknown error'
+            });
           },
         }
       );
-      */
 
     } catch (error) {
       console.error('Swap error:', error);
-      toast.error('Swap preview error', {
+      toast.error('Swap error', {
         description: error instanceof Error ? error.message : 'Unknown error',
       });
     } finally {

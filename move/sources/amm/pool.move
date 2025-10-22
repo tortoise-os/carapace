@@ -3,6 +3,9 @@
 module carapace::pool {
     use sui::balance::{Self, Balance, Supply};
     use sui::coin::{Self, Coin};
+    use sui::object;
+    use sui::transfer;
+    use sui::tx_context::TxContext;
     use carapace::math;
 
     /// Error codes
@@ -26,7 +29,7 @@ module carapace::pool {
 
     /// Liquidity Pool
     public struct Pool<phantom X, phantom Y> has key {
-        id: UID,
+        id: object::UID,
         reserve_x: Balance<X>,
         reserve_y: Balance<Y>,
         lp_supply: Supply<LP<X, Y>>,
@@ -41,13 +44,13 @@ module carapace::pool {
 
     /// Pool creation event
     public struct PoolCreated<phantom X, phantom Y> has copy, drop {
-        pool_id: ID,
+        pool_id: object::ID,
         fee_bps: u64,
     }
 
     /// Liquidity added event
     public struct LiquidityAdded<phantom X, phantom Y> has copy, drop {
-        pool_id: ID,
+        pool_id: object::ID,
         amount_x: u64,
         amount_y: u64,
         liquidity: u64,
@@ -55,7 +58,7 @@ module carapace::pool {
 
     /// Liquidity removed event
     public struct LiquidityRemoved<phantom X, phantom Y> has copy, drop {
-        pool_id: ID,
+        pool_id: object::ID,
         amount_x: u64,
         amount_y: u64,
         liquidity: u64,
@@ -63,7 +66,7 @@ module carapace::pool {
 
     /// Swap event
     public struct Swapped<phantom X, phantom Y> has copy, drop {
-        pool_id: ID,
+        pool_id: object::ID,
         amount_in: u64,
         amount_out: u64,
         is_x_to_y: bool,

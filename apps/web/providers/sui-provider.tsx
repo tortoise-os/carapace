@@ -9,6 +9,9 @@ import '@mysten/dapp-kit/dist/index.css';
 
 const network = (process.env.NEXT_PUBLIC_SUI_NETWORK as 'mainnet' | 'testnet' | 'devnet') || 'testnet';
 
+// Package ID from deployment
+const PACKAGE_ID = '0x998379bb53423871a9e4f8f779c339c096622209309452995ae5ed395779106e';
+
 // Create QueryClient outside of component to prevent hydration issues
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,6 +39,7 @@ export function SuiProvider({ children }: { children: ReactNode }) {
       new CarapaceSDK({
         network,
         rpcUrl: getFullnodeUrl(network),
+        packageIds: { carapace: PACKAGE_ID },
       }),
     []
   );

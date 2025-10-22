@@ -20,7 +20,14 @@
       "Bash(bun install:*)",
       "Bash(npx shadcn@latest add:*)",
       "Bash(npx playwright install chromium)",
-      "Bash(bunx playwright test:*)"
+      "Bash(bunx playwright test:*)",
+      "Read(//Users/decebaldobrica/Projects/blockchain/**)",
+      "Bash(sui move build:*)",
+      "Bash(sui move test)",
+      "Bash(sui client:*)",
+      "Bash(sui keytool export:*)",
+      "Bash(awk:*)",
+      "Bash(SUI_PRIVATE_KEY=\"suiprivkey1qz2mlze0nuphxtj0u79ftcx6qjru9zjc5p3p4rpur7wdp4ll8a3hvezn2w0\" bun run:*)"
     ],
     "deny": [],
     "ask": []

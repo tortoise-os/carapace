@@ -28,7 +28,7 @@ export const DEFAULT_PACKAGE_IDS: Record<Network, PackageIds> = {
     carapace: '0x0', // TODO: Update after mainnet deployment
   },
   testnet: {
-    carapace: '0x0', // TODO: Update after testnet deployment
+    carapace: '0x998379bb53423871a9e4f8f779c339c096622209309452995ae5ed395779106e',
   },
   devnet: {
     carapace: '0x0', // TODO: Update after devnet deployment
