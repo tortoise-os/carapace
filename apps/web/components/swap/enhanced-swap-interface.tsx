@@ -163,6 +163,7 @@ export function EnhancedSwapInterface() {
         tokenOut.address,
         coins.data[0]!.coinObjectId,
         amountInSmallest,
+        account.address, // sender address for output coin transfer
         minAmountOut,
         {
           gasBudget: 10_000_000,

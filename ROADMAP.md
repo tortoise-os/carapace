@@ -50,23 +50,34 @@
 **Priority: CRITICAL** - Required for MVP functionality
 
 #### 1.1 Smart Contract Completion
+- [ ] **Code Review & Benchmarking** (Sui DeFi references)
+  - [ ] Clone and study Avocado DEX for clean reference implementation
+  - [ ] Audit constant product math against Avocado's implementation
+  - [ ] Review Cetus CLMM for advanced AMM patterns
+  - [ ] Study flash swap implementation from Cetus
+  - [ ] Port fixed-point math library from Avocado (Phase 1J integration)
+
 - [ ] **Complete AMM pool.move contract**
-  - [ ] Implement create_pool() function
-  - [ ] Finalize add_liquidity() with proper math
+  - [ ] Implement create_pool() function (reference: Avocado factory pattern)
+  - [ ] Finalize add_liquidity() with proper math (audit vs Avocado)
   - [ ] Finalize remove_liquidity() with burn logic
   - [ ] Implement swap_x_to_y() and swap_y_to_x()
-  - [ ] Add flash swap support
+  - [ ] Add flash swap support (pattern from Cetus)
   - [ ] Implement slippage protection
-  - [ ] Add emergency pause mechanism
+  - [ ] Add emergency pause mechanism (pattern from Navi)
   - [ ] Protocol fee collection logic
+  - [ ] Adopt versioned module design (Cetus pattern)
 
 - [ ] **Complete TortoiseVault contract**
   - [ ] Implement deposit() function
   - [ ] Implement withdraw() function
-  - [ ] Add share calculation logic
-  - [ ] Implement strategy allocation
+  - [ ] Add share calculation logic (adapt Navi interest model)
+  - [ ] Implement strategy allocation (isolated pools pattern from Navi)
   - [ ] Add rebalancing functions
   - [ ] Fee distribution mechanism
+  - [ ] Health factor tracking (Navi liquidation pattern)
+  - [ ] Risk parameter configuration per strategy
+  - [ ] Emergency pause mechanism (Navi pattern)
 
 - [ ] **Add contract tests**
   - [ ] Unit tests for pool operations (move/tests/)
@@ -88,12 +99,19 @@
   - [ ] Document deployed addresses
 
 #### 1.3 SDK Integration
+- [ ] **Study SDK architectures** (Sui DeFi references)
+  - [ ] Review Cetus SDK transaction builder patterns
+  - [ ] Study type safety and error handling from Cetus
+  - [ ] Analyze Turbos frontend SDK for real-time quotes
+  - [ ] Document SDK design decisions
+
 - [ ] **Build TypeScript SDK (packages/sdk/)**
   - [ ] Pool interaction functions
   - [ ] Vault interaction functions
-  - [ ] Transaction building utilities
+  - [ ] Transaction building utilities (Cetus PTB patterns)
   - [ ] Event parsing/listening
   - [ ] Type definitions for contracts
+  - [ ] Real-time quote system (Turbos pattern)
 
 - [ ] **Transaction Execution**
   - [ ] Implement actual swap execution (replace preview mode)
@@ -144,10 +162,17 @@
   - [ ] Custom token import functionality
 
 #### 2.2 Price Oracles
+- [ ] **Study oracle patterns** (Sui DeFi references)
+  - [ ] Review Navi's multi-oracle aggregation strategy
+  - [ ] Study Cetus TWAP implementation for on-chain prices
+  - [ ] Benchmark oracle latency and costs (Pyth vs Switchboard)
+
 - [ ] **Integrate price feeds**
   - [ ] Connect to Sui price oracles
-  - [ ] Pyth Network integration
-  - [ ] Fallback price sources
+  - [ ] Pyth Network integration (primary, pattern from Navi)
+  - [ ] Switchboard integration (fallback, pattern from Navi)
+  - [ ] Multi-source median calculation (Navi pattern)
+  - [ ] On-chain TWAP for internal pools (Cetus pattern)
   - [ ] USD price display for all tokens
 
 ---
@@ -157,12 +182,18 @@
 **Priority: MEDIUM** - Enhanced functionality
 
 #### 3.1 Pool Creation
+- [ ] **Study factory patterns** (Sui DeFi references)
+  - [ ] Review Avocado's deterministic pool creation
+  - [ ] Study Cetus factory for registry management
+  - [ ] Benchmark pool creation gas costs
+
 - [ ] **Pool factory UI**
   - [ ] Create new pool interface
   - [ ] Token pair selection
   - [ ] Initial liquidity provision
-  - [ ] Fee tier selection
+  - [ ] Fee tier selection (study Cetus multi-tier approach)
   - [ ] Pool deployment transaction
+  - [ ] Deterministic address derivation (Avocado + Phase 1J pattern)
 
 #### 3.2 Pool Analytics
 - [ ] **Pool statistics**
@@ -206,6 +237,17 @@
 ### Phase 1E: Vault Implementation (2-3 weeks)
 
 **Priority: HIGH** - Core Phase 1 feature
+**Reference**: See [SUI_DEFI_REFERENCES.md](./SUI_DEFI_REFERENCES.md) Section 2 (Navi Lending)
+
+#### 5.0 Code Review - Navi Protocol
+- [ ] **Deep dive into Navi lending** (full week recommended)
+  - [ ] Clone and build Navi Protocol locally
+  - [ ] Study isolated pool risk management architecture
+  - [ ] Analyze interest rate models for share pricing patterns
+  - [ ] Review liquidation health factor calculations
+  - [ ] Study oracle integration for multi-strategy evaluation
+  - [ ] Document risk parameter management patterns
+  - [ ] Benchmark lending vs vault tradeoffs
 
 #### 5.1 Vault UI
 - [ ] **Vault interface**
@@ -234,6 +276,17 @@
 ### Phase 1F: AI/ML Integration (3-4 weeks)
 
 **Priority: MEDIUM** - Differentiator feature
+**Reference**: See [SUI_DEFI_REFERENCES.md](./SUI_DEFI_REFERENCES.md) Section 5 (Sui-AI-Agent-Kit)
+
+#### 6.0 Code Review - AI Agent Kit
+- [ ] **Deep dive into Sui-AI-Agent-Kit** (Weeks 10-11)
+  - [ ] Clone and explore AI Agent Kit repository
+  - [ ] Study MCP tool architecture for DeFi automation
+  - [ ] Review capability-based access patterns
+  - [ ] Analyze Walrus Storage integration for ML models
+  - [ ] Test Nautilus TEE setup and attestation
+  - [ ] Compare capability patterns with Percolator research
+  - [ ] Prototype MCP tools for vault automation
 
 #### 6.1 Dynamic Fee Optimization
 - [ ] **ML model for fee adjustment**
@@ -256,11 +309,22 @@
   - [ ] Optimal liquidity provision suggestions
   - [ ] Impermanent loss forecasting
 
+#### 6.4 Scoped Capabilities for AI (Percolator + AI Agent Kit)
+- [ ] **Secure AI interaction framework**
+  - [ ] Replace direct TEE calls with capability-based access
+  - [ ] Issue TTL-limited tokens for RL optimizer (Percolator pattern)
+  - [ ] Verify via Sui's zkLogin or object signatures
+  - [ ] Add replay protection for Walrus-stored models
+  - [ ] Integrate MCP tools from AI Agent Kit
+  - [ ] Implement simulation-first execution (AI Agent Kit pattern)
+  - [ ] Integrate ARG taxation with RL (anti-toxicity)
+
 ---
 
 ### Phase 1G: Testing & Quality (2-3 weeks)
 
 **Priority: CRITICAL** - Required before mainnet
+**Reference**: See [SECURITY_AUDIT_GUIDE.md](./SECURITY_AUDIT_GUIDE.md) for comprehensive security best practices
 
 #### 7.1 Comprehensive Testing
 - [ ] **Unit tests**
@@ -284,9 +348,13 @@
 - [ ] **Security measures**
   - [ ] Input validation
   - [ ] Access control verification
-  - [ ] Reentrancy protection
+  - [ ] Reentrancy protection (inherent in Move)
   - [ ] Integer overflow/underflow checks
-  - [ ] External security audit (before mainnet)
+  - [ ] Fixed-point math precision validation
+  - [ ] Oracle manipulation resistance testing
+  - [ ] Capability scoping with TTL enforcement
+  - [ ] Invariant verification for all critical operations
+  - [ ] External security audit (OtterSec recommended - see Phase 1K)
 
 #### 7.3 Performance Optimization
 - [ ] **Frontend optimization**
@@ -300,6 +368,232 @@
   - [ ] Database query optimization
   - [ ] Rate limiting
   - [ ] Load testing
+
+---
+
+### Phase 1J: Percolator-Inspired Enhancements (2-3 weeks)
+
+**Priority: HIGH** - Security, scalability, and MEV protection
+**Reference**: See [PERCOLATOR_RESEARCH.md](./PERCOLATOR_RESEARCH.md) for detailed analysis
+
+> Based on research from the Percolator perpetual futures exchange (Solana), this phase integrates battle-tested innovations for risk management, anti-toxicity, scalability, and security into Carapace's AMM and vault infrastructure.
+
+#### 7J.1 Risk Management and Liquidation Handling
+- [ ] **Fixed-point math precision**
+  - [ ] Port Percolator's 6-decimal fixed-point library to Move
+  - [ ] Standardize basis-point calculations across contracts
+  - [ ] Integrate with fee calculation and PnL tracking
+  - [ ] Unit tests for precision edge cases
+
+- [ ] **Liquidation detection framework**
+  - [ ] Implement monotone increasing initial margin (IM) model
+  - [ ] Add kill-band parameters to pool configuration
+  - [ ] Integrate off-chain RL signals for liquidation prediction
+  - [ ] Test partial/full liquidation triggers
+
+- [ ] **Cross-pool netting architecture (vault)**
+  - [ ] Design global position registry using shared objects
+  - [ ] Track user exposures across pools and external protocols
+  - [ ] Add pre-compound margin ratio checks
+  - [ ] Implement equity aggregation logic
+
+#### 7J.2 Anti-Toxicity and MEV Protections
+- [ ] **Batch processing for swaps**
+  - [ ] Implement batch epochs (1-2 block delay)
+  - [ ] Group liquidity operations and swaps
+  - [ ] AI-driven batch sizing based on volatility
+  - [ ] Leverage Sui's programmable transaction blocks
+  - [ ] Two-phase reserve/commit flow
+
+- [ ] **Aggressor roundtrip guards (ARG)**
+  - [ ] Track rapid deposit-withdraw cycles in vault
+  - [ ] Implement 10K ring buffer for aggressor detection
+  - [ ] Apply dynamic fees via RL in TEE
+  - [ ] Reward long-term LPs with reduced fees
+
+- [ ] **Non-replay protection**
+  - [ ] Add nonces to capabilities for off-chain AI calls
+  - [ ] Integrate with existing TEE security framework
+  - [ ] Test replay attack vectors
+
+#### 7J.3 Scalability and Resource Efficiency
+- [ ] **Code Review - Turbos Finance** (Week 7)
+  - [ ] Clone and explore Turbos hybrid DEX
+  - [ ] Study sharded pool implementation in detail
+  - [ ] Review batch settlement patterns for gas savings
+  - [ ] Analyze gas optimization techniques (state access)
+  - [ ] Benchmark hybrid orderbook-AMM model
+  - [ ] Document sharding lessons in `docs/architecture/sharding.md`
+
+- [ ] **Sharded liquidity pools design**
+  - [ ] Design per-token-pair shard architecture (Turbos + Percolator)
+  - [ ] Dynamic sharding based on TVL/volume metrics
+  - [ ] Central router for cross-shard swaps (Turbos pattern)
+  - [ ] Leverage Sui's parallel execution model
+  - [ ] Address cross-shard liquidity fragmentation
+  - [ ] Compare Turbos (horizontal) vs Percolator (slab) sharding
+
+- [ ] **Memory-optimized vault strategies**
+  - [ ] Adopt freelist-based allocators in Move
+  - [ ] Cap state growth for reward tracking
+  - [ ] Set instrument limits per slab (32 baseline)
+  - [ ] Use Sui's gas metering for budget enforcement
+
+- [ ] **Shard testing infrastructure**
+  - [ ] Extend Taskfile.yml for shard simulation
+  - [ ] Create local multi-shard test environment
+  - [ ] Add performance benchmarks
+  - [ ] Parallel execution stress tests
+
+#### 7J.4 Security and Capability Models
+- [ ] **Enhanced object derivation**
+  - [ ] Implement PDA-like helpers for Sui objects
+  - [ ] Derive vault escrows deterministically
+  - [ ] Add versioned registries for upgrade safety
+  - [ ] Document object ID generation patterns
+
+- [ ] **Invariant checks and assertions**
+  - [ ] Add comprehensive invariant checks to Move contracts
+  - [ ] Verify scoped debits ≤ escrow limits
+  - [ ] Check reserve ratios remain within bounds
+  - [ ] Validate all state transitions
+  - [ ] Integrate with audit preparation
+
+- [ ] **Documentation and research**
+  - [ ] Complete Percolator research analysis
+  - [ ] Document Sui-specific adaptations
+  - [ ] Open questions and trade-off analysis
+  - [ ] Cross-protocol collaboration opportunities
+
+---
+
+### Phase 1K: Security Audit Preparation (3-4 weeks)
+
+**Priority: CRITICAL** - Required before mainnet launch
+**Reference**: See [SECURITY_AUDIT_GUIDE.md](./SECURITY_AUDIT_GUIDE.md) for detailed guidelines
+
+#### 7K.1 Pre-Audit Security Hardening
+- [ ] **Move-specific security enhancements**
+  - [ ] Implement hot potato pattern for all flash operations
+  - [ ] Add TTL expiry to all admin capabilities
+  - [ ] Implement capability rotation mechanism (90-day cycles)
+  - [ ] Multi-sig enforcement for critical operations (>5% TVL)
+  - [ ] Capability action allowlists
+
+- [ ] **Oracle security**
+  - [ ] Integrate 3+ oracle sources (Pyth, Switchboard, Supra)
+  - [ ] Implement 30-second freshness checks
+  - [ ] Median pricing to resist manipulation
+  - [ ] Circuit breakers for >10% price deviations
+
+- [ ] **Precision and invariant checks**
+  - [ ] Use 1e12 precision for all fee calculations
+  - [ ] Add invariant checks after every swap/liquidity change
+  - [ ] Unit test boundary cases (dust amounts, max values)
+  - [ ] Verify pool constant product: reserve_x * reserve_y ≥ k_last
+  - [ ] Verify vault solvency: total_shares * share_price ≤ total_assets
+
+- [ ] **Cross-pool safety (TortoiseVault)**
+  - [ ] Validate atomicity in multi-pool operations
+  - [ ] Implement all-or-nothing PTB execution
+  - [ ] Verify vault health after rebalancing
+
+#### 7K.2 Move Registry & Transparency
+- [ ] **On-chain registry integration**
+  - [ ] Register all Carapace packages in Sui Move Registry
+  - [ ] Set up GitHub Actions for registry verification on PRs
+  - [ ] Monitor registry alerts for dependency vulnerabilities
+  - [ ] Enable real-time vulnerability scanning
+
+#### 7K.3 Formal Verification
+- [ ] **Implement formal verification**
+  - [ ] Write formal specs for all critical invariants
+  - [ ] Pool constant product formula verification
+  - [ ] Vault solvency verification
+  - [ ] Flash loan atomicity verification
+  - [ ] RL fee bounds verification (0.01% - 1%)
+  - [ ] Run Move Prover in CI (warnings allowed initially)
+  - [ ] Document all assumptions in module comments
+
+#### 7K.4 Comprehensive Testing
+- [ ] **Pre-audit test suite**
+  - [ ] Complete unit tests for all public functions (>80% coverage)
+  - [ ] End-to-end swap scenarios including edge cases
+  - [ ] Multi-user vault deposit/withdrawal stress tests
+  - [ ] Oracle failure simulations
+  - [ ] Network partition scenarios for TEE communication
+  - [ ] Gas optimization benchmarks (target <1M gas per swap)
+
+- [ ] **Fuzzing and property testing**
+  - [ ] Implement property-based tests for all invariants
+  - [ ] Run fuzzing campaigns (1M+ iterations)
+  - [ ] Test with randomized transaction orderings
+  - [ ] Simulate malicious behaviors (sandwich attacks, front-running)
+
+#### 7K.5 TEE-Specific Security
+- [ ] **Nautilus TEE hardening**
+  - [ ] Use Intel SGX attestation for TEE verification
+  - [ ] Implement nonce-based replay protection
+  - [ ] Rate-limit RL model updates (max 1 per epoch)
+  - [ ] Store model hashes on Walrus for tamper detection
+
+- [ ] **RL model safety**
+  - [ ] Hard-code fee bounds (0.01% - 1%) in contract
+  - [ ] Implement circuit breakers for >3 std dev deviations
+  - [ ] Fallback to static fees if TEE unreachable
+  - [ ] Test adversarial input scenarios
+
+- [ ] **Walrus storage integrity**
+  - [ ] Store redundant copies across Walrus epochs
+  - [ ] Verify blob hash before loading model
+  - [ ] Cache last-known-good model in contract
+
+#### 7K.6 Audit Firm Engagement
+- [ ] **Primary audit preparation**
+  - [ ] Create comprehensive documentation package
+  - [ ] Prepare threat model for TEE integration
+  - [ ] Document all admin capabilities and privileges
+  - [ ] Test emergency pause mechanisms
+  - [ ] Engage OtterSec or SlowMist ($80-120K budget)
+
+- [ ] **Audit execution**
+  - [ ] 2-week code freeze during audit
+  - [ ] Daily standups with audit team
+  - [ ] Address all findings before testnet launch
+  - [ ] Public disclosure of audit report
+
+- [ ] **Bug bounty program**
+  - [ ] Launch via Hacken or Immunefi ($200K+ reserve)
+  - [ ] Tiered rewards: Critical ($50K), High ($20K), Medium ($5K)
+  - [ ] Testnet bug bounty for initial validation
+  - [ ] Community security review period (2 weeks)
+
+#### 7K.7 Emergency Response Planning
+- [ ] **Incident response framework**
+  - [ ] Implement pause mechanism in all critical modules
+  - [ ] Test pause/unpause procedures monthly
+  - [ ] Establish multi-sig unpause process (3-of-5)
+  - [ ] Create incident response plan with 24-hour SLA
+  - [ ] Define severity levels and response times
+
+- [ ] **Security metrics tracking**
+  - [ ] Set up test coverage monitoring (target: >85%)
+  - [ ] Track critical findings resolved (target: 100% before mainnet)
+  - [ ] Monitor bug bounty payouts
+  - [ ] Track mean time to patch (target: <48 hours for high severity)
+
+#### 7K.8 Sui-Specific Vulnerability Mitigation
+- [ ] **Common anti-patterns avoided**
+  - [ ] No unbounded loops (implement batched processing)
+  - [ ] Minimize shared object contention (use sharded design)
+  - [ ] Capability-gated mutations only
+  - [ ] No missing access controls on public functions
+
+- [ ] **Sui ecosystem best practices**
+  - [ ] Review and apply patterns from audited protocols (Cetus, Turbos, MMT Finance)
+  - [ ] Study recent audit reports from OtterSec, SlowMist
+  - [ ] Join Sui Security Working Group (Discord)
+  - [ ] Attend Sui Foundation security office hours
 
 ---
 
@@ -357,28 +651,207 @@
 
 ---
 
+### Phase 1L: Competitive Intelligence & Market Positioning (Ongoing)
+
+**Priority: MEDIUM** - Strategic awareness
+**Reference**: See [SUI_DEFI_COMPETITIVE_LANDSCAPE.md](./SUI_DEFI_COMPETITIVE_LANDSCAPE.md) for detailed analysis
+
+#### 7L.1 Competitor Analysis (Q4 2025 - Q1 2026 Launches)
+- [ ] **MMT Finance monitoring (Launch: Oct 30, 2025)**
+  - [ ] Review CLMM implementation post-launch
+  - [ ] Study ve(3,3) tokenomics for SHELL governance
+  - [ ] Monitor gas optimization techniques
+  - [ ] Analyze cross-chain bridge patterns
+
+- [ ] **EnsoFi analysis (Launched: Oct 22, 2025)**
+  - [ ] Attend EnsoFi AMAs for agent architecture insights
+  - [ ] Evaluate EDAS compatibility with TortoiseVault RL
+  - [ ] Explore partnership for lending integration
+  - [ ] Compare AI agent approach vs. Carapace's TEE-secured RL
+
+- [ ] **Aster DEX review (Launch: Q4 2025)**
+  - [ ] Benchmark execution speed against TortoiseSwap
+  - [ ] Review MEV protection code for arbitrage module
+  - [ ] Study Hyperliquid integration patterns
+  - [ ] Consider liquidity routing integration
+
+- [ ] **FlowX Finance integration (Major upgrades: Jan 2026)**
+  - [ ] Evaluate FlowX SDK for TortoiseSwap integration
+  - [ ] Analyze adaptive pool algorithms for RL fee optimization
+  - [ ] Explore partnership for oracle data feeds
+  - [ ] Study modular liquidity layer design
+
+- [ ] **AftermathFi deep dive (V2 Launch: Q1 2026)**
+  - [ ] Conduct architecture analysis post-V2 launch
+  - [ ] Benchmark vault performance against TortoiseVault
+  - [ ] Identify differentiation opportunities (TEE, verifiable RL)
+  - [ ] Study RWA integration approach for Phase 3
+
+#### 7L.2 Strategic Differentiation
+- [ ] **Unique value propositions**
+  - [ ] Document TEE-secured computation advantage
+  - [ ] Emphasize transparent AI (Walrus-stored models)
+  - [ ] Highlight MEV resistance via RL strategies
+  - [ ] Promote academic rigor and research-driven approach
+
+- [ ] **Collaboration opportunities**
+  - [ ] Identify liquidity aggregation partnerships (FlowX, MMT)
+  - [ ] Explore lending integration (EnsoFi)
+  - [ ] Shared oracle networks (Aster, FlowX)
+  - [ ] Joint bug bounty programs with established projects
+
+#### 7L.3 Ecosystem Engagement
+- [ ] **Events and networking**
+  - [ ] Attend Sui Basecamp 2025 (Dubai)
+  - [ ] Monitor major protocol launches (MMT Oct 30, etc.)
+  - [ ] Join project Discord/Telegram for technical discussions
+  - [ ] Participate in Sui DeFi working groups
+
+- [ ] **Market intelligence**
+  - [ ] Track Sui DeFi TVL growth (DefiLlama)
+  - [ ] Monitor Sui Foundation ecosystem reports
+  - [ ] Study community-first distribution trends
+  - [ ] Analyze cross-chain liquidity patterns
+
+#### 7L.4 Competitive Benchmarking (Quarterly Updates)
+- [ ] **Performance metrics**
+  - [ ] Swap execution speed vs. competitors
+  - [ ] Gas costs comparison
+  - [ ] Vault APY benchmarking
+  - [ ] Security incident tracking (ecosystem-wide)
+
+- [ ] **Feature parity analysis**
+  - [ ] Concentrated liquidity support (vs. MMT, Cetus)
+  - [ ] Cross-chain capabilities (vs. Wormhole-integrated DEXs)
+  - [ ] AI/automation features (vs. EnsoFi, AftermathFi)
+  - [ ] RWA integration roadmap (Phase 3 planning)
+
+---
+
+## Repository Study Schedule
+
+> Dedicated timeline for studying Sui DeFi reference implementations
+> See [SUI_DEFI_REFERENCES.md](./SUI_DEFI_REFERENCES.md) for detailed analysis
+
+### Week 1: Avocado DEX (Reference Implementation)
+- **Mon-Tue**: Clone all 5 repos, build locally, run tests
+- **Wed-Thu**: Deep dive into Avocado's constant product implementation
+- **Fri**: Port fixed-point math patterns to Carapace
+
+### Week 2: Cetus CLMM (Advanced AMM)
+- **Mon-Wed**: Study Cetus tick math, flash swaps, and SDK architecture
+- **Thu-Fri**: Compare Cetus vs Avocado vs Carapace design decisions
+
+### Weeks 3-4: Ad-Hoc Reviews
+- Reference repos as needed for specific features
+- Focus: Navi oracle patterns for Phase 1B prep
+
+### Weeks 5-6: Navi Lending (Vault Deep Dive)
+- **Full Week 5**: Navi lending protocol analysis
+- Focus: Risk management, interest models, liquidations, oracles
+- Document patterns for TortoiseVault implementation
+
+### Weeks 7-9: Turbos (Sharding + Percolator)
+- **Week 7**: Turbos sharding architecture study
+- **Week 8**: Batch processing patterns (Turbos + Percolator)
+- **Week 9**: Integration testing and documentation
+
+### Weeks 10-13: Sui-AI-Agent-Kit (AI Integration)
+- **Week 10-11**: Full AI Agent Kit integration study
+- **Week 12**: MCP tools for vault automation
+- **Week 13**: TEE setup and RL prototype
+
+---
+
 ## Milestone Timeline
 
-### Month 1: Core Functionality
-- **Week 1-2**: Smart contract completion & deployment
-- **Week 3**: SDK integration & transaction execution
-- **Week 4**: Token management & pool analytics
+### Month 1: Core Functionality + Repository Studies
+- **Week 1-2**: Smart contract completion & deployment (Phase 1A)
+  - **Parallel study**: Avocado DEX + Cetus CLMM (see schedule above)
+  - Include fixed-point math library from Avocado (Phase 1J)
+  - Enhanced object derivation (Phase 1J)
+  - Basic invariant checks (Phase 1J)
+  - Flash swap implementation from Cetus
+- **Week 3**: SDK integration & transaction execution (Phase 1A)
+  - Apply Cetus SDK patterns
+- **Week 4**: Token management & pool analytics (Phase 1B-C)
+  - Navi oracle pattern review
 
-### Month 2: Advanced Features
-- **Week 1**: Pool creation & multi-hop swaps
-- **Week 2**: Vault UI & auto-compounding
-- **Week 3**: Testing & security hardening
-- **Week 4**: Performance optimization
+### Month 2: Advanced Features + Vault + Percolator
+- **Week 1 (Week 5)**: Pool creation & multi-hop swaps (Phase 1C-D)
+- **Week 2 (Week 6)**: Vault UI & auto-compounding (Phase 1E)
+  - **Parallel study**: Navi Lending full analysis (see schedule)
+  - Apply isolated pool patterns to vault strategies
+- **Week 3 (Week 7)**: Percolator innovations - Part 1 (Phase 1J)
+  - **Parallel study**: Turbos sharding architecture
+  - Risk management & liquidation framework
+  - Fixed-point math integration
+  - Cross-pool netting design
+- **Week 4 (Week 8)**: Percolator innovations - Part 2 (Phase 1J)
+  - Batch processing for MEV protection (Turbos + Percolator patterns)
+  - ARG implementation
+  - Sharding architecture design (Turbos + Percolator hybrid)
 
-### Month 3: AI Integration & Launch
-- **Week 1-2**: AI/ML fee optimization & vault strategies
-- **Week 3**: Final testing & audit preparation
-- **Week 4**: Testnet launch & documentation
+### Month 3: AI Integration & Security
+- **Week 1-2 (Weeks 10-11)**: AI/ML fee optimization & vault strategies (Phase 1F)
+  - **Parallel study**: Sui-AI-Agent-Kit full analysis (see schedule)
+  - Scoped capabilities for AI (Phase 1J + 1F + AI Agent Kit)
+  - MCP tools integration
+  - Non-replay protection
+  - Walrus Storage + TEE setup
+- **Week 3 (Week 12)**: Testing & security hardening (Phase 1G)
+  - Comprehensive invariant testing
+  - Percolator enhancement validation
+  - AI Agent Kit MCP automation testing
+- **Week 4 (Week 13)**: Performance optimization (Phase 1G)
+  - Shard testing infrastructure
+  - Memory optimization benchmarks
+  - RL prototype validation
 
-### Month 4: Mainnet Preparation
-- **Week 1-2**: Security audit fixes
-- **Week 3**: DevOps & monitoring setup
-- **Week 4**: Mainnet deployment & launch
+### Month 4: Testnet & Final Preparation
+- **Week 1**: Final Percolator integration testing (Phase 1J)
+  - Cross-pool netting validation
+  - Batch processing performance
+  - Liquidation detection stress tests
+- **Week 2**: Security audit preparation begins (Phase 1K)
+  - Pre-audit security hardening
+  - Move Registry integration
+  - Formal verification setup
+- **Week 3**: DevOps & monitoring setup (Phase 1H)
+- **Week 4**: Testnet launch & documentation (Phase 1I)
+  - Begin competitive analysis tracking (Phase 1L)
+
+### Month 5: Security Audit & Mainnet Preparation
+- **Week 1**: Complete security audit preparation (Phase 1K)
+  - TEE-specific security hardening
+  - Comprehensive testing and fuzzing
+  - Audit documentation package
+- **Week 2-3**: External security audit execution (Phase 1K)
+  - Engage OtterSec or SlowMist
+  - Daily audit team coordination
+  - Critical findings remediation
+- **Week 4**: Post-audit fixes and validation
+  - Address all medium+ findings
+  - Public audit report disclosure
+  - Testnet bug bounty launch
+
+### Month 6: Mainnet Launch & Market Positioning
+- **Week 1**: Final mainnet deployment preparation
+  - Production infrastructure setup
+  - Emergency response drills
+- **Week 2**: Mainnet launch
+  - Launch bug bounty program ($200K+ reserve)
+  - Community announcements
+- **Week 3-4**: Post-launch monitoring & competitive analysis (Phase 1L)
+  - Track MMT Finance launch (Oct 30)
+  - Monitor competitor metrics
+  - Attend Sui Basecamp 2025 (if scheduled)
+
+### Post-Launch (Month 7+): Phase 2 Scaling
+- Implement full sharding architecture (Phase 1J → Phase 2)
+- Deploy cross-pool netting in production
+- Optimize memory allocation for scale
+- Launch TortoiseUSD & TortoiseArb
 
 ---
 
@@ -386,10 +859,12 @@
 
 ### Technical KPIs
 - [ ] 100% E2E test coverage for critical flows
-- [ ] < 2 second average swap execution time
+- [ ] < 2 second average swap execution time (< 4s with batching)
 - [ ] 99.9% API uptime
 - [ ] All smart contracts audited with zero critical issues
 - [ ] Lighthouse performance score > 90
+- [ ] Test coverage >85% across all modules
+- [ ] Move Prover verification passing for all critical invariants
 
 ### Product KPIs
 - [ ] Support 20+ token pairs at launch
@@ -398,38 +873,86 @@
 - [ ] 5+ vault strategies implemented
 - [ ] 1000+ unique wallet connections in first week
 
+### Security KPIs (Phase 1K)
+- [ ] External audit completed with zero critical findings
+- [ ] Bug bounty program active with $200K+ reserve
+- [ ] 100% of medium+ audit findings resolved
+- [ ] Mean time to patch < 48 hours for high severity issues
+- [ ] Emergency pause mechanism tested monthly
+- [ ] Multi-sig governance operational (3-of-5 minimum)
+- [ ] Zero capability replay attacks in testing
+- [ ] All admin capabilities have TTL enforcement
+
+### Percolator Enhancement KPIs (Phase 1J)
+- [ ] Zero liquidation cascades in testnet stress tests
+- [ ] < 1% position losses during extreme volatility events
+- [ ] Cross-pool netting reduces margin requirements by 20%+
+- [ ] 90%+ reduction in sandwich attack profitability (batching)
+- [ ] < 0.1% toxic flow ratio (ARG detection)
+- [ ] Batch processing adds < 2 second latency
+- [ ] Support 100+ concurrent shards (design validated)
+- [ ] < 10MB state per shard maintained
+- [ ] Zero capability replay attacks in audit
+- [ ] 100% invariant check coverage in Move contracts
+
 ---
 
 ## Risk Mitigation
 
 ### Technical Risks
-- **Smart contract bugs**: Comprehensive testing + external audit
-- **Oracle failures**: Multiple price feed fallbacks
+- **Smart contract bugs**: Comprehensive testing + external audit + invariant checks (Phase 1J + 1K)
+- **Oracle failures**: Multiple price feed fallbacks + circuit breakers (Phase 1K)
+- **Oracle manipulation**: 3+ sources with median pricing (Phase 1K)
 - **Gas price spikes**: Gas optimization + user warnings
-- **Network congestion**: Transaction retry logic
+- **Network congestion**: Transaction retry logic + batch processing (Phase 1J)
+- **MEV exploitation**: Batch epochs + ARG taxation (Phase 1J)
+- **Liquidation cascades**: Cross-pool netting + RL prediction (Phase 1J)
+- **State bloat**: Memory-optimized allocators + shard budgets (Phase 1J)
+- **Capability replay attacks**: Nonce-based protection + TTL enforcement (Phase 1J + 1K)
+- **TEE compromise**: SGX attestation + fallback mechanisms (Phase 1K)
+- **Model tampering**: Walrus hash verification + redundant storage (Phase 1K)
 
 ### Business Risks
-- **Low liquidity**: Liquidity mining incentives
-- **Competitor advantage**: Focus on AI differentiation
+- **Low liquidity**: Liquidity mining incentives + LP protection (ARG)
+- **Competitor advantage**: Focus on AI differentiation + Percolator innovations (Phase 1L tracking)
 - **Regulatory concerns**: Clear disclaimers + legal review
+- **Market timing**: Q4 2025 - Q1 2026 sees major launches (MMT, EnsoFi, AftermathFi) - differentiate early (Phase 1L)
+
+### Sui-Specific Risks (Phase 1J)
+- **Shared object contention**: Sharding strategy + parallel execution
+- **Move language constraints**: PDA-like object derivation patterns
+- **Gas model differences**: Empirical benchmarking of batch costs
+- **Cross-shard complexity**: Centralized router for initial launch, distributed later
 
 ---
 
 ## Next Immediate Actions
 
-### This Week (Priority Tasks)
-1. Complete AMM pool.move swap functions
-2. Deploy contracts to local Sui network
-3. Build SDK transaction builders
-4. Replace preview mode with real transactions
-5. Fetch actual pool data from blockchain
+**Note:** Refer to [IMPLEMENTATION_CHECKLIST.md](./IMPLEMENTATION_CHECKLIST.md) for detailed tracking of all tasks.
+
+### This Week (Priority Tasks - Top 6 Focus)
+1. **[Repository Study] Clone all 5 Sui DeFi repositories locally** (Checklist 5.1)
+2. **[Repository Study] Deep dive into Avocado DEX - audit constant product math** (Checklist 5.1)
+3. **[Phase 1J] Port fixed-point math library from Avocado to Carapace** (Checklist 1.3)
+4. Complete AMM pool.move swap functions (audit vs Avocado)
+5. **[Phase 1J] Implement enhanced object derivation patterns** (Checklist 4.1)
+6. **[Phase 1L] Monitor MMT Finance launch (Oct 30, 2025)** (Checklist 5.2)
 
 ### Next Week
-1. Implement token balance fetching
-2. Add pool creation UI
-3. Integrate price feeds
-4. Expand E2E test coverage
-5. Set up indexer for pool events
+1. **[Repository Study] Study Cetus CLMM - flash swaps and SDK architecture** (Checklist 5.1)
+2. **[Phase 1J] Add basic invariant checks to contracts** (Checklist 4.1)
+3. Replace preview mode with real transactions
+4. Deploy contracts to local Sui network
+5. Build SDK transaction builders (using Cetus patterns)
+6. **[Phase 1L] Attend EnsoFi community calls for architecture insights** (Checklist 5.2)
+
+### Next Two Weeks (Phase 1J Foundation + Code Review)
+1. **[Repository Study] Review Navi oracle patterns for Phase 1B prep** (Checklist 5.1)
+2. Design batch processing architecture (Checklist 2.1)
+3. Prototype capability token system (Checklist 4.2)
+4. Create fixed-point math test suite (compare Avocado vs Carapace) (Checklist 1.3)
+5. Document PDA-like object derivation for vault escrows
+6. **[Phase 1K] Begin security audit preparation checklist** (See AUDIT_PREPARATION_CHECKLIST.md)
 
 ---
 
@@ -440,9 +963,65 @@
 - Timeline estimates assume 2-3 full-time developers
 - AI/ML features can be implemented in parallel with core functionality
 - Security audit should be scheduled 4-6 weeks before mainnet launch
+- **Phase 1J** integrates battle-tested innovations from Percolator (perpetuals DEX on Solana)
+- **Phase 1K** provides comprehensive security audit preparation framework
+- **Phase 1L** tracks competitive landscape and market positioning
+- **Sui DeFi references** provide production Sui Move implementations to study
+- See [PERCOLATOR_RESEARCH.md](./PERCOLATOR_RESEARCH.md) for Solana learnings
+- See [SUI_DEFI_REFERENCES.md](./SUI_DEFI_REFERENCES.md) for Sui-specific patterns
+- See [SECURITY_AUDIT_GUIDE.md](./SECURITY_AUDIT_GUIDE.md) for security best practices
+- See [SUI_DEFI_COMPETITIVE_LANDSCAPE.md](./SUI_DEFI_COMPETITIVE_LANDSCAPE.md) for market analysis
+- See [IMPLEMENTATION_CHECKLIST.md](./IMPLEMENTATION_CHECKLIST.md) for actionable development tasks
+- See [AUDIT_PREPARATION_CHECKLIST.md](./AUDIT_PREPARATION_CHECKLIST.md) for detailed audit prep
+- Percolator enhancements prioritize security, MEV protection, and scalability
+- Repository studies run in parallel with development (see "Repository Study Schedule")
+- Some Phase 1J features (sharding, cross-pool netting) will be fully deployed in Phase 2
+- **Budget**: Allocate $300-400K for comprehensive security program (audits + bug bounty)
+
+## Key Phase 1J Integration Points
+
+### Immediate Integration (Phase 1A-C)
+- Fixed-point math library
+- Enhanced object derivation
+- Basic invariant checks
+
+### Mid-Term Integration (Phase 1F-G)
+- Scoped capabilities for AI
+- Batch processing for swaps
+- Non-replay protection
+- ARG taxation
+
+### Long-Term Integration (Phase 2)
+- Full sharding architecture
+- Cross-pool netting in production
+- Memory-optimized allocation at scale
+
+## Repository Integration Summary
+
+| Repository | Primary Phase | Key Learnings | Integration Priority |
+|------------|---------------|---------------|---------------------|
+| **Avocado DEX** | Phase 1A | Fixed-point math, clean reference implementation | 🔴 CRITICAL (Week 1) |
+| **Cetus CLMM** | Phase 1A, 1C | Flash swaps, SDK patterns, TWAP oracles | 🟠 HIGH (Week 2) |
+| **Navi Lending** | Phase 1B, 1E | Oracle aggregation, risk management, liquidations | 🔴 CRITICAL (Week 5-6) |
+| **Turbos Finance** | Phase 1J | Sharding, batch settlement, gas optimization | 🔴 CRITICAL (Week 7-8) |
+| **Sui-AI-Agent-Kit** | Phase 1F | MCP tools, capability systems, TEE integration | 🔴 CRITICAL (Week 10-11) |
+
+### Quick Reference: Feature Adoption
+
+| Feature | Source Repo | Carapace Implementation | Status |
+|---------|-------------|------------------------|--------|
+| Fixed-point math | Avocado | `move/sources/math/fixed_point.move` | Week 1 |
+| Flash swaps | Cetus | `move/sources/amm/pool.move` | Week 2 |
+| Emergency pause | Navi | `move/sources/amm/pool.move`, `vault.move` | Phase 1A |
+| Multi-oracle | Navi | `packages/sdk/src/oracles/` | Phase 1B |
+| Sharding | Turbos + Percolator | `move/sources/amm/shard.move` | Phase 1J |
+| Batch processing | Turbos | `move/sources/amm/batch.move` | Phase 1J |
+| MCP tools | AI Agent Kit | `apps/api/src/services/mcp/` | Phase 1F |
+| Capability tokens | AI Agent Kit + Percolator | `move/sources/vault/capabilities.move` | Phase 1F + 1J |
 
 ---
 
 **Last Updated**: 2025-10-22
 **Status**: In Active Development
-**Target Mainnet Launch**: Q1 2026
+**Target Mainnet Launch**: Q2 2026 (extended for Phase 1J)
+**Target Testnet Launch**: Q1 2026

@@ -1,231 +1,260 @@
 /**
- * Pool Routes
+ * Pool Routes (Elysia Plugin)
  */
 
-import { Router } from 'express';
-import { z } from 'zod';
+import { Elysia, t } from 'elysia';
 import type { CarapaceSDK } from '@carapace/sdk';
 import { poolQueries } from '../db/client';
 import { mockDataProvider } from '../db/mock-data';
-import { config } from '../config';
 
-export function createPoolRoutes(sdk: CarapaceSDK) {
-  const router = Router();
-
+export const createPoolPlugin = new Elysia({ prefix: '/api/pools' })
   /**
-   * GET /pools
+   * GET /api/pools
    * List all pools
    */
-  router.get('/', async (req, res) => {
-    try {
-      const limit = Math.min(parseInt(req.query.limit as string) || 100, 1000);
-      const offset = parseInt(req.query.offset as string) || 0;
-
-      let pools;
+  .get(
+    '/',
+    async ({ query }) => {
       try {
-        pools = await poolQueries.getAll(limit, offset);
-        // If database returns empty, use mock data
-        if (!pools || pools.length === 0) {
-          console.log('No pools in database, using mock data');
+        const limit = Math.min(parseInt(query.limit as string) || 100, 1000);
+        const offset = parseInt(query.offset as string) || 0;
+
+        let pools;
+        try {
+          pools = await poolQueries.getAll(limit, offset);
+          // If database returns empty, use mock data
+          if (!pools || pools.length === 0) {
+            console.log('No pools in database, using mock data');
+            pools = mockDataProvider.getAllPools(limit, offset);
+          }
+        } catch (dbError) {
+          console.log('Database unavailable, using mock data');
           pools = mockDataProvider.getAllPools(limit, offset);
         }
-      } catch (dbError) {
-        console.log('Database unavailable, using mock data');
-        pools = mockDataProvider.getAllPools(limit, offset);
-      }
 
-      res.json({
-        success: true,
-        data: pools,
-        meta: {
-          limit,
-          offset,
-          count: pools.length,
-        },
-      });
-    } catch (error) {
-      console.error('Error fetching pools:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to fetch pools',
-      });
+        return {
+          success: true,
+          data: pools,
+          meta: {
+            limit,
+            offset,
+            count: pools.length,
+          },
+        };
+      } catch (error) {
+        console.error('Error fetching pools:', error);
+        throw new Error('Failed to fetch pools');
+      }
+    },
+    {
+      query: t.Object({
+        limit: t.Optional(t.String()),
+        offset: t.Optional(t.String()),
+      }),
     }
-  });
+  )
 
   /**
-   * GET /pools/:id
+   * GET /api/pools/:id
    * Get pool details
    */
-  router.get('/:id', async (req, res) => {
-    try {
-      const { id } = req.params;
-
-      let pool;
+  .get(
+    '/:id',
+    async ({ params, set }) => {
       try {
-        // Try database first (faster)
-        pool = await poolQueries.getById(id);
+        const { id } = params;
 
-        // If not in DB, try mock data
-        if (!pool) {
+        let pool;
+        try {
+          // Try database first (faster)
+          pool = await poolQueries.getById(id);
+
+          // If not in DB, try mock data
+          if (!pool) {
+            pool = mockDataProvider.getPool(id);
+          }
+        } catch (dbError) {
+          console.log('Database unavailable, using mock data');
           pool = mockDataProvider.getPool(id);
         }
-      } catch (dbError) {
-        console.log('Database unavailable, using mock data');
-        pool = mockDataProvider.getPool(id);
-      }
 
-      if (!pool) {
-        return res.status(404).json({
-          success: false,
-          error: 'Pool not found',
-        });
-      }
+        if (!pool) {
+          set.status = 404;
+          return {
+            success: false,
+            error: 'Pool not found',
+          };
+        }
 
-      res.json({
-        success: true,
-        data: pool,
-      });
-    } catch (error) {
-      console.error('Error fetching pool:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to fetch pool',
-      });
+        return {
+          success: true,
+          data: pool,
+        };
+      } catch (error) {
+        console.error('Error fetching pool:', error);
+        throw new Error('Failed to fetch pool');
+      }
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
     }
-  });
+  )
 
   /**
-   * GET /pools/:id/quote
+   * GET /api/pools/:id/quote
    * Get swap quote
    */
-  router.get('/:id/quote', async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { amountIn, isXToY } = req.query;
+  .get(
+    '/:id/quote',
+    async ({ params, query, set }) => {
+      try {
+        const { id } = params;
+        const { amountIn, isXToY } = query;
 
-      if (!amountIn || isXToY === undefined) {
-        return res.status(400).json({
-          success: false,
-          error: 'Missing required parameters: amountIn, isXToY',
-        });
+        if (!amountIn || isXToY === undefined) {
+          set.status = 400;
+          return {
+            success: false,
+            error: 'Missing required parameters: amountIn, isXToY',
+          };
+        }
+
+        const amountInBigInt = BigInt(amountIn);
+        const isXToYBool = isXToY === 'true';
+
+        // Try mock data calculation
+        const mockQuote = mockDataProvider.calculateSwapOutput(
+          id,
+          amountInBigInt,
+          isXToYBool
+        );
+
+        if (!mockQuote) {
+          set.status = 404;
+          return {
+            success: false,
+            error: 'Pool not found',
+          };
+        }
+
+        return {
+          success: true,
+          data: {
+            amountIn: amountInBigInt.toString(),
+            amountOut: mockQuote.amountOut.toString(),
+            priceImpact: mockQuote.priceImpact,
+            fee: mockQuote.fee.toString(),
+            route: [id],
+          },
+        };
+      } catch (error) {
+        console.error('Error getting quote:', error);
+        throw new Error('Failed to get quote');
       }
-
-      const amountInBigInt = BigInt(amountIn as string);
-      const isXToYBool = isXToY === 'true';
-
-      // Try mock data calculation
-      const mockQuote = mockDataProvider.calculateSwapOutput(
-        id,
-        amountInBigInt,
-        isXToYBool
-      );
-
-      if (!mockQuote) {
-        return res.status(404).json({
-          success: false,
-          error: 'Pool not found',
-        });
-      }
-
-      res.json({
-        success: true,
-        data: {
-          amountIn: amountInBigInt.toString(),
-          amountOut: mockQuote.amountOut.toString(),
-          priceImpact: mockQuote.priceImpact,
-          fee: mockQuote.fee.toString(),
-          route: [id],
-        },
-      });
-    } catch (error) {
-      console.error('Error getting quote:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to get quote',
-      });
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+      query: t.Object({
+        amountIn: t.String(),
+        isXToY: t.String(),
+      }),
     }
-  });
+  )
 
   /**
-   * GET /pools/:id/price
+   * GET /api/pools/:id/price
    * Get spot price
    */
-  router.get('/:id/price', async (req, res) => {
-    try {
-      const { id } = req.params;
-      const price = mockDataProvider.getSpotPrice(id);
+  .get(
+    '/:id/price',
+    async ({ params, set }) => {
+      try {
+        const { id } = params;
+        const price = mockDataProvider.getSpotPrice(id);
 
-      if (price === null) {
-        return res.status(404).json({
-          success: false,
-          error: 'Pool not found',
-        });
+        if (price === null) {
+          set.status = 404;
+          return {
+            success: false,
+            error: 'Pool not found',
+          };
+        }
+
+        return {
+          success: true,
+          data: { price },
+        };
+      } catch (error) {
+        console.error('Error getting price:', error);
+        throw new Error('Failed to get price');
       }
-
-      res.json({
-        success: true,
-        data: { price },
-      });
-    } catch (error) {
-      console.error('Error getting price:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to get price',
-      });
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
     }
-  });
+  )
 
   /**
-   * POST /pools/:id/swap
+   * POST /api/pools/:id/swap
    * Get swap transaction
    */
-  router.post('/:id/swap', async (req, res) => {
-    try {
-      const { id } = req.params;
-      const schema = z.object({
-        tokenIn: z.string(),
-        tokenOut: z.string(),
-        coinIn: z.string(),
-        amountIn: z.string(),
-        minAmountOut: z.string().optional(),
-        isXToY: z.boolean(),
-      });
+  .post(
+    '/:id/swap',
+    async ({ params, body, sdk }) => {
+      try {
+        const { id } = params;
 
-      const body = schema.parse(req.body);
+        const tx = body.isXToY
+          ? sdk.pool.swapXToY(
+              id,
+              body.tokenIn,
+              body.tokenOut,
+              body.coinIn,
+              BigInt(body.amountIn),
+              body.minAmountOut ? BigInt(body.minAmountOut) : 0n,
+            )
+          : sdk.pool.swapYToX(
+              id,
+              body.tokenIn,
+              body.tokenOut,
+              body.coinIn,
+              BigInt(body.amountIn),
+              body.minAmountOut ? BigInt(body.minAmountOut) : 0n,
+            );
 
-      const tx = body.isXToY
-        ? sdk.pool.swapXToY(
-            id,
-            body.coinIn,
-            BigInt(body.amountIn),
-            body.minAmountOut ? BigInt(body.minAmountOut) : 0n,
-          )
-        : sdk.pool.swapYToX(
-            id,
-            body.coinIn,
-            BigInt(body.amountIn),
-            body.minAmountOut ? BigInt(body.minAmountOut) : 0n,
-          );
+        // Serialize transaction
+        const txBytes = await tx.build({
+          client: sdk.client,
+        });
 
-      // Serialize transaction
-      const txBytes = await tx.build({
-        client: sdk.client,
-      });
-
-      res.json({
-        success: true,
-        data: {
-          transaction: Buffer.from(txBytes).toString('base64'),
-        },
-      });
-    } catch (error) {
-      console.error('Error creating swap tx:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to create swap transaction',
-      });
+        return {
+          success: true,
+          data: {
+            transaction: Buffer.from(txBytes).toString('base64'),
+          },
+        };
+      } catch (error) {
+        console.error('Error creating swap tx:', error);
+        throw new Error('Failed to create swap transaction');
+      }
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+      body: t.Object({
+        tokenIn: t.String(),
+        tokenOut: t.String(),
+        coinIn: t.String(),
+        amountIn: t.String(),
+        minAmountOut: t.Optional(t.String()),
+        isXToY: t.Boolean(),
+      }),
     }
-  });
-
-  return router;
-}
+  );

@@ -80,6 +80,7 @@ async function main() {
       SUI_TYPE,
       null, // Use gas coin for SUI
       amountIn,
+      address, // sender address for output coin transfer
       minAmountOut,
       {
         gasBudget: 10_000_000,

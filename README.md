@@ -255,13 +255,35 @@ This project handles financial assets. Security is our top priority:
 - Bug bounty program coming soon
 - Report vulnerabilities to: security@tortoiseos.dev
 
-## Resources
+## Documentation
 
-### Documentation
-- [Carapace Docs](./docs/README.md)
+### Core Documents (Root)
+- **[README.md](./README.md)** - This file (project overview)
+- **[ROADMAP.md](./ROADMAP.md)** - Complete Phase 1 roadmap
+- **[FUNCTIONAL_STATUS.md](./FUNCTIONAL_STATUS.md)** - Current functional status (updated: 2025-10-22)
+
+### Documentation Index
+📚 **[docs/INDEX.md](./docs/INDEX.md)** - Complete documentation index with organization and history
+
+### Quick Links
+- **Getting Started**: [docs/guides/GETTING_STARTED.md](./docs/guides/GETTING_STARTED.md)
+- **Testnet Deployment**: [docs/guides/TESTNET_DEPLOYMENT.md](./docs/guides/TESTNET_DEPLOYMENT.md)
+- **Troubleshooting**: [docs/guides/TROUBLESHOOTING.md](./docs/guides/TROUBLESHOOTING.md)
+- **Security Audit Guide**: [docs/security/SECURITY_AUDIT_GUIDE.md](./docs/security/SECURITY_AUDIT_GUIDE.md)
+- **Sui DeFi Research**: [docs/research/SUI_DEFI_REFERENCES.md](./docs/research/SUI_DEFI_REFERENCES.md)
+- **Percolator Research**: [docs/research/PERCOLATOR_RESEARCH.md](./docs/research/PERCOLATOR_RESEARCH.md)
+
+### External Documentation
 - [TortoiseOS Main Repo](https://github.com/tortoise-os/bun-move)
 - [Sui Documentation](https://docs.sui.io)
 - [Move Language Guide](https://move-language.github.io/move/)
+
+### Reference Implementations (Sui DeFi)
+- [Cetus CLMM](https://github.com/CetusProtocol/cetus-clmm) - Concentrated liquidity AMM
+- [Navi Protocol](https://github.com/naviprotocol/navi-lending) - Lending protocol
+- [Turbos Finance](https://github.com/turbos-finance/turbos) - Hybrid DEX
+- [Avocado DEX](https://github.com/avocadodefi/sc-dex) - Clean reference implementation
+- [Sui AI Agent Kit](https://github.com/caterpillardev/Sui-AI-Agent-Kit) - AI/DeFi integration
 
 ### Community
 - [Discord](https://discord.gg/tortoiseos)

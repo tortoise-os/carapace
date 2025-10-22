@@ -1,26 +1,14 @@
 /**
  * Carapace API Server
+ * Using Elysia.js - https://elysiajs.com
  */
 
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
+import { Elysia, t } from 'elysia';
+import { cors } from '@elysiajs/cors';
 import { CarapaceSDK } from '@carapace/sdk';
 import { config } from './config';
 import { testConnection } from './db/client';
-import { createPoolRoutes } from './routes/pools';
-
-const app = express();
-
-// Middleware
-app.use(helmet());
-app.use(cors(config.cors));
-app.use(express.json());
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+import { createPoolPlugin } from './routes/pools';
 
 // Initialize SDK
 const sdk = new CarapaceSDK({
@@ -29,25 +17,44 @@ const sdk = new CarapaceSDK({
   packageIds: config.sui.packageIds,
 });
 
-// Routes
-app.use('/api/pools', createPoolRoutes(sdk));
+// Create Elysia app
+const app = new Elysia()
+  .use(cors({
+    origin: config.cors.origin,
+    credentials: config.cors.credentials,
+  }))
+  .decorate('sdk', sdk)
+  .get('/health', () => ({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+  }))
+  .use(createPoolPlugin)
+  .onError(({ code, error, set }) => {
+    console.error('Error:', error);
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Not found',
-  });
-});
+    if (code === 'VALIDATION') {
+      set.status = 400;
+      return {
+        success: false,
+        error: 'Validation error',
+        details: error.message,
+      };
+    }
 
-// Error handler
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err);
-  res.status(500).json({
-    success: false,
-    error: err.message || 'Internal server error',
+    if (code === 'NOT_FOUND') {
+      set.status = 404;
+      return {
+        success: false,
+        error: 'Not found',
+      };
+    }
+
+    set.status = 500;
+    return {
+      success: false,
+      error: error.message || 'Internal server error',
+    };
   });
-});
 
 // Start server
 async function start() {
@@ -58,9 +65,9 @@ async function start() {
       console.log('⚠️  Running in mock mode - database unavailable');
     }
 
-    app.listen(config.server.port, config.server.host, () => {
+    app.listen(config.server.port, () => {
       console.log(`
-🐢 Carapace API Server
+🐢 Carapace API Server (Elysia.js)
 
 Environment: ${config.server.env}
 Network: ${config.sui.network}
