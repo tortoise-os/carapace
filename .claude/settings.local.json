@@ -38,7 +38,10 @@
       "Bash(curl:*)",
       "Bash(sui move test:*)",
       "Bash(cat:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(task move:build:*)",
+      "Bash(task move:test)",
+      "Bash(task:*)"
     ],
     "deny": [],
     "ask": []

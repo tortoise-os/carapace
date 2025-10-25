@@ -156,6 +156,136 @@ tasks:
     cmds:
       - rm -rf build/
 
+  # Pool Operations
+  pool:create:
+    desc: Create a new AMM pool
+    cmds:
+      - |
+        echo "Creating new AMM pool..."
+        echo "Package ID: $PACKAGE_ID"
+        echo "Token X Type: $TOKEN_X"
+        echo "Token Y Type: $TOKEN_Y"
+        sui client call \
+          --package $PACKAGE_ID \
+          --module pool \
+          --function create_pool \
+          --type-args $TOKEN_X $TOKEN_Y \
+          --gas-budget 100000000
+
+  pool:add-liquidity:
+    desc: Add liquidity to a pool
+    cmds:
+      - |
+        echo "Adding liquidity to pool..."
+        sui client call \
+          --package $PACKAGE_ID \
+          --module pool \
+          --function add_liquidity \
+          --type-args $TOKEN_X $TOKEN_Y \
+          --args $POOL_ID $COIN_X_ID $COIN_Y_ID $AMOUNT_X $AMOUNT_Y $MIN_X $MIN_Y \
+          --gas-budget 100000000
+
+  pool:remove-liquidity:
+    desc: Remove liquidity from a pool
+    cmds:
+      - |
+        echo "Removing liquidity from pool..."
+        sui client call \
+          --package $PACKAGE_ID \
+          --module pool \
+          --function remove_liquidity \
+          --type-args $TOKEN_X $TOKEN_Y \
+          --args $POOL_ID $LP_TOKEN $MIN_X $MIN_Y \
+          --gas-budget 100000000
+
+  pool:swap:
+    desc: Execute a token swap
+    cmds:
+      - |
+        echo "Executing swap..."
+        sui client call \
+          --package $PACKAGE_ID \
+          --module pool \
+          --function swap_x_to_y \
+          --type-args $TOKEN_X $TOKEN_Y \
+          --args $POOL_ID $COIN_IN $MIN_OUT \
+          --gas-budget 100000000
+
+  pool:pause:
+    desc: Emergency pause a pool (requires admin cap)
+    cmds:
+      - |
+        echo "⚠️  Pausing pool (emergency only)..."
+        sui client call \
+          --package $PACKAGE_ID \
+          --module pool \
+          --function pause \
+          --type-args $TOKEN_X $TOKEN_Y \
+          --args $ADMIN_CAP $POOL_ID \
+          --gas-budget 100000000
+
+  pool:unpause:
+    desc: Unpause a pool (requires admin cap)
+    cmds:
+      - |
+        echo "Unpausing pool..."
+        sui client call \
+          --package $PACKAGE_ID \
+          --module pool \
+          --function unpause \
+          --type-args $TOKEN_X $TOKEN_Y \
+          --args $ADMIN_CAP $POOL_ID \
+          --gas-budget 100000000
+
+  pool:info:
+    desc: Get pool information
+    cmds:
+      - |
+        if [ -z "$POOL_ID" ]; then
+          echo "Error: POOL_ID environment variable not set"
+          exit 1
+        fi
+        sui client object $POOL_ID --json
+
+  # Vault Operations
+  vault:create:
+    desc: Create a new vault
+    cmds:
+      - |
+        echo "Creating new vault..."
+        sui client call \
+          --package $PACKAGE_ID \
+          --module vault \
+          --function create_vault \
+          --type-args $TOKEN_TYPE \
+          --gas-budget 100000000
+
+  vault:deposit:
+    desc: Deposit tokens into vault
+    cmds:
+      - |
+        echo "Depositing into vault..."
+        sui client call \
+          --package $PACKAGE_ID \
+          --module vault \
+          --function deposit \
+          --type-args $TOKEN_TYPE \
+          --args $VAULT_ID $COIN_ID \
+          --gas-budget 100000000
+
+  vault:withdraw:
+    desc: Withdraw tokens from vault
+    cmds:
+      - |
+        echo "Withdrawing from vault..."
+        sui client call \
+          --package $PACKAGE_ID \
+          --module vault \
+          --function withdraw \
+          --type-args $TOKEN_TYPE \
+          --args $VAULT_ID $SHARE_TOKEN \
+          --gas-budget 100000000
+
   # Testing
   test:
     desc: Run all tests
