@@ -1,0 +1,110 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "🐢 TortoiseSwap AI-Powered DEX" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e6]: 🐢
+          - generic [ref=e7]:
+            - heading "TortoiseSwap" [level=1] [ref=e8]
+            - paragraph [ref=e9]: AI-Powered DEX
+        - navigation [ref=e10]:
+          - link "Swap" [ref=e11] [cursor=pointer]:
+            - /url: /swap
+          - link "Pools" [ref=e12] [cursor=pointer]:
+            - /url: /pools
+          - link "Analytics" [ref=e13] [cursor=pointer]:
+            - /url: /analytics
+          - link "Docs" [ref=e14] [cursor=pointer]:
+            - /url: https://github.com/yourusername/tortoise-os
+        - generic [ref=e15]:
+          - button "Toggle theme" [ref=e16] [cursor=pointer]:
+            - img
+            - generic [ref=e22]: Toggle theme
+          - button "Connect Wallet" [ref=e23] [cursor=pointer]
+    - main [ref=e24]:
+      - generic [ref=e25]:
+        - img [ref=e26]
+        - generic [ref=e2909]:
+          - generic [ref=e2910]:
+            - heading "Swap" [level=2] [ref=e2911]
+            - button "Swap settings" [ref=e2912] [cursor=pointer]:
+              - img [ref=e2913]
+          - generic [ref=e2916]:
+            - generic [ref=e2918]: You pay
+            - generic [ref=e2919]:
+              - textbox "0" [active] [ref=e2920]: "10"
+              - button "S SUI" [ref=e2921] [cursor=pointer]:
+                - generic [ref=e2922]: S
+                - generic [ref=e2923]: SUI
+                - img [ref=e2924]
+            - generic [ref=e2926]: $0.00
+          - button [ref=e2928] [cursor=pointer]:
+            - img [ref=e2929]
+          - generic [ref=e2931]:
+            - generic [ref=e2933]: You receive
+            - generic [ref=e2934]:
+              - textbox "0" [ref=e2935]
+              - button "U USDC" [ref=e2936] [cursor=pointer]:
+                - generic [ref=e2937]: U
+                - generic [ref=e2938]: USDC
+                - img [ref=e2939]
+          - button "Connect Wallet" [disabled] [ref=e2941]
+    - contentinfo [ref=e2942]:
+      - generic [ref=e2943]:
+        - generic [ref=e2944]:
+          - generic [ref=e2945]:
+            - generic [ref=e2946]:
+              - generic [ref=e2947]: 🐢
+              - heading "TortoiseSwap" [level=2] [ref=e2948]
+            - paragraph [ref=e2949]: AI-powered DEX on Sui blockchain. Trade smarter with adaptive fees and intelligent yield optimization.
+          - generic [ref=e2950]:
+            - heading "Product" [level=3] [ref=e2951]
+            - list [ref=e2952]:
+              - listitem [ref=e2953]:
+                - link "Swap" [ref=e2954] [cursor=pointer]:
+                  - /url: /swap
+              - listitem [ref=e2955]:
+                - link "Pools" [ref=e2956] [cursor=pointer]:
+                  - /url: /pools
+              - listitem [ref=e2957]:
+                - link "Analytics" [ref=e2958] [cursor=pointer]:
+                  - /url: /analytics
+              - listitem [ref=e2959]:
+                - link "Vaults" [ref=e2960] [cursor=pointer]:
+                  - /url: "#"
+          - generic [ref=e2961]:
+            - heading "Community" [level=3] [ref=e2962]
+            - list [ref=e2963]:
+              - listitem [ref=e2964]:
+                - link "Twitter" [ref=e2965] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e2966]:
+                - link "Discord" [ref=e2967] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e2968]:
+                - link "GitHub" [ref=e2969] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e2970]:
+                - link "Docs" [ref=e2971] [cursor=pointer]:
+                  - /url: "#"
+        - paragraph [ref=e2973]: © 2025 TortoiseSwap. Built on Sui. Powered by AI.
+  - region "Notifications alt+T"
+  - generic:
+    - generic [ref=e2976] [cursor=pointer]:
+      - img [ref=e2977]
+      - generic [ref=e2979]: 5 errors
+      - button "Hide Errors" [ref=e2980]:
+        - img [ref=e2981]
+    - status [ref=e2984]:
+      - generic [ref=e2985]:
+        - img [ref=e2987]
+        - generic [ref=e2989]:
+          - text: Static route
+          - button "Hide static indicator" [ref=e2990] [cursor=pointer]:
+            - img [ref=e2991]
+  - alert [ref=e2994]
+```

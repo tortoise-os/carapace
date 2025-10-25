@@ -2,6 +2,8 @@
  * Oracle Client - Fetch token prices from Pyth Network
  */
 
+import type { Network } from './types';
+
 /**
  * Pyth price feed IDs for tokens
  * See: https://pyth.network/developers/price-feed-ids
@@ -18,11 +20,14 @@ export const PYTH_PRICE_FEED_IDS = {
  * Pyth Hermes API endpoint
  * For testnet, use: https://hermes-beta.pyth.network
  * For mainnet, use: https://hermes.pyth.network
+ * For devnet/localnet, fallback to testnet
  */
-const HERMES_ENDPOINTS = {
+const HERMES_ENDPOINTS: Record<Network, string> = {
   mainnet: 'https://hermes.pyth.network',
   testnet: 'https://hermes-beta.pyth.network',
-} as const;
+  devnet: 'https://hermes-beta.pyth.network',
+  localnet: 'https://hermes-beta.pyth.network',
+};
 
 interface PythPriceData {
   id: string;
@@ -55,8 +60,6 @@ export interface TokenPrice {
 interface CachedPrice extends TokenPrice {
   cachedAt: number;
 }
-
-export type Network = 'mainnet' | 'testnet';
 
 export class OracleClient {
   private hermesUrl: string;
@@ -110,7 +113,7 @@ export class OracleClient {
         throw new Error(`Hermes API error: ${response.status} ${response.statusText}`);
       }
 
-      const data: PythPriceResponse = await response.json();
+      const data = await response.json() as PythPriceResponse;
 
       if (!data.parsed || data.parsed.length === 0) {
         throw new Error(`No price data returned for ${symbol}`);

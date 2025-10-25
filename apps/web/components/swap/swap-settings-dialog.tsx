@@ -10,7 +10,7 @@ import {
   Button,
   Input,
 } from '@carapace/ui';
-import { Settings, ChevronRight, ExternalLink } from 'lucide-react';
+import { Settings, ExternalLink, AlertTriangle } from 'lucide-react';
 
 interface SwapSettingsDialogProps {
   open: boolean;
@@ -20,6 +20,7 @@ interface SwapSettingsDialogProps {
 export function SwapSettingsDialog({ open, onOpenChange }: SwapSettingsDialogProps) {
   const [slippage, setSlippage] = useState('0.5');
   const [customSlippage, setCustomSlippage] = useState('');
+  const [deadline, setDeadline] = useState('20');
   const [gasBudget, setGasBudget] = useState('');
   const [usingLedger, setUsingLedger] = useState(false);
   const [rpc, setRpc] = useState('https://fullnode.mainnet.sui.io:443');
@@ -36,6 +37,27 @@ export function SwapSettingsDialog({ open, onOpenChange }: SwapSettingsDialogPro
     setCustomSlippage(value);
     setSlippage('custom');
   };
+
+  const getSlippageWarning = () => {
+    const numSlippage = parseFloat(slippage === 'custom' ? customSlippage : slippage);
+    if (isNaN(numSlippage)) return null;
+
+    if (numSlippage < 0.1) {
+      return { level: 'error', message: 'Your transaction may fail due to low slippage' };
+    }
+    if (numSlippage < 0.5) {
+      return { level: 'warning', message: 'Your transaction may fail' };
+    }
+    if (numSlippage > 5) {
+      return { level: 'error', message: 'High slippage - you may be front-run' };
+    }
+    if (numSlippage > 1) {
+      return { level: 'warning', message: 'High slippage tolerance' };
+    }
+    return null;
+  };
+
+  const slippageWarning = getSlippageWarning();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -88,8 +110,40 @@ export function SwapSettingsDialog({ open, onOpenChange }: SwapSettingsDialogPro
               <span className="text-sm text-muted-foreground">%</span>
             </div>
 
+            {slippageWarning && (
+              <div
+                className={`flex items-center gap-2 p-3 rounded-lg ${
+                  slippageWarning.level === 'error'
+                    ? 'bg-red-500/10 text-red-600 border border-red-500/20'
+                    : 'bg-yellow-500/10 text-yellow-600 border border-yellow-500/20'
+                }`}
+              >
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                <span className="text-xs font-medium">{slippageWarning.message}</span>
+              </div>
+            )}
+
             <p className="text-xs text-muted-foreground">
               Your transaction will revert if the price changes unfavorably by more than this percentage.
+            </p>
+          </div>
+
+          {/* Transaction Deadline */}
+          <div className="space-y-3">
+            <label className="text-sm font-semibold">Transaction Deadline</label>
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+                className="h-9"
+                min="1"
+                max="4320"
+              />
+              <span className="text-sm text-muted-foreground">minutes</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Your transaction will revert if it is pending for more than this long.
             </p>
           </div>
 
@@ -175,6 +229,7 @@ export function SwapSettingsDialog({ open, onOpenChange }: SwapSettingsDialogPro
             onClick={() => {
               setSlippage('0.5');
               setCustomSlippage('');
+              setDeadline('20');
               setGasBudget('');
               setUsingLedger(false);
               setRpc('https://fullnode.mainnet.sui.io:443');

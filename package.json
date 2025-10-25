@@ -13,6 +13,9 @@
     "test": "bun test",
     "lint": "bun run --filter './apps/*' --filter './packages/*' lint"
   },
+  "resolutions": {
+    "@mysten/sui": "^1.14.0"
+  },
   "devDependencies": {
     "@types/bun": "^1.1.10",
     "playwright": "^1.56.1",

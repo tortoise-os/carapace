@@ -56,6 +56,42 @@ export default function RootLayout({
                   >
                     Pools
                   </Link>
+                  <Link
+                    href="/staking"
+                    className="px-4 py-2 text-sm font-medium rounded-md hover:bg-accent/10 hover:text-accent transition-all"
+                  >
+                    Staking
+                  </Link>
+                  <Link
+                    href="/governance"
+                    className="px-4 py-2 text-sm font-medium rounded-md hover:bg-accent/10 hover:text-accent transition-all"
+                  >
+                    Governance
+                  </Link>
+                  <Link
+                    href="/orders"
+                    className="px-4 py-2 text-sm font-medium rounded-md hover:bg-accent/10 hover:text-accent transition-all"
+                  >
+                    Orders
+                  </Link>
+                  <Link
+                    href="/portfolio"
+                    className="px-4 py-2 text-sm font-medium rounded-md hover:bg-accent/10 hover:text-accent transition-all"
+                  >
+                    Portfolio
+                  </Link>
+                  <Link
+                    href="/analytics"
+                    className="px-4 py-2 text-sm font-medium rounded-md hover:bg-accent/10 hover:text-accent transition-all"
+                  >
+                    Analytics
+                  </Link>
+                  <Link
+                    href="/roadmap"
+                    className="px-4 py-2 text-sm font-medium rounded-md hover:bg-accent/10 hover:text-accent transition-all"
+                  >
+                    Roadmap
+                  </Link>
                   <a
                     href="https://github.com/yourusername/tortoise-os"
                     target="_blank"
@@ -97,8 +133,9 @@ export default function RootLayout({
                     <ul className="space-y-2 text-sm text-muted-foreground">
                       <li><Link href="/swap" className="hover:text-primary transition-colors">Swap</Link></li>
                       <li><Link href="/pools" className="hover:text-primary transition-colors">Pools</Link></li>
-                      <li><a href="#" className="hover:text-primary transition-colors">Vaults</a></li>
-                      <li><a href="#" className="hover:text-primary transition-colors">Analytics</a></li>
+                      <li><Link href="/positions" className="hover:text-primary transition-colors">Positions</Link></li>
+                      <li><Link href="/history" className="hover:text-primary transition-colors">History</Link></li>
+                      <li><Link href="/analytics" className="hover:text-primary transition-colors">Analytics</Link></li>
                     </ul>
                   </div>
 

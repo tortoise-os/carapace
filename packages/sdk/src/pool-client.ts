@@ -2,12 +2,11 @@
  * Pool Client - Interact with AMM pools
  */
 
-import { SuiClient } from '@mysten/sui.js/client';
-import { TransactionBlock } from '@mysten/sui.js/transactions';
+import { SuiClient } from '@mysten/sui/client';
+import { Transaction } from '@mysten/sui/transactions';
 import type {
   PoolInfo,
   SwapQuote,
-  LiquidityQuote,
   TxOptions,
   CoinType,
   ObjectId,
@@ -40,13 +39,13 @@ export class PoolClient {
     // Extract token types from pool type
     const poolType = poolObject.data.content.type;
     const typeMatch = poolType.match(/Pool<(.+),\s*(.+)>/);
-    const tokenX = typeMatch ? typeMatch[1]!.trim() : '' as X;
-    const tokenY = typeMatch ? typeMatch[2]!.trim() : '' as Y;
+    const tokenX = (typeMatch ? typeMatch[1]!.trim() : '') as X;
+    const tokenY = (typeMatch ? typeMatch[2]!.trim() : '') as Y;
 
     return {
       poolId,
-      tokenX,
-      tokenY,
+      tokenX: tokenX as X,
+      tokenY: tokenY as Y,
       reserveX: BigInt(fields.reserve_x || '0'),
       reserveY: BigInt(fields.reserve_y || '0'),
       lpSupply: BigInt(fields.lp_supply?.fields?.value || '0'),
@@ -159,8 +158,8 @@ export class PoolClient {
     typeX: string,
     typeY: string,
     options?: TxOptions,
-  ): TransactionBlock {
-    const tx = new TransactionBlock();
+  ): Transaction {
+    const tx = new Transaction();
 
     tx.moveCall({
       target: `${this.packageId}::pool::create_pool`,
@@ -189,8 +188,8 @@ export class PoolClient {
     senderAddress: string,
     minLiquidity: bigint = 0n,
     options?: TxOptions,
-  ): TransactionBlock {
-    const tx = new TransactionBlock();
+  ): Transaction {
+    const tx = new Transaction();
 
     // For SUI tokens, use gas coin
     const isSuiX = typeX === '0x2::sui::SUI';
@@ -201,36 +200,36 @@ export class PoolClient {
 
     if (isSuiX && isSuiY) {
       // Both are SUI, split from gas
-      [coinXSplit] = tx.splitCoins(tx.gas, [tx.pure(amountX)]);
-      [coinYSplit] = tx.splitCoins(tx.gas, [tx.pure(amountY)]);
+      [coinXSplit] = tx.splitCoins(tx.gas, [tx.pure.u64(amountX)]);
+      [coinYSplit] = tx.splitCoins(tx.gas, [tx.pure.u64(amountY)]);
     } else if (isSuiX) {
       // X is SUI, use gas
-      [coinXSplit] = tx.splitCoins(tx.gas, [tx.pure(amountX)]);
-      [coinYSplit] = tx.splitCoins(tx.object(coinY!), [tx.pure(amountY)]);
+      [coinXSplit] = tx.splitCoins(tx.gas, [tx.pure.u64(amountX)]);
+      [coinYSplit] = tx.splitCoins(tx.object(coinY!), [tx.pure.u64(amountY)]);
     } else if (isSuiY) {
       // Y is SUI, use gas
-      [coinXSplit] = tx.splitCoins(tx.object(coinX!), [tx.pure(amountX)]);
-      [coinYSplit] = tx.splitCoins(tx.gas, [tx.pure(amountY)]);
+      [coinXSplit] = tx.splitCoins(tx.object(coinX!), [tx.pure.u64(amountX)]);
+      [coinYSplit] = tx.splitCoins(tx.gas, [tx.pure.u64(amountY)]);
     } else {
       // Neither is SUI
-      [coinXSplit] = tx.splitCoins(tx.object(coinX!), [tx.pure(amountX)]);
-      [coinYSplit] = tx.splitCoins(tx.object(coinY!), [tx.pure(amountY)]);
+      [coinXSplit] = tx.splitCoins(tx.object(coinX!), [tx.pure.u64(amountX)]);
+      [coinYSplit] = tx.splitCoins(tx.object(coinY!), [tx.pure.u64(amountY)]);
     }
 
     // Call add_liquidity - returns LP token
-    const [lpToken] = tx.moveCall({
+    const lpToken = tx.moveCall({
       target: `${this.packageId}::pool::add_liquidity`,
       typeArguments: [typeX, typeY],
       arguments: [
         tx.object(poolId),
-        coinXSplit,
-        coinYSplit,
-        tx.pure(minLiquidity),
+        coinXSplit!,
+        coinYSplit!,
+        tx.pure.u64(minLiquidity),
       ],
     });
 
     // Transfer LP token to sender
-    tx.transferObjects([lpToken], tx.pure.address(senderAddress));
+    tx.transferObjects([lpToken], senderAddress);
 
     if (options?.gasBudget) {
       tx.setGasBudget(options.gasBudget);
@@ -252,25 +251,25 @@ export class PoolClient {
     minAmountX: bigint = 0n,
     minAmountY: bigint = 0n,
     options?: TxOptions,
-  ): TransactionBlock {
-    const tx = new TransactionBlock();
+  ): Transaction {
+    const tx = new Transaction();
 
-    const [lpSplit] = tx.splitCoins(tx.object(lpToken), [tx.pure(lpAmount)]);
+    const [lpSplit] = tx.splitCoins(tx.object(lpToken), [tx.pure.u64(lpAmount)]);
 
     // Call remove_liquidity - returns (Coin<X>, Coin<Y>)
-    const [coinX, coinY] = tx.moveCall({
+    const result = tx.moveCall({
       target: `${this.packageId}::pool::remove_liquidity`,
       typeArguments: [typeX, typeY],
       arguments: [
         tx.object(poolId),
         lpSplit,
-        tx.pure(minAmountX),
-        tx.pure(minAmountY),
+        tx.pure.u64(minAmountX),
+        tx.pure.u64(minAmountY),
       ],
     });
 
     // Transfer withdrawn coins to sender
-    tx.transferObjects([coinX, coinY], tx.pure.address(senderAddress));
+    tx.transferObjects([result[0]!, result[1]!], senderAddress);
 
     if (options?.gasBudget) {
       tx.setGasBudget(options.gasBudget);
@@ -291,28 +290,28 @@ export class PoolClient {
     senderAddress: string,
     minAmountOut: bigint = 0n,
     options?: TxOptions,
-  ): TransactionBlock {
-    const tx = new TransactionBlock();
+  ): Transaction {
+    const tx = new Transaction();
 
     // For SUI, use gas coin; otherwise use provided coin
     const isSuiX = typeX === '0x2::sui::SUI';
     const [coinSplit] = isSuiX
-      ? tx.splitCoins(tx.gas, [tx.pure(amountIn)])
-      : tx.splitCoins(tx.object(coinX!), [tx.pure(amountIn)]);
+      ? tx.splitCoins(tx.gas, [tx.pure.u64(amountIn)])
+      : tx.splitCoins(tx.object(coinX!), [tx.pure.u64(amountIn)]);
 
     // Call swap_x_to_y - returns Coin<Y>
-    const [coinOut] = tx.moveCall({
+    const coinOut = tx.moveCall({
       target: `${this.packageId}::pool::swap_x_to_y`,
       typeArguments: [typeX, typeY],
       arguments: [
         tx.object(poolId),
         coinSplit,
-        tx.pure(minAmountOut),
+        tx.pure.u64(minAmountOut),
       ],
     });
 
     // Transfer output coin to sender
-    tx.transferObjects([coinOut], tx.pure.address(senderAddress));
+    tx.transferObjects([coinOut], senderAddress);
 
     if (options?.gasBudget) {
       tx.setGasBudget(options.gasBudget);
@@ -333,28 +332,28 @@ export class PoolClient {
     senderAddress: string,
     minAmountOut: bigint = 0n,
     options?: TxOptions,
-  ): TransactionBlock {
-    const tx = new TransactionBlock();
+  ): Transaction {
+    const tx = new Transaction();
 
     // For SUI, use gas coin; otherwise use provided coin
     const isSuiY = typeY === '0x2::sui::SUI';
     const [coinSplit] = isSuiY
-      ? tx.splitCoins(tx.gas, [tx.pure(amountIn)])
-      : tx.splitCoins(tx.object(coinY!), [tx.pure(amountIn)]);
+      ? tx.splitCoins(tx.gas, [tx.pure.u64(amountIn)])
+      : tx.splitCoins(tx.object(coinY!), [tx.pure.u64(amountIn)]);
 
     // Call swap_y_to_x - returns Coin<X>
-    const [coinOut] = tx.moveCall({
+    const coinOut = tx.moveCall({
       target: `${this.packageId}::pool::swap_y_to_x`,
       typeArguments: [typeX, typeY],
       arguments: [
         tx.object(poolId),
         coinSplit,
-        tx.pure(minAmountOut),
+        tx.pure.u64(minAmountOut),
       ],
     });
 
     // Transfer output coin to sender
-    tx.transferObjects([coinOut], tx.pure.address(senderAddress));
+    tx.transferObjects([coinOut], senderAddress);
 
     if (options?.gasBudget) {
       tx.setGasBudget(options.gasBudget);

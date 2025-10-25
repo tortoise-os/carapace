@@ -35,7 +35,10 @@
       "Bash(ps:*)",
       "WebFetch(domain:docs.pyth.network)",
       "WebFetch(domain:pyth.network)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(sui move test:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

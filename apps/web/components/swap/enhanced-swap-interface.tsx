@@ -15,9 +15,12 @@ import { apiClient, type SwapQuote, type Pool } from '@/lib/api-client';
 import { toast } from 'sonner';
 import { SwapSettingsDialog } from './swap-settings-dialog';
 import { TokenSelectorModal } from './token-selector-modal';
+import { PriceImpactWarning, PriceImpactBadge } from './price-impact-warning';
+import { HighImpactConfirmationDialog } from './high-impact-confirmation-dialog';
 import { useCarapaceSDK } from '@/providers/sui-provider';
 import { useTokenBalance } from '@/lib/hooks/use-token-balance';
 import { useTokenPrice, formatUSD } from '@/lib/hooks/use-token-price';
+import { calculatePriceImpact, type PriceImpactData } from '@/lib/utils/price-impact';
 
 interface Token {
   symbol: string;
@@ -55,6 +58,8 @@ export function EnhancedSwapInterface() {
   const [showSettings, setShowSettings] = useState(false);
   const [showTokenSelector, setShowTokenSelector] = useState(false);
   const [selectingTokenType, setSelectingTokenType] = useState<'in' | 'out'>('in');
+  const [showHighImpactDialog, setShowHighImpactDialog] = useState(false);
+  const [priceImpactData, setPriceImpactData] = useState<PriceImpactData | null>(null);
 
   // Fetch token balances
   const tokenInBalance = useTokenBalance(tokenIn.address, tokenIn.decimals);
@@ -102,11 +107,23 @@ export function EnhancedSwapInterface() {
         // Convert back to human-readable decimals
         const amountOutDecimal = parseFloat(quoteData.amountOut) / Math.pow(10, tokenOut.decimals);
         setAmountOut(amountOutDecimal.toFixed(6));
+
+        // Calculate price impact using our utility
+        const reserveIn = isXToY ? BigInt(currentPool.reserve_x) : BigInt(currentPool.reserve_y);
+        const reserveOut = isXToY ? BigInt(currentPool.reserve_y) : BigInt(currentPool.reserve_x);
+        const impact = calculatePriceImpact(
+          BigInt(amountInSmallest),
+          BigInt(quoteData.amountOut),
+          reserveIn,
+          reserveOut
+        );
+        setPriceImpactData(impact);
       })
       .catch(error => {
         console.error('Failed to get quote:', error);
         setAmountOut('');
         setQuote(null);
+        setPriceImpactData(null);
       })
       .finally(() => setIsLoadingQuote(false));
   }, [amountIn, currentPool, tokenIn.address, tokenIn.decimals, tokenOut.address, tokenOut.decimals]);
@@ -137,7 +154,18 @@ export function EnhancedSwapInterface() {
     }
   };
 
-  const handleSwap = async () => {
+  const initiateSwap = () => {
+    // Check if high impact and needs confirmation
+    if (priceImpactData && (priceImpactData.severity === 'high' || priceImpactData.severity === 'critical')) {
+      setShowHighImpactDialog(true);
+      return;
+    }
+
+    // Otherwise proceed directly
+    executeSwap();
+  };
+
+  const executeSwap = async () => {
     if (!account || !quote || !amountIn) {
       toast.error('Missing requirements', {
         description: 'Please connect wallet and enter an amount',
@@ -363,9 +391,7 @@ export function EnhancedSwapInterface() {
             <div className="space-y-2 p-3 bg-muted rounded-xl mt-2">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Price impact</span>
-                <span className={quote.priceImpact < 1 ? 'text-green-500' : quote.priceImpact < 3 ? 'text-yellow-500' : 'text-red-500'}>
-                  {Math.abs(quote.priceImpact).toFixed(2)}%
-                </span>
+                {priceImpactData && <PriceImpactBadge priceImpact={priceImpactData} />}
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Fee</span>
@@ -384,6 +410,11 @@ export function EnhancedSwapInterface() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Price Impact Warning */}
+      {priceImpactData && priceImpactData.shouldWarn && (
+        <PriceImpactWarning priceImpact={priceImpactData} className="mb-4" />
       )}
 
       {/* Action Button */}
@@ -409,7 +440,7 @@ export function EnhancedSwapInterface() {
           className="w-full h-14 text-base font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-shadow"
           shimmerColor="rgba(0, 255, 241, 0.8)"
           background="linear-gradient(135deg, hsl(var(--brand-teal)), hsl(var(--brand-cyan)))"
-          onClick={handleSwap}
+          onClick={initiateSwap}
           disabled={isSwapping}
         >
           {isSwapping ? (
@@ -431,6 +462,18 @@ export function EnhancedSwapInterface() {
         onSelectToken={handleSelectToken}
         selectedToken={selectingTokenType === 'in' ? tokenIn : tokenOut}
       />
+      {priceImpactData && (
+        <HighImpactConfirmationDialog
+          open={showHighImpactDialog}
+          onOpenChange={setShowHighImpactDialog}
+          onConfirm={executeSwap}
+          priceImpact={priceImpactData}
+          tokenInSymbol={tokenIn.symbol}
+          tokenOutSymbol={tokenOut.symbol}
+          amountIn={amountIn}
+          amountOut={amountOut}
+        />
+      )}
     </MagicCard>
   );
 }

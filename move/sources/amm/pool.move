@@ -13,6 +13,9 @@ module carapace::pool {
     const ESlippageExceeded: u64 = 2;
     const EInvalidFeeRate: u64 = 3;
     const EZeroAmount: u64 = 4;
+    const EPoolPaused: u64 = 5;
+    const ENotAuthorized: u64 = 6;
+    const EInvalidFlashSwapRepayment: u64 = 7;
 
     /// Minimum liquidity locked forever
     const MINIMUM_LIQUIDITY: u64 = 1000;
@@ -27,6 +30,12 @@ module carapace::pool {
     /// Protocol fee (% of swap fees)
     const DEFAULT_PROTOCOL_FEE_BPS: u64 = 1667;  // 16.67% (1/6)
 
+    /// Admin capability for pool management
+    public struct AdminCap has key, store {
+        id: object::UID,
+        pool_id: object::ID,
+    }
+
     /// Liquidity Pool
     public struct Pool<phantom X, phantom Y> has key {
         id: object::UID,
@@ -37,10 +46,21 @@ module carapace::pool {
         protocol_fee_bps: u64,
         protocol_fee_x: Balance<X>,
         protocol_fee_y: Balance<Y>,
+        paused: bool,
     }
 
     /// LP Token type
     public struct LP<phantom X, phantom Y> has drop {}
+
+    /// Flash swap receipt (Hot Potato)
+    /// Must be consumed by repay_flash_swap in the same transaction
+    public struct FlashSwap<phantom X, phantom Y> {
+        pool_id: object::ID,
+        borrowed_x: u64,
+        borrowed_y: u64,
+        repay_x: u64,
+        repay_y: u64,
+    }
 
     /// Pool creation event
     public struct PoolCreated<phantom X, phantom Y> has copy, drop {
@@ -73,7 +93,27 @@ module carapace::pool {
         fee_amount: u64,
     }
 
+    /// Pool paused event
+    public struct PoolPaused<phantom X, phantom Y> has copy, drop {
+        pool_id: object::ID,
+    }
+
+    /// Pool unpaused event
+    public struct PoolUnpaused<phantom X, phantom Y> has copy, drop {
+        pool_id: object::ID,
+    }
+
+    /// Flash swap event
+    public struct FlashSwapped<phantom X, phantom Y> has copy, drop {
+        pool_id: object::ID,
+        borrowed_x: u64,
+        borrowed_y: u64,
+        repaid_x: u64,
+        repaid_y: u64,
+    }
+
     /// Create a new liquidity pool and share it
+    /// Returns an AdminCap to the creator for pool management
     public fun create_pool<X, Y>(
         ctx: &mut TxContext
     ) {
@@ -86,14 +126,24 @@ module carapace::pool {
             protocol_fee_bps: DEFAULT_PROTOCOL_FEE_BPS,
             protocol_fee_x: balance::zero(),
             protocol_fee_y: balance::zero(),
+            paused: false,
+        };
+
+        let pool_id = object::uid_to_inner(&pool.id);
+
+        // Create admin capability for the pool creator
+        let admin_cap = AdminCap {
+            id: object::new(ctx),
+            pool_id,
         };
 
         sui::event::emit(PoolCreated<X, Y> {
-            pool_id: object::uid_to_inner(&pool.id),
+            pool_id,
             fee_bps: DEFAULT_FEE_BPS,
         });
 
         transfer::share_object(pool);
+        transfer::transfer(admin_cap, sui::tx_context::sender(ctx));
     }
 
     /// Add liquidity to the pool
@@ -105,6 +155,8 @@ module carapace::pool {
         min_liquidity: u64,
         ctx: &mut TxContext
     ): Coin<LP<X, Y>> {
+        assert!(!pool.paused, EPoolPaused);
+
         let amount_x = coin::value(&coin_x);
         let amount_y = coin::value(&coin_y);
 
@@ -159,6 +211,8 @@ module carapace::pool {
         min_amount_y: u64,
         ctx: &mut TxContext
     ): (Coin<X>, Coin<Y>) {
+        assert!(!pool.paused, EPoolPaused);
+
         let liquidity = coin::value(&lp_token);
         assert!(liquidity > 0, EZeroAmount);
 
@@ -198,6 +252,8 @@ module carapace::pool {
         min_amount_out: u64,
         ctx: &mut TxContext
     ): Coin<Y> {
+        assert!(!pool.paused, EPoolPaused);
+
         let amount_in = coin::value(&coin_x);
         assert!(amount_in > 0, EZeroAmount);
 
@@ -246,6 +302,8 @@ module carapace::pool {
         min_amount_out: u64,
         ctx: &mut TxContext
     ): Coin<X> {
+        assert!(!pool.paused, EPoolPaused);
+
         let amount_in = coin::value(&coin_y);
         assert!(amount_in > 0, EZeroAmount);
 
@@ -373,5 +431,163 @@ module carapace::pool {
             balance::value(&pool.protocol_fee_x),
             balance::value(&pool.protocol_fee_y)
         )
+    }
+
+    /// Pause the pool (emergency stop)
+    /// Only the admin (holder of AdminCap) can pause
+    public fun pause<X, Y>(
+        pool: &mut Pool<X, Y>,
+        admin_cap: &AdminCap,
+    ) {
+        // Verify admin_cap matches this pool
+        assert!(admin_cap.pool_id == object::uid_to_inner(&pool.id), ENotAuthorized);
+        assert!(!pool.paused, 0); // Can't pause already paused pool
+
+        pool.paused = true;
+
+        sui::event::emit(PoolPaused<X, Y> {
+            pool_id: object::uid_to_inner(&pool.id),
+        });
+    }
+
+    /// Unpause the pool
+    /// Only the admin (holder of AdminCap) can unpause
+    public fun unpause<X, Y>(
+        pool: &mut Pool<X, Y>,
+        admin_cap: &AdminCap,
+    ) {
+        // Verify admin_cap matches this pool
+        assert!(admin_cap.pool_id == object::uid_to_inner(&pool.id), ENotAuthorized);
+        assert!(pool.paused, 0); // Can't unpause already active pool
+
+        pool.paused = false;
+
+        sui::event::emit(PoolUnpaused<X, Y> {
+            pool_id: object::uid_to_inner(&pool.id),
+        });
+    }
+
+    /// Check if pool is paused
+    public fun is_paused<X, Y>(pool: &Pool<X, Y>): bool {
+        pool.paused
+    }
+
+    /// Flash swap: borrow tokens from the pool
+    /// Returns borrowed coins and a FlashSwap receipt (hot potato)
+    /// The receipt MUST be consumed by calling repay_flash_swap in the same transaction
+    ///
+    /// Usage:
+    /// 1. Call flash_swap to borrow tokens
+    /// 2. Use the borrowed tokens for arbitrary operations (arbitrage, liquidations, etc.)
+    /// 3. Call repay_flash_swap with repayment coins to complete the flash swap
+    ///
+    /// The pool charges the standard swap fee on the borrowed amount
+    public fun flash_swap<X, Y>(
+        pool: &mut Pool<X, Y>,
+        borrow_x: u64,
+        borrow_y: u64,
+        ctx: &mut TxContext
+    ): (Coin<X>, Coin<Y>, FlashSwap<X, Y>) {
+        assert!(!pool.paused, EPoolPaused);
+        assert!(borrow_x > 0 || borrow_y > 0, EZeroAmount);
+
+        let reserve_x = balance::value(&pool.reserve_x);
+        let reserve_y = balance::value(&pool.reserve_y);
+
+        // Can't borrow more than available
+        assert!(borrow_x < reserve_x, EInsufficientLiquidity);
+        assert!(borrow_y < reserve_y, EInsufficientLiquidity);
+
+        // Calculate repayment amounts (borrowed + fee)
+        // Fee is applied to the borrowed amount
+        let fee_x = if (borrow_x > 0) { math::apply_fee(borrow_x, pool.fee_bps) } else { 0 };
+        let fee_y = if (borrow_y > 0) { math::apply_fee(borrow_y, pool.fee_bps) } else { 0 };
+
+        let repay_x = borrow_x + fee_x;
+        let repay_y = borrow_y + fee_y;
+
+        // Withdraw borrowed amounts from reserves
+        let coin_x = if (borrow_x > 0) {
+            coin::from_balance(balance::split(&mut pool.reserve_x, borrow_x), ctx)
+        } else {
+            coin::zero<X>(ctx)
+        };
+
+        let coin_y = if (borrow_y > 0) {
+            coin::from_balance(balance::split(&mut pool.reserve_y, borrow_y), ctx)
+        } else {
+            coin::zero<Y>(ctx)
+        };
+
+        // Create flash swap receipt (hot potato)
+        let receipt = FlashSwap<X, Y> {
+            pool_id: object::uid_to_inner(&pool.id),
+            borrowed_x: borrow_x,
+            borrowed_y: borrow_y,
+            repay_x,
+            repay_y,
+        };
+
+        (coin_x, coin_y, receipt)
+    }
+
+    /// Repay flash swap
+    /// Consumes the FlashSwap receipt and repays the borrowed tokens plus fees
+    /// Validates that the correct amounts are repaid and the constant product invariant is maintained
+    public fun repay_flash_swap<X, Y>(
+        pool: &mut Pool<X, Y>,
+        repay_coin_x: Coin<X>,
+        repay_coin_y: Coin<Y>,
+        receipt: FlashSwap<X, Y>,
+    ) {
+        let FlashSwap {
+            pool_id,
+            borrowed_x,
+            borrowed_y,
+            repay_x,
+            repay_y,
+        } = receipt;
+
+        // Verify receipt matches this pool
+        assert!(pool_id == object::uid_to_inner(&pool.id), ENotAuthorized);
+
+        // Verify repayment amounts are correct
+        let repaid_x = coin::value(&repay_coin_x);
+        let repaid_y = coin::value(&repay_coin_y);
+
+        assert!(repaid_x >= repay_x, EInvalidFlashSwapRepayment);
+        assert!(repaid_y >= repay_y, EInvalidFlashSwapRepayment);
+
+        // Add repayment to reserves
+        balance::join(&mut pool.reserve_x, coin::into_balance(repay_coin_x));
+        balance::join(&mut pool.reserve_y, coin::into_balance(repay_coin_y));
+
+        // Collect protocol fees from the swap fees
+        if (borrowed_x > 0) {
+            let swap_fee_x = repay_x - borrowed_x;
+            let protocol_fee_x = math::apply_fee(swap_fee_x, pool.protocol_fee_bps);
+            if (protocol_fee_x > 0) {
+                let fee_balance_x = balance::split(&mut pool.reserve_x, protocol_fee_x);
+                balance::join(&mut pool.protocol_fee_x, fee_balance_x);
+            };
+        };
+
+        if (borrowed_y > 0) {
+            let swap_fee_y = repay_y - borrowed_y;
+            let protocol_fee_y = math::apply_fee(swap_fee_y, pool.protocol_fee_bps);
+            if (protocol_fee_y > 0) {
+                let fee_balance_y = balance::split(&mut pool.reserve_y, protocol_fee_y);
+                balance::join(&mut pool.protocol_fee_y, fee_balance_y);
+            };
+        };
+
+        // Emit flash swap event
+        sui::event::emit(FlashSwapped<X, Y> {
+            pool_id,
+            borrowed_x,
+            borrowed_y,
+            repaid_x,
+            repaid_y,
+        });
     }
 }

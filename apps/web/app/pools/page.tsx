@@ -1,16 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, TrendingUp, Droplet } from 'lucide-react';
+import { Plus, TrendingUp, Droplet, Star } from 'lucide-react';
 import { BlurFade, MagicCard, Button, DotPattern, ShimmerButton, TokenIcon } from '@carapace/ui';
 import { apiClient, type Pool } from '@/lib/api-client';
 import { LiquidityDialog } from '@/components/liquidity/liquidity-dialog';
+import { useFavoritePools } from '@/lib/hooks/use-favorite-pools';
 
 export default function PoolsPage() {
   const [pools, setPools] = useState<Pool[]>([]);
   const [selectedPool, setSelectedPool] = useState<Pool | null>(null);
   const [dialogMode, setDialogMode] = useState<'add' | 'remove'>('add');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavoritePools();
 
   // Fetch pools from API
   useEffect(() => {
@@ -22,6 +25,12 @@ export default function PoolsPage() {
     setDialogMode(mode);
     setIsDialogOpen(true);
   };
+
+  // Filter pools based on favorites
+  const filteredPools = showFavoritesOnly
+    ? pools.filter((pool) => isFavorite(pool.pool_id))
+    : pools;
+
   return (
     <div className="relative min-h-screen py-12">
       <DotPattern className="opacity-10" />
@@ -38,10 +47,21 @@ export default function PoolsPage() {
           </BlurFade>
 
           <BlurFade delay={0.2}>
-            <Button size="lg" className="mt-4 md:mt-0">
-              <Plus className="mr-2 h-5 w-5" />
-              Create Pool
-            </Button>
+            <div className="flex gap-3 mt-4 md:mt-0">
+              <Button
+                variant={showFavoritesOnly ? 'default' : 'outline'}
+                size="lg"
+                onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                className="flex items-center gap-2"
+              >
+                <Star className={`h-5 w-5 ${showFavoritesOnly ? 'fill-current' : ''}`} />
+                Favorites
+              </Button>
+              <Button size="lg">
+                <Plus className="mr-2 h-5 w-5" />
+                Create Pool
+              </Button>
+            </div>
           </BlurFade>
         </div>
 
@@ -66,11 +86,12 @@ export default function PoolsPage() {
 
         {/* Pools Grid */}
         <div className="grid grid-cols-1 gap-6">
-          {pools.map((pool, i) => {
+          {filteredPools.map((pool, i) => {
             const tokenXSymbol = pool.token_x.split('::').pop() || 'Token X';
             const tokenYSymbol = pool.token_y.split('::').pop() || 'Token Y';
             const tvl = ((Number(pool.reserve_x) / 1e9 * 1.5 + Number(pool.reserve_y) / 1e6)).toFixed(2);
             const feePercent = (pool.fee_rate / 100).toFixed(2);
+            const isPoolFavorite = isFavorite(pool.pool_id);
 
             return (
               <BlurFade key={pool.pool_id} delay={0.3 + i * 0.1}>
@@ -78,6 +99,19 @@ export default function PoolsPage() {
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     {/* Pool Info */}
                     <div className="flex items-center gap-4 group-hover/card:scale-[1.01] transition-transform">
+                      <button
+                        onClick={() => toggleFavorite(pool.pool_id)}
+                        className="p-2 rounded-lg hover:bg-accent/50 transition-colors"
+                        title={isPoolFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                      >
+                        <Star
+                          className={`h-5 w-5 transition-all ${
+                            isPoolFavorite
+                              ? 'fill-yellow-500 text-yellow-500 scale-110'
+                              : 'text-muted-foreground hover:text-yellow-500'
+                          }`}
+                        />
+                      </button>
                       <div className="flex -space-x-3">
                         <TokenIcon
                           symbol={tokenXSymbol}
@@ -143,18 +177,33 @@ export default function PoolsPage() {
         </div>
 
         {/* Empty State Message */}
-        {pools.length === 0 && (
+        {filteredPools.length === 0 && (
           <BlurFade delay={0.3}>
             <div className="text-center py-12">
-              <Droplet className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-2xl font-semibold mb-2">No pools found</h3>
-              <p className="text-muted-foreground mb-6">
-                Be the first to create a liquidity pool
-              </p>
-              <Button size="lg">
-                <Plus className="mr-2 h-5 w-5" />
-                Create First Pool
-              </Button>
+              {showFavoritesOnly ? (
+                <>
+                  <Star className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-2xl font-semibold mb-2">No favorite pools</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Star pools to add them to your favorites
+                  </p>
+                  <Button size="lg" onClick={() => setShowFavoritesOnly(false)}>
+                    View All Pools
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Droplet className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-2xl font-semibold mb-2">No pools found</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Be the first to create a liquidity pool
+                  </p>
+                  <Button size="lg">
+                    <Plus className="mr-2 h-5 w-5" />
+                    Create First Pool
+                  </Button>
+                </>
+              )}
             </div>
           </BlurFade>
         )}

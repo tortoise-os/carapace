@@ -288,20 +288,57 @@
   - [ ] Compare capability patterns with Percolator research
   - [ ] Prototype MCP tools for vault automation
 
+#### 6.0A Code Review - awesome-seal Ecosystem
+**Reference**: See [AWESOME_SEAL_EVALUATION.md](./AWESOME_SEAL_EVALUATION.md) for comprehensive analysis
+**Time Saved**: 5-7 weeks across Phase 1F and Phase 1K
+
+- [ ] **Deep dive into Nautilus enclave patterns** (Week 10)
+  - [ ] Clone and study Lockin Bot zero-trust key vault architecture
+  - [ ] Review attestation and verification patterns for TEE
+  - [ ] Document enclave-to-chain communication protocols
+  - [ ] Benchmark vs. custom TEE implementation (estimated 2-3 weeks saved)
+  - [ ] Study secure key management for RL model signing
+  - [ ] Test attestation verification flows
+
+- [ ] **Integrate Seal Rust SDK** (Week 11)
+  - [ ] Add Seal Rust SDK to packages/sdk/
+  - [ ] Create encryption wrapper for Walrus client
+  - [ ] Implement encrypted model upload/download flow
+  - [ ] Test access control for model decryption (TEE-only access)
+  - [ ] Add hash verification for tamper detection
+  - [ ] Estimated time saved: 1-2 weeks vs. custom encryption
+
+- [ ] **Study Tusky token-gated access patterns** (Week 12)
+  - [ ] Review token-gated vault access control implementation
+  - [ ] Design tiered vault access (Basic/Premium/Institutional)
+  - [ ] Integrate with ARG (Aggressor Roundtrip Guards) for LP rewards
+  - [ ] Prototype LP-token threshold checks
+  - [ ] Plan revenue model for premium vault features
+
+- [ ] **Integrate Decryptable Move Enum** (Week 12)
+  - [ ] Add decryptable_enum to Move dependencies
+  - [ ] Implement encrypted vault strategy parameters
+  - [ ] Test time-released strategy disclosure (transparency + MEV protection)
+  - [ ] Add decryption logic for TEE-only access during active epoch
+  - [ ] Estimated time saved: 1 week vs. custom implementation
+
 #### 6.1 Dynamic Fee Optimization
 - [ ] **ML model for fee adjustment**
   - [ ] Volatility prediction model
   - [ ] Train on historical Sui data
-  - [ ] Deploy model to Walrus Storage
+  - [ ] Deploy model to Walrus Storage (with Seal encryption - see 6.0A)
+  - [ ] Store encrypted blob hash on-chain for tamper detection
   - [ ] Integrate fee adjustment in contract
 
 #### 6.2 Vault Strategy Optimizer
 - [ ] **RL optimizer in Nautilus TEE**
-  - [ ] Set up Nautilus TEE environment
+  - [ ] Set up Nautilus TEE environment (apply Lockin Bot patterns - see 6.0A)
+  - [ ] Implement zero-trust key management for model signing
   - [ ] Implement RL agent
   - [ ] Strategy performance tracking
-  - [ ] Secure execution framework
+  - [ ] Secure execution framework with attestation verification
   - [ ] Risk-adjusted optimization
+  - [ ] Token-gated premium vault access (Tusky pattern - see 6.0A)
 
 #### 6.3 Performance Analytics
 - [ ] **AI-powered insights**
@@ -309,15 +346,16 @@
   - [ ] Optimal liquidity provision suggestions
   - [ ] Impermanent loss forecasting
 
-#### 6.4 Scoped Capabilities for AI (Percolator + AI Agent Kit)
+#### 6.4 Scoped Capabilities for AI (Percolator + AI Agent Kit + awesome-seal)
 - [ ] **Secure AI interaction framework**
   - [ ] Replace direct TEE calls with capability-based access
   - [ ] Issue TTL-limited tokens for RL optimizer (Percolator pattern)
   - [ ] Verify via Sui's zkLogin or object signatures
-  - [ ] Add replay protection for Walrus-stored models
+  - [ ] Add replay protection for Walrus-stored models (Seal attestation patterns)
   - [ ] Integrate MCP tools from AI Agent Kit
   - [ ] Implement simulation-first execution (AI Agent Kit pattern)
   - [ ] Integrate ARG taxation with RL (anti-toxicity)
+  - [ ] Use Decryptable enums for private strategy parameters (awesome-seal - see 6.0A)
 
 ---
 
@@ -547,6 +585,44 @@
   - [ ] Store redundant copies across Walrus epochs
   - [ ] Verify blob hash before loading model
   - [ ] Cache last-known-good model in contract
+
+#### 7K.5A awesome-seal Security Enhancements
+**Reference**: See [AWESOME_SEAL_EVALUATION.md](./AWESOME_SEAL_EVALUATION.md) Section 7
+
+- [ ] **TEE attestation hardening (Lockin Bot patterns)**
+  - [ ] Apply Lockin Bot zero-trust key vault architecture
+  - [ ] Implement comprehensive enclave attestation verification
+  - [ ] Test enclave compromise scenarios and fallback mechanisms
+  - [ ] Verify master keys never leave enclave (zero-trust principle)
+  - [ ] Add derived key rotation for model signing (90-day cycles)
+
+- [ ] **Encrypted storage integrity (Seal SDK)**
+  - [ ] Use Seal Rust SDK for all RL model encryption
+  - [ ] Verify encrypted blob hashes on retrieval (tamper detection)
+  - [ ] Test tamper detection mechanisms with corrupted blobs
+  - [ ] Implement TEE-only decryption access control
+  - [ ] Add encrypted model version tracking
+
+- [ ] **Token-gated access security (Tusky patterns)**
+  - [ ] Validate LP token balance verification is flash-loan resistant
+  - [ ] Implement time-weighted LP balance checks (prevent MEV)
+  - [ ] Add minimum lock periods for premium vault access
+  - [ ] Test token-gating bypass attempts (flash loans, re-entrancy)
+  - [ ] Document premium vault access control in audit scope
+
+- [ ] **Decryptable enum security**
+  - [ ] Audit decryption logic for capability bypass vulnerabilities
+  - [ ] Test time-released strategy disclosure mechanisms
+  - [ ] Verify TEE-only access during active epochs
+  - [ ] Add replay protection for decryption requests
+  - [ ] Document encrypted parameter security model
+
+- [ ] **Bug bounty infrastructure (Dominion Lancer patterns)**
+  - [ ] Study Dominion Lancer TEE-based escrow architecture
+  - [ ] Design trustless researcher reward system (optional enhancement)
+  - [ ] Launch testnet bug bounty before main audit
+  - [ ] Engage Seal ecosystem security researcher network
+  - [ ] Create vulnerability disclosure process with enclave verification
 
 #### 7K.6 Audit Firm Engagement
 - [ ] **Primary audit preparation**
@@ -1002,23 +1078,28 @@
   - Sharding architecture design (Turbos + Percolator hybrid)
   - **Heimdahl security**: Implement audit logging and replay protection (Phase 1M.3)
 
-### Month 3: AI Integration & Security + Heimdahl Multi-Chain
+### Month 3: AI Integration & Security + Heimdahl Multi-Chain + awesome-seal
 - **Week 1-2 (Weeks 10-11)**: AI/ML fee optimization & vault strategies (Phase 1F)
   - **Parallel study**: Sui-AI-Agent-Kit full analysis (see schedule)
+  - **awesome-seal integration**: Study Lockin Bot zero-trust key vault (Phase 1F/6.0A)
+  - **awesome-seal integration**: Integrate Seal Rust SDK for model encryption (Phase 1F/6.0A)
   - Scoped capabilities for AI (Phase 1J + 1F + AI Agent Kit)
   - MCP tools integration
   - Non-replay protection
-  - Walrus Storage + TEE setup
+  - Walrus Storage + TEE setup (with Seal encryption)
   - **Heimdahl RL training**: Use aggregated data for RL model training (Phase 1M.2)
 - **Week 3 (Week 12)**: Testing & security hardening (Phase 1G)
   - Comprehensive invariant testing
   - Percolator enhancement validation
   - AI Agent Kit MCP automation testing
+  - **awesome-seal integration**: Implement token-gated premium vaults (Tusky pattern - Phase 1F/6.0A)
+  - **awesome-seal integration**: Add Decryptable enums for vault strategies (Phase 1F/6.0A)
   - **Heimdahl multi-chain**: Begin cross-chain arbitrage signal detection (Phase 1M.4)
 - **Week 4 (Week 13)**: Performance optimization (Phase 1G)
   - Shard testing infrastructure
   - Memory optimization benchmarks
   - RL prototype validation
+  - **awesome-seal testing**: Test TEE attestation and encrypted storage
   - **Heimdahl SDK**: Integrate JS SDK for frontend dashboards (Phase 1M.5)
 
 ### Month 4: Testnet & Final Preparation + Heimdahl Production
@@ -1040,12 +1121,16 @@
 
 ### Month 5: Security Audit & Mainnet Preparation
 - **Week 1**: Complete security audit preparation (Phase 1K)
-  - TEE-specific security hardening
+  - TEE-specific security hardening (with awesome-seal patterns - Phase 1K/7K.5A)
+  - **awesome-seal security**: Validate Lockin Bot attestation patterns
+  - **awesome-seal security**: Test Seal SDK encrypted storage integrity
+  - **awesome-seal security**: Audit token-gated access bypass resistance
   - Comprehensive testing and fuzzing
-  - Audit documentation package
+  - Audit documentation package (include awesome-seal integrations)
 - **Week 2-3**: External security audit execution (Phase 1K)
   - Engage OtterSec or SlowMist
   - Daily audit team coordination
+  - **awesome-seal audit scope**: TEE patterns, encrypted enums, token-gating
   - Critical findings remediation
 - **Week 4**: Post-audit fixes and validation
   - Address all medium+ findings
@@ -1143,6 +1228,41 @@
   - [ ] SDK integration test coverage >90%
   - [ ] Real-time dashboard updates with <1s refresh rate
 
+### awesome-seal Integration KPIs (Phase 1F, 1K)
+- [ ] **TEE security and attestation**
+  - [ ] 100% enclave attestation success rate (Lockin Bot patterns)
+  - [ ] Zero TEE-related findings in security audit
+  - [ ] Master keys never leave enclave (zero-trust validation)
+  - [ ] Key rotation cycles completed every 90 days
+  - [ ] Fallback mechanism tested with 100% success rate
+
+- [ ] **Encrypted storage integrity**
+  - [ ] 100% of RL models encrypted with Seal SDK
+  - [ ] Zero model tampering incidents in testing
+  - [ ] < 1% encrypted blob hash verification false positives
+  - [ ] Model decryption latency < 100ms in TEE
+  - [ ] Redundant storage across 3+ Walrus epochs
+
+- [ ] **Token-gated access control**
+  - [ ] 20%+ of vault TVL in premium vaults (token-gated)
+  - [ ] Zero token-gating bypass attempts successful
+  - [ ] Flash-loan resistant balance checks (100% tested)
+  - [ ] Time-weighted LP tracking accuracy >99%
+  - [ ] Premium vault access latency < 500ms
+
+- [ ] **Decryptable enum security**
+  - [ ] Zero capability bypass vulnerabilities in audit
+  - [ ] Time-released disclosure works 100% of time
+  - [ ] TEE-only access enforced during active epochs
+  - [ ] Replay protection blocks 100% of duplicate requests
+  - [ ] Encrypted strategy parameter size < 500 bytes per vault
+
+- [ ] **Development velocity**
+  - [ ] Saved 5-7 weeks vs. custom implementation (target met)
+  - [ ] awesome-seal patterns integrated by Week 12 (Phase 1F)
+  - [ ] Security enhancements completed by Month 5 (Phase 1K)
+  - [ ] Zero regressions from awesome-seal dependencies
+
 ---
 
 ## Risk Mitigation
@@ -1157,8 +1277,11 @@
 - **Liquidation cascades**: Cross-pool netting + RL prediction (Phase 1J)
 - **State bloat**: Memory-optimized allocators + shard budgets (Phase 1J)
 - **Capability replay attacks**: Nonce-based protection + TTL enforcement (Phase 1J + 1K)
-- **TEE compromise**: SGX attestation + fallback mechanisms (Phase 1K)
-- **Model tampering**: Walrus hash verification + redundant storage (Phase 1K)
+- **TEE compromise**: SGX attestation (awesome-seal Lockin Bot patterns) + fallback mechanisms (Phase 1K)
+- **Model tampering**: Seal SDK encryption + Walrus hash verification + redundant storage (Phase 1K + awesome-seal)
+- **Token-gating bypass**: Flash-loan resistant checks + time-weighted balances (awesome-seal Tusky patterns)
+- **Encrypted storage failures**: Multi-epoch Walrus redundancy + hash verification (awesome-seal)
+- **Seal SDK dependency**: Pin versions + fork capability + comprehensive testing
 
 ### Business Risks
 - **Low liquidity**: Liquidity mining incentives + LP protection (ARG)
@@ -1178,7 +1301,7 @@
 
 **Note:** Refer to [IMPLEMENTATION_CHECKLIST.md](./IMPLEMENTATION_CHECKLIST.md) for detailed tracking of all tasks.
 
-### This Week (Priority Tasks - Top 8 Focus)
+### This Week (Priority Tasks - Top 10 Focus)
 1. **[Repository Study] Clone all 5 Sui DeFi repositories locally** (Checklist 5.1)
 2. **[Repository Study] Deep dive into Avocado DEX - audit constant product math** (Checklist 5.1)
 3. **[Phase 1J] Port fixed-point math library from Avocado to Carapace** (Checklist 1.3)
@@ -1187,6 +1310,8 @@
 6. **[Phase 1M] Verify Heimdahl Sui support status and request beta access** (Phase 1M.1)
 7. **[Phase 1M] Install Heimdahl CLI and test basic event queries** (Phase 1M.1)
 8. **[Phase 1L] Monitor MMT Finance launch (Oct 30, 2025)** (Checklist 5.2)
+9. **[awesome-seal] Clone Lockin Bot, Tusky, and Decryptable Enum repos** (Phase 1F prep)
+10. **[awesome-seal] Review AWESOME_SEAL_EVALUATION.md for integration strategy** (Phase 1F prep)
 
 ### Next Week
 1. **[Repository Study] Study Cetus CLMM - flash swaps and SDK architecture** (Checklist 5.1)
@@ -1221,6 +1346,7 @@
 - **Phase 1K** provides comprehensive security audit preparation framework
 - **Phase 1L** tracks competitive landscape and market positioning
 - **Phase 1M** integrates Heimdahl.xyz for real-time blockchain data indexing and analytics
+- **awesome-seal ecosystem** provides TEE, encryption, and access control patterns (saves 5-7 weeks)
 - **Sui DeFi references** provide production Sui Move implementations to study
 - See [PERCOLATOR_RESEARCH.md](./PERCOLATOR_RESEARCH.md) for Solana learnings
 - See [SUI_DEFI_REFERENCES.md](./SUI_DEFI_REFERENCES.md) for Sui-specific patterns
@@ -1228,8 +1354,10 @@
 - See [SUI_DEFI_COMPETITIVE_LANDSCAPE.md](./SUI_DEFI_COMPETITIVE_LANDSCAPE.md) for market analysis
 - See [IMPLEMENTATION_CHECKLIST.md](./IMPLEMENTATION_CHECKLIST.md) for actionable development tasks
 - See [AUDIT_PREPARATION_CHECKLIST.md](./AUDIT_PREPARATION_CHECKLIST.md) for detailed audit prep
+- See [AWESOME_SEAL_EVALUATION.md](./AWESOME_SEAL_EVALUATION.md) for Seal ecosystem integration analysis
 - Percolator enhancements prioritize security, MEV protection, and scalability
 - Heimdahl.xyz integration enhances data infrastructure for AI/ML, cross-chain operations, and security monitoring
+- awesome-seal integration provides TEE patterns, encryption SDKs, and token-gated access control
 - Repository studies run in parallel with development (see "Repository Study Schedule")
 - Some Phase 1J features (sharding, cross-pool netting) will be fully deployed in Phase 2
 - Some Phase 1M features (cross-chain arbitrage) will be fully utilized in Phase 2 (TortoiseArb)
@@ -1289,6 +1417,7 @@
 | **Navi Lending** | Phase 1B, 1E | Oracle aggregation, risk management, liquidations | 🔴 CRITICAL (Week 5-6) |
 | **Turbos Finance** | Phase 1J | Sharding, batch settlement, gas optimization | 🔴 CRITICAL (Week 7-8) |
 | **Sui-AI-Agent-Kit** | Phase 1F | MCP tools, capability systems, TEE integration | 🔴 CRITICAL (Week 10-11) |
+| **awesome-seal** | Phase 1F, 1K | Nautilus TEE patterns, Seal encryption, token-gated access, decryptable enums | 🔴 CRITICAL (Week 10-12) |
 | **Heimdahl.xyz** | Phase 1M | Real-time event indexing, multi-chain data, WebSocket streams | 🔴 CRITICAL (Week 1-2) |
 
 ### Quick Reference: Feature Adoption
@@ -1303,6 +1432,10 @@
 | Batch processing | Turbos | `move/sources/amm/batch.move` | Phase 1J |
 | MCP tools | AI Agent Kit | `apps/api/src/services/mcp/` | Phase 1F |
 | Capability tokens | AI Agent Kit + Percolator | `move/sources/vault/capabilities.move` | Phase 1F + 1J |
+| **Nautilus TEE patterns** | **awesome-seal (Lockin Bot)** | `move/sources/ai/enclave_key_vault.move` | **Phase 1F (Week 10)** |
+| **Seal encryption SDK** | **awesome-seal** | `packages/sdk/src/seal/encryption-client.ts` | **Phase 1F (Week 11)** |
+| **Token-gated vaults** | **awesome-seal (Tusky)** | `move/sources/vault/premium_access.move` | **Phase 1F (Week 12)** |
+| **Decryptable enums** | **awesome-seal** | `move/sources/vault/encrypted_strategy.move` | **Phase 1F (Week 12)** |
 | Event monitoring | Heimdahl.xyz | `apps/api/src/services/heimdahl/` | Phase 1M (Week 1-2) |
 | WebSocket streams | Heimdahl.xyz | `packages/sdk/src/heimdahl-client.ts` | Phase 1M (Week 5) |
 | Cross-chain data | Heimdahl.xyz | `apps/api/src/services/arbitrage/` | Phase 1M (Week 12) |
@@ -1310,7 +1443,9 @@
 
 ---
 
-**Last Updated**: 2025-10-22
+**Last Updated**: 2025-10-25
 **Status**: In Active Development
 **Target Mainnet Launch**: Q2 2026 (extended for Phase 1J)
 **Target Testnet Launch**: Q1 2026
+
+**Note**: awesome-seal ecosystem integration added 2025-10-25 (estimated 5-7 weeks time savings)

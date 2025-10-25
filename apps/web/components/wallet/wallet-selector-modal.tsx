@@ -41,28 +41,10 @@ export function WalletSelectorModal({ open, onOpenChange }: WalletSelectorModalP
     }
   };
 
-  // Get wallet installation URLs
-  const getWalletUrl = (name: string): string => {
-    const urls: Record<string, string> = {
-      'Sui Wallet': 'https://chrome.google.com/webstore/detail/sui-wallet/opcgpfmipidbgpenhmajoajpbobppdil',
-      'Suiet': 'https://suiet.app',
-      'Ethos Wallet': 'https://ethoswallet.xyz',
-      'Glass Wallet': 'https://glasswallet.io',
-      'Nightly': 'https://nightly.app',
-      'Morphis': 'https://morphis.app',
-      'Surf Wallet': 'https://surfwallet.io',
-      'Spacecy': 'https://spacecy.io',
-    };
-    return urls[name] || '#';
-  };
-
   const getWalletIcon = (name: string): string => {
     // In production, these would be actual logo URLs
     return name.charAt(0);
   };
-
-  const installedWallets = wallets.filter(w => w.installed);
-  const notInstalledWallets = wallets.filter(w => !w.installed);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -75,14 +57,14 @@ export function WalletSelectorModal({ open, onOpenChange }: WalletSelectorModalP
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
-          {/* Installed Wallets */}
-          {installedWallets.length > 0 && (
+          {/* Available Wallets */}
+          {wallets.length > 0 ? (
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                 <CheckCircle2 className="h-3 w-3" />
-                Installed Wallets
+                Available Wallets
               </div>
-              {installedWallets.map((wallet) => (
+              {wallets.map((wallet) => (
                 <button
                   key={wallet.name}
                   onClick={() => handleConnect(wallet.name)}
@@ -108,43 +90,7 @@ export function WalletSelectorModal({ open, onOpenChange }: WalletSelectorModalP
                 </button>
               ))}
             </div>
-          )}
-
-          {/* Not Installed Wallets */}
-          {notInstalledWallets.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                <Download className="h-3 w-3" />
-                Available Wallets
-              </div>
-              {notInstalledWallets.map((wallet) => (
-                <a
-                  key={wallet.name}
-                  href={getWalletUrl(wallet.name)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full flex items-center justify-between p-4 rounded-xl border hover:border-muted-foreground/30 hover:bg-muted transition-all group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center font-bold text-muted-foreground">
-                      {getWalletIcon(wallet.name)}
-                    </div>
-                    <div className="text-left">
-                      <div className="font-semibold">{wallet.name}</div>
-                      <div className="text-xs text-muted-foreground">Not installed</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors">
-                    <span className="text-xs font-medium">Install</span>
-                    <ExternalLink className="h-4 w-4" />
-                  </div>
-                </a>
-              ))}
-            </div>
-          )}
-
-          {/* No Wallets Found */}
-          {wallets.length === 0 && (
+          ) : (
             <div className="text-center py-8">
               <Download className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <p className="text-sm font-medium mb-2">No wallets detected</p>

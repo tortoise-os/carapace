@@ -34,7 +34,7 @@ export function useTokenMetadata(coinType: string | undefined): UseTokenMetadata
         setLoading(true);
         setError(null);
 
-        const data = await sdk.tokenMetadata.getTokenMetadata(coinType);
+        const data = await sdk.tokenMetadata.getTokenMetadata(coinType!);
 
         if (!cancelled) {
           setMetadata(data);

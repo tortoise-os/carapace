@@ -1,0 +1,125 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "🐢 TortoiseSwap AI-Powered DEX" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e6]: 🐢
+          - generic [ref=e7]:
+            - heading "TortoiseSwap" [level=1] [ref=e8]
+            - paragraph [ref=e9]: AI-Powered DEX
+        - navigation [ref=e10]:
+          - link "Swap" [ref=e11] [cursor=pointer]:
+            - /url: /swap
+          - link "Pools" [ref=e12] [cursor=pointer]:
+            - /url: /pools
+          - link "Analytics" [ref=e13] [cursor=pointer]:
+            - /url: /analytics
+          - link "Docs" [ref=e14] [cursor=pointer]:
+            - /url: https://github.com/yourusername/tortoise-os
+        - generic [ref=e15]:
+          - button "Toggle theme" [ref=e16] [cursor=pointer]:
+            - img
+            - generic [ref=e22]: Toggle theme
+          - button "Connect Wallet" [ref=e23] [cursor=pointer]
+    - main [ref=e24]:
+      - generic [ref=e25]:
+        - img [ref=e26]
+        - generic [ref=e3627]:
+          - generic [ref=e3629]:
+            - heading "Analytics" [level=1] [ref=e3630]
+            - paragraph [ref=e3631]: Protocol-wide statistics and pool performance metrics
+          - generic [ref=e3633]:
+            - generic [ref=e3635]:
+              - generic [ref=e3636]:
+                - paragraph [ref=e3637]: Total Value Locked
+                - paragraph [ref=e3638]: $0.00
+              - img [ref=e3640]
+            - generic [ref=e3643]:
+              - generic [ref=e3644]:
+                - paragraph [ref=e3645]: 24h Volume
+                - paragraph [ref=e3646]: $0.00
+              - img [ref=e3648]
+            - generic [ref=e3652]:
+              - generic [ref=e3653]:
+                - paragraph [ref=e3654]: 24h Fees
+                - paragraph [ref=e3655]: $0.00
+              - img [ref=e3657]
+            - generic [ref=e3660]:
+              - generic [ref=e3661]:
+                - paragraph [ref=e3662]: Total Pools
+                - paragraph [ref=e3663]: "0"
+              - img [ref=e3665]
+          - generic [ref=e3670]:
+            - heading "Pool Analytics" [level=3] [ref=e3671]
+            - table [ref=e3673]:
+              - rowgroup [ref=e3674]:
+                - row "Pool TVL 24h Volume 7d Volume 24h Fees APR" [ref=e3675]:
+                  - cell "Pool" [ref=e3676]
+                  - cell "TVL" [ref=e3677] [cursor=pointer]:
+                    - generic [ref=e3678]:
+                      - text: TVL
+                      - img [ref=e3679]
+                  - cell "24h Volume" [ref=e3682] [cursor=pointer]:
+                    - generic [ref=e3683]:
+                      - text: 24h Volume
+                      - img [ref=e3684]
+                  - cell "7d Volume" [ref=e3687]
+                  - cell "24h Fees" [ref=e3688]
+                  - cell "APR" [ref=e3689] [cursor=pointer]:
+                    - generic [ref=e3690]:
+                      - text: APR
+                      - img [ref=e3691]
+              - rowgroup
+    - contentinfo [ref=e3694]:
+      - generic [ref=e3695]:
+        - generic [ref=e3696]:
+          - generic [ref=e3697]:
+            - generic [ref=e3698]:
+              - generic [ref=e3699]: 🐢
+              - heading "TortoiseSwap" [level=2] [ref=e3700]
+            - paragraph [ref=e3701]: AI-powered DEX on Sui blockchain. Trade smarter with adaptive fees and intelligent yield optimization.
+          - generic [ref=e3702]:
+            - heading "Product" [level=3] [ref=e3703]
+            - list [ref=e3704]:
+              - listitem [ref=e3705]:
+                - link "Swap" [ref=e3706] [cursor=pointer]:
+                  - /url: /swap
+              - listitem [ref=e3707]:
+                - link "Pools" [ref=e3708] [cursor=pointer]:
+                  - /url: /pools
+              - listitem [ref=e3709]:
+                - link "Analytics" [ref=e3710] [cursor=pointer]:
+                  - /url: /analytics
+              - listitem [ref=e3711]:
+                - link "Vaults" [ref=e3712] [cursor=pointer]:
+                  - /url: "#"
+          - generic [ref=e3713]:
+            - heading "Community" [level=3] [ref=e3714]
+            - list [ref=e3715]:
+              - listitem [ref=e3716]:
+                - link "Twitter" [ref=e3717] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e3718]:
+                - link "Discord" [ref=e3719] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e3720]:
+                - link "GitHub" [ref=e3721] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e3722]:
+                - link "Docs" [ref=e3723] [cursor=pointer]:
+                  - /url: "#"
+        - paragraph [ref=e3725]: © 2025 TortoiseSwap. Built on Sui. Powered by AI.
+  - region "Notifications alt+T"
+  - status [ref=e3726]:
+    - generic [ref=e3727]:
+      - img [ref=e3729]
+      - generic [ref=e3731]:
+        - text: Static route
+        - button "Hide static indicator" [ref=e3732] [cursor=pointer]:
+          - img [ref=e3733]
+  - alert [ref=e3736]
+```

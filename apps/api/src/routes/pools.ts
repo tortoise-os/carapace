@@ -7,6 +7,88 @@ import type { CarapaceSDK } from '@carapace/sdk';
 import { poolQueries } from '../db/client';
 import { mockDataProvider } from '../db/mock-data';
 
+interface PriceDataPoint {
+  timestamp: number;
+  price: number;
+  volume: number;
+  high: number;
+  low: number;
+  open: number;
+  close: number;
+}
+
+// Helper function to generate mock historical price data
+function getHistoricalPriceData(
+  poolId: string,
+  timeframe: string,
+  interval: string
+): PriceDataPoint[] | null {
+  const pool = mockDataProvider.getPool(poolId);
+  if (!pool) return null;
+
+  const currentPrice = mockDataProvider.getSpotPrice(poolId) || 2.0;
+  const now = Date.now();
+
+  // Calculate number of data points based on timeframe and interval
+  const timeframeMs = parseTimeframe(timeframe);
+  const intervalMs = parseInterval(interval);
+  const numPoints = Math.min(Math.floor(timeframeMs / intervalMs), 500); // Max 500 points
+
+  const dataPoints: PriceDataPoint[] = [];
+
+  for (let i = numPoints - 1; i >= 0; i--) {
+    const timestamp = now - i * intervalMs;
+
+    // Generate realistic-looking price fluctuations
+    const randomFactor = 1 + (Math.random() - 0.5) * 0.1; // ±5% variation
+    const trendFactor = 1 + (i / numPoints) * 0.05; // Slight upward trend
+    const basePrice = currentPrice * randomFactor * trendFactor;
+
+    const volatility = basePrice * 0.02; // 2% volatility
+    const open = basePrice + (Math.random() - 0.5) * volatility;
+    const close = basePrice + (Math.random() - 0.5) * volatility;
+    const high = Math.max(open, close) + Math.random() * volatility;
+    const low = Math.min(open, close) - Math.random() * volatility;
+
+    // Generate volume with some randomness
+    const baseVolume = 10000 + Math.random() * 50000;
+
+    dataPoints.push({
+      timestamp,
+      price: close,
+      volume: baseVolume,
+      high,
+      low,
+      open,
+      close,
+    });
+  }
+
+  return dataPoints;
+}
+
+function parseTimeframe(timeframe: string): number {
+  const map: Record<string, number> = {
+    '1h': 60 * 60 * 1000,
+    '24h': 24 * 60 * 60 * 1000,
+    '7d': 7 * 24 * 60 * 60 * 1000,
+    '30d': 30 * 24 * 60 * 60 * 1000,
+    '1y': 365 * 24 * 60 * 60 * 1000,
+  };
+  return map[timeframe] || map['24h'];
+}
+
+function parseInterval(interval: string): number {
+  const map: Record<string, number> = {
+    '1m': 60 * 1000,
+    '5m': 5 * 60 * 1000,
+    '15m': 15 * 60 * 1000,
+    '1h': 60 * 60 * 1000,
+    '1d': 24 * 60 * 60 * 1000,
+  };
+  return map[interval] || map['1h'];
+}
+
 export const createPoolPlugin = new Elysia({ prefix: '/api/pools' })
   /**
    * GET /api/pools
@@ -196,6 +278,48 @@ export const createPoolPlugin = new Elysia({ prefix: '/api/pools' })
     {
       params: t.Object({
         id: t.String(),
+      }),
+    }
+  )
+
+  /**
+   * GET /api/pools/:id/price-history
+   * Get historical price data
+   */
+  .get(
+    '/:id/price-history',
+    async ({ params, query, set }) => {
+      try {
+        const { id } = params;
+        const { timeframe = '24h', interval = '1h' } = query;
+
+        // Generate mock historical data
+        const dataPoints = getHistoricalPriceData(id, timeframe, interval);
+
+        if (!dataPoints) {
+          set.status = 404;
+          return {
+            success: false,
+            error: 'Pool not found',
+          };
+        }
+
+        return {
+          success: true,
+          data: dataPoints,
+        };
+      } catch (error) {
+        console.error('Error getting price history:', error);
+        throw new Error('Failed to get price history');
+      }
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+      query: t.Object({
+        timeframe: t.Optional(t.String()), // 1h, 24h, 7d, 30d, 1y
+        interval: t.Optional(t.String()),   // 1m, 5m, 15m, 1h, 1d
       }),
     }
   )

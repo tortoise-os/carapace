@@ -9,6 +9,11 @@ import { CarapaceSDK } from '@carapace/sdk';
 import { config } from './config';
 import { testConnection } from './db/client';
 import { createPoolPlugin } from './routes/pools';
+import { createTransactionPlugin } from './routes/transactions';
+import { createAnalyticsPlugin } from './routes/analytics';
+import { createPositionsPlugin } from './routes/positions';
+import { createTokensPlugin } from './routes/tokens';
+import { createTransactionHistoryPlugin } from './routes/transactions-history';
 
 // Initialize SDK
 const sdk = new CarapaceSDK({
@@ -29,6 +34,11 @@ const app = new Elysia()
     timestamp: new Date().toISOString(),
   }))
   .use(createPoolPlugin)
+  .use(createTransactionPlugin)
+  .use(createAnalyticsPlugin)
+  .use(createPositionsPlugin)
+  .use(createTokensPlugin(sdk.getClient()))
+  .use(createTransactionHistoryPlugin(sdk.getClient()))
   .onError(({ code, error, set }) => {
     console.error('Error:', error);
 

@@ -2,8 +2,8 @@
  * Balance Client - Fetch user token balances
  */
 
-import type { SuiClient } from '@mysten/sui.js/client';
-import type { CoinType, ObjectId } from './types';
+import type { SuiClient } from '@mysten/sui/client';
+import type { CoinType } from './types';
 
 export interface TokenBalance {
   coinType: string;

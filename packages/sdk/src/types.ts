@@ -2,9 +2,6 @@
  * Carapace SDK Type Definitions
  */
 
-import type { TransactionBlock } from '@mysten/sui.js/transactions';
-import type { SuiClient } from '@mysten/sui.js/client';
-
 // Network Configuration
 export type Network = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
 
