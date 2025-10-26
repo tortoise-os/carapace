@@ -8,7 +8,6 @@ import {
   Badge,
   Button,
   DotPattern,
-  Input,
 } from '@carapace/ui';
 import {
   Vote,
