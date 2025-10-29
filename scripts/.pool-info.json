@@ -1,8 +1,8 @@
 {
-  "poolId": "0x163fb7a120e23832f366d8ea0d3939062c6269d2797975e82e9bf7b5f9afc7e4",
-  "packageId": "0x998379bb53423871a9e4f8f779c339c096622209309452995ae5ed395779106e",
+  "poolId": "0x6828cc09b4466dd7753a457aaa8a328f32e189729b178ce38252a03ab8190951",
+  "packageId": "0xad1a82cc599cca382ee2888ebe7220061f0654332543aab37f84db34f9a6e06e",
   "tokenX": "0x2::sui::SUI",
-  "tokenY": "0x2::sui::SUI",
-  "createdAt": "2025-10-22T10:38:50.743Z",
-  "transactionDigest": "ASiXkwcmFqZhGQwAeDJFeRHurkPmY7xWbc5m8Qu2CPes"
+  "tokenY": "0xad1a82cc599cca382ee2888ebe7220061f0654332543aab37f84db34f9a6e06e::test_coin::TEST_COIN",
+  "createdAt": "2025-10-26T14:56:31.050Z",
+  "transactionDigest": "J6UufqRJb1RqY5kj1rTMrK8fQrWmTnVfc1kfYpjX5wtk"
 }

@@ -157,15 +157,20 @@ export class PoolClient {
   createPool(
     typeX: string,
     typeY: string,
+    senderAddress: string,
     options?: TxOptions,
   ): Transaction {
     const tx = new Transaction();
 
-    tx.moveCall({
+    // Call create_pool - returns AdminCap
+    const adminCap = tx.moveCall({
       target: `${this.packageId}::pool::create_pool`,
       typeArguments: [typeX, typeY],
       arguments: [],
     });
+
+    // Transfer AdminCap to sender
+    tx.transferObjects([adminCap], senderAddress);
 
     if (options?.gasBudget) {
       tx.setGasBudget(options.gasBudget);

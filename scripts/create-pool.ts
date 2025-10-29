@@ -4,14 +4,16 @@
  */
 
 import { CarapaceSDK } from '../packages/sdk/src/index';
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
-import { decodeSuiPrivateKey } from '@mysten/sui.js/cryptography';
-import { fromB64 } from '@mysten/sui.js/utils';
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+import { decodeSuiPrivateKey } from '@mysten/sui/cryptography';
+import { fromB64 } from '@mysten/sui/utils';
 
-const PACKAGE_ID = '0x998379bb53423871a9e4f8f779c339c096622209309452995ae5ed395779106e';
+const PACKAGE_ID = '0xad1a82cc599cca382ee2888ebe7220061f0654332543aab37f84db34f9a6e06e';
 
 // SUI coin type
 const SUI_TYPE = '0x2::sui::SUI';
+// TEST coin type
+const TEST_TYPE = `${PACKAGE_ID}::test_coin::TEST_COIN`;
 
 async function main() {
   console.log('🚀 Creating pool on Sui testnet...\n');
@@ -62,10 +64,11 @@ async function main() {
 
   try {
     // Create pool transaction
-    console.log('📝 Building create pool transaction...');
+    console.log('📝 Building create pool transaction for SUI/TEST...');
     const tx = sdk.pool.createPool(
       SUI_TYPE,
-      SUI_TYPE,
+      TEST_TYPE,
+      address, // sender address for AdminCap transfer
       {
         gasBudget: 10_000_000,
       }
@@ -74,8 +77,8 @@ async function main() {
     console.log('✍️  Signing and executing transaction...');
 
     // Sign and execute
-    const result = await sdk.client.signAndExecuteTransactionBlock({
-      transactionBlock: tx,
+    const result = await sdk.client.signAndExecuteTransaction({
+      transaction: tx,
       signer: keypair,
       options: {
         showEffects: true,
@@ -88,9 +91,24 @@ async function main() {
     console.log(`📋 Transaction digest: ${result.digest}`);
     console.log(`🔗 View on explorer: https://testnet.suivision.xyz/txblock/${result.digest}\n`);
 
+    // Log all object changes for debugging
+    if (result.objectChanges && result.objectChanges.length > 0) {
+      console.log('All object changes:');
+      result.objectChanges.forEach((change: any, i: number) => {
+        console.log(`\n[${i + 1}] Type: ${change.type}`);
+        if ('objectType' in change) {
+          console.log(`    ObjectType: ${change.objectType}`);
+        }
+        if ('objectId' in change) {
+          console.log(`    ObjectId: ${change.objectId}`);
+        }
+      });
+      console.log('');
+    }
+
     // Find the created pool object
     const poolObject = result.objectChanges?.find(
-      (change: any) => change.type === 'created' && change.objectType.includes('::pool::Pool')
+      (change: any) => change.type === 'created' && change.objectType?.includes('::pool::Pool')
     );
 
     if (poolObject && 'objectId' in poolObject) {
@@ -102,7 +120,7 @@ async function main() {
         poolId: poolObject.objectId,
         packageId: PACKAGE_ID,
         tokenX: SUI_TYPE,
-        tokenY: SUI_TYPE,
+        tokenY: TEST_TYPE,
         createdAt: new Date().toISOString(),
         transactionDigest: result.digest,
       };

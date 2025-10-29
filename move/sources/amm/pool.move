@@ -3,9 +3,6 @@
 module carapace::pool {
     use sui::balance::{Self, Balance, Supply};
     use sui::coin::{Self, Coin};
-    use sui::object;
-    use sui::transfer;
-    use sui::tx_context::TxContext;
     use carapace::math;
 
     /// Error codes
@@ -116,7 +113,7 @@ module carapace::pool {
     /// Returns an AdminCap to the creator for pool management
     public fun create_pool<X, Y>(
         ctx: &mut TxContext
-    ) {
+    ): AdminCap {
         let pool = Pool<X, Y> {
             id: object::new(ctx),
             reserve_x: balance::zero(),
@@ -143,7 +140,7 @@ module carapace::pool {
         });
 
         transfer::share_object(pool);
-        transfer::transfer(admin_cap, sui::tx_context::sender(ctx));
+        admin_cap
     }
 
     /// Add liquidity to the pool
@@ -589,5 +586,17 @@ module carapace::pool {
             repaid_x,
             repaid_y,
         });
+    }
+
+    // ============================================================================
+    // Test Helpers
+    // ============================================================================
+
+    #[test_only]
+    /// Test helper that creates a pool and transfers admin cap to sender
+    /// This maintains backward compatibility with existing tests
+    public fun create_pool_for_testing<X, Y>(ctx: &mut TxContext) {
+        let admin_cap = create_pool<X, Y>(ctx);
+        transfer::public_transfer(admin_cap, tx_context::sender(ctx));
     }
 }

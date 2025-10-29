@@ -16,7 +16,7 @@ module carapace::pool_tests {
     fun test_create_pool() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -35,7 +35,7 @@ module carapace::pool_tests {
     fun test_add_initial_liquidity() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -69,7 +69,7 @@ module carapace::pool_tests {
     fun test_add_subsequent_liquidity() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -103,7 +103,7 @@ module carapace::pool_tests {
     fun test_remove_liquidity() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -138,7 +138,7 @@ module carapace::pool_tests {
     fun test_swap_exact_amount() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -182,7 +182,7 @@ module carapace::pool_tests {
     fun test_swap_maintains_k() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -239,7 +239,7 @@ module carapace::pool_tests {
     fun test_spot_price() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -265,7 +265,7 @@ module carapace::pool_tests {
     fun test_swap_slippage_protection() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -297,7 +297,7 @@ module carapace::pool_tests {
     fun test_swap_zero_amount() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -323,7 +323,7 @@ module carapace::pool_tests {
     fun test_pause_and_unpause() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -353,7 +353,7 @@ module carapace::pool_tests {
     fun test_add_liquidity_when_paused() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -381,7 +381,7 @@ module carapace::pool_tests {
     fun test_remove_liquidity_when_paused() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -413,7 +413,7 @@ module carapace::pool_tests {
     fun test_swap_x_to_y_when_paused() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -446,7 +446,7 @@ module carapace::pool_tests {
     fun test_swap_y_to_x_when_paused() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -478,7 +478,7 @@ module carapace::pool_tests {
     fun test_operations_work_after_unpause() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -529,7 +529,7 @@ module carapace::pool_tests {
     fun test_flash_swap_basic() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -575,7 +575,7 @@ module carapace::pool_tests {
     fun test_flash_swap_both_tokens() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -617,7 +617,7 @@ module carapace::pool_tests {
     fun test_flash_swap_when_paused() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -655,7 +655,7 @@ module carapace::pool_tests {
     fun test_flash_swap_insufficient_repayment() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {
@@ -688,7 +688,7 @@ module carapace::pool_tests {
     fun test_flash_swap_overpayment_allowed() {
         let mut scenario = test::begin(@0xCAFE);
         {
-            pool::create_pool<TokenA, TokenB>(ctx(&mut scenario));
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
         };
         next_tx(&mut scenario, @0xCAFE);
         {

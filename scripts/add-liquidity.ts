@@ -4,14 +4,15 @@
  */
 
 import { CarapaceSDK } from '../packages/sdk/src/index';
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
-import { decodeSuiPrivateKey } from '@mysten/sui.js/cryptography';
-import { fromB64 } from '@mysten/sui.js/utils';
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+import { decodeSuiPrivateKey } from '@mysten/sui/cryptography';
+import { fromB64 } from '@mysten/sui/utils';
 
-const PACKAGE_ID = '0x998379bb53423871a9e4f8f779c339c096622209309452995ae5ed395779106e';
+const PACKAGE_ID = '0xad1a82cc599cca382ee2888ebe7220061f0654332543aab37f84db34f9a6e06e';
 
-// SUI coin type
+// Coin types
 const SUI_TYPE = '0x2::sui::SUI';
+const TEST_TYPE = `${PACKAGE_ID}::test_coin::TEST_COIN`;
 
 async function main() {
   console.log('🚀 Adding liquidity to pool on Sui testnet...\n');
@@ -61,34 +62,53 @@ async function main() {
 
   console.log(`👛 Wallet address: ${address}`);
 
-  // Check balance
-  const coins = await sdk.client.getCoins({ owner: address });
-  const totalBalance = coins.data.reduce((sum, coin) => sum + BigInt(coin.balance), 0n);
-  console.log(`💰 SUI balance: ${Number(totalBalance) / 1e9} SUI\n`);
+  // Check SUI balance
+  const suiCoins = await sdk.client.getCoins({ owner: address, coinType: SUI_TYPE });
+  const suiBalance = suiCoins.data.reduce((sum, coin) => sum + BigInt(coin.balance), 0n);
+  console.log(`💰 SUI balance: ${Number(suiBalance) / 1e9} SUI`);
 
-  if (totalBalance < 200_000_000n) {
+  // Check TEST balance
+  const testCoins = await sdk.client.getCoins({ owner: address, coinType: TEST_TYPE });
+  const testBalance = testCoins.data.reduce((sum, coin) => sum + BigInt(coin.balance), 0n);
+  console.log(`💰 TEST balance: ${Number(testBalance) / 1e6} TEST\n`);
+
+  if (suiBalance < 200_000_000n) {
     console.error('❌ Error: Insufficient SUI balance (need at least 0.2 SUI)');
     console.log('Get testnet SUI from: https://faucet.testnet.sui.io');
     process.exit(1);
   }
 
-  // Liquidity amounts (0.1 SUI for each side)
-  const amountX = 100_000_000n; // 0.1 SUI
-  const amountY = 100_000_000n; // 0.1 SUI
+  if (testBalance < 10_000_000n) {
+    console.error('❌ Error: Insufficient TEST balance (need at least 10 TEST)');
+    console.log('Run: SUI_PRIVATE_KEY="..." bun run scripts/mint-test-coins.ts');
+    process.exit(1);
+  }
+
+  // Get the TEST coin object
+  const testCoinObject = testCoins.data[0]?.coinObjectId;
+  if (!testCoinObject) {
+    console.error('❌ Error: No TEST coin object found');
+    process.exit(1);
+  }
+
+  // Liquidity amounts
+  const amountX = 100_000_000n; // 0.1 SUI (9 decimals)
+  const amountY = 10_000_000n;  // 10 TEST (6 decimals)
 
   console.log(`💧 Adding liquidity:`);
   console.log(`   Token X (SUI): ${Number(amountX) / 1e9} SUI`);
-  console.log(`   Token Y (SUI): ${Number(amountY) / 1e9} SUI\n`);
+  console.log(`   Token Y (TEST): ${Number(amountY) / 1e6} TEST`);
+  console.log(`   TEST Coin Object: ${testCoinObject}\n`);
 
   try {
     console.log('📝 Building add liquidity transaction...');
-    // For SUI/SUI pool, pass null for coins - SDK will use gas coin
+    // For SUI/TEST pool: null for SUI (uses gas), testCoinObject for TEST
     const tx = sdk.pool.addLiquidity(
       poolId,
       SUI_TYPE,
-      SUI_TYPE,
-      null,
-      null,
+      TEST_TYPE,
+      null, // SUI coin (will use gas)
+      testCoinObject, // TEST coin object
       amountX,
       amountY,
       address, // sender address for LP token transfer
@@ -101,8 +121,8 @@ async function main() {
     console.log('✍️  Signing and executing transaction...');
 
     // Sign and execute
-    const result = await sdk.client.signAndExecuteTransactionBlock({
-      transactionBlock: tx,
+    const result = await sdk.client.signAndExecuteTransaction({
+      transaction: tx,
       signer: keypair,
       options: {
         showEffects: true,

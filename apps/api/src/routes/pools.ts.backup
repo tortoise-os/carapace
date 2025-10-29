@@ -481,4 +481,129 @@ export const createPoolPlugin = (sdk: CarapaceSDK, discoveryService?: PoolDiscov
       }
     )
 
+    /**
+     * GET /api/pools/discovery/status
+     * Get pool discovery service status
+     */
+    .get(
+      '/discovery/status',
+      async ({ discoveryService }) => {
+        if (!discoveryService) {
+          return {
+            success: false,
+            error: 'Pool discovery service not available',
+          };
+        }
+
+        return {
+          success: true,
+          data: {
+            enabled: true,
+            poolCount: discoveryService.getPoolCount(),
+            scanning: false, // Would need to expose this from service
+          },
+        };
+      }
+    )
+
+    /**
+     * GET /api/pools/discovery/discovered
+     * List all discovered pools
+     */
+    .get(
+      '/discovery/discovered',
+      async ({ discoveryService }) => {
+        if (!discoveryService) {
+          return {
+            success: false,
+            error: 'Pool discovery service not available',
+          };
+        }
+
+        const discovered = discoveryService.getAllDiscoveredPools();
+
+        return {
+          success: true,
+          data: discovered,
+          meta: {
+            count: discovered.length,
+          },
+        };
+      }
+    )
+
+    /**
+     * POST /api/pools/discovery/scan
+     * Trigger manual pool scan
+     */
+    .post(
+      '/discovery/scan',
+      async ({ discoveryService }) => {
+        if (!discoveryService) {
+          return {
+            success: false,
+            error: 'Pool discovery service not available',
+          };
+        }
+
+        try {
+          const newPools = await discoveryService.scanForPools();
+
+          return {
+            success: true,
+            data: {
+              newPoolsFound: newPools.length,
+              pools: newPools,
+            },
+          };
+        } catch (error) {
+          console.error('Error during manual scan:', error);
+          throw new Error('Failed to scan for pools');
+        }
+      }
+    )
+
+    /**
+     * POST /api/pools/discovery/add
+     * Manually add a pool to discovery
+     */
+    .post(
+      '/discovery/add',
+      async ({ body, discoveryService }) => {
+        if (!discoveryService) {
+          return {
+            success: false,
+            error: 'Pool discovery service not available',
+          };
+        }
+
+        try {
+          const pool = {
+            poolId: body.poolId,
+            tokenX: body.tokenX || 'unknown',
+            tokenY: body.tokenY || 'unknown',
+            discoveredAt: new Date(),
+            transactionDigest: body.transactionDigest || 'manual',
+          };
+
+          discoveryService.addPool(pool);
+
+          return {
+            success: true,
+            data: pool,
+          };
+        } catch (error) {
+          console.error('Error adding pool:', error);
+          throw new Error('Failed to add pool');
+        }
+      },
+      {
+        body: t.Object({
+          poolId: t.String(),
+          tokenX: t.Optional(t.String()),
+          tokenY: t.Optional(t.String()),
+          transactionDigest: t.Optional(t.String()),
+        }),
+      }
+    );
 };

@@ -4,18 +4,25 @@
  */
 
 import { CarapaceSDK } from '../packages/sdk/src/index';
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
-import { decodeSuiPrivateKey } from '@mysten/sui.js/cryptography';
-import { fromB64 } from '@mysten/sui.js/utils';
-
-const PACKAGE_ID = '0x998379bb53423871a9e4f8f779c339c096622209309452995ae5ed395779106e';
-const POOL_ID = '0x163fb7a120e23832f366d8ea0d3939062c6269d2797975e82e9bf7b5f9afc7e4';
-
-// SUI coin type
-const SUI_TYPE = '0x2::sui::SUI';
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+import { decodeSuiPrivateKey } from '@mysten/sui/cryptography';
+import { fromB64 } from '@mysten/sui/utils';
 
 async function main() {
   console.log('🧪 Testing real swap on Sui testnet...\n');
+
+  // Load pool info
+  const poolInfoFile = Bun.file('./scripts/.pool-info.json');
+  if (!(await poolInfoFile.exists())) {
+    console.error('❌ Error: Pool info file not found. Run create-pool.ts first.');
+    process.exit(1);
+  }
+
+  const poolInfo = await poolInfoFile.json();
+  const PACKAGE_ID = poolInfo.packageId;
+  const POOL_ID = poolInfo.poolId;
+  const SUI_TYPE = '0x2::sui::SUI';
+  const TEST_TYPE = `${PACKAGE_ID}::test_coin::TEST_COIN`;
 
   // Initialize SDK
   const sdk = new CarapaceSDK({
@@ -47,26 +54,30 @@ async function main() {
 
   console.log(`👛 Wallet address: ${address}`);
 
-  // Check initial balance
-  const coinsBefore = await sdk.client.getCoins({ owner: address });
-  const balanceBefore = coinsBefore.data.reduce((sum, coin) => sum + BigInt(coin.balance), 0n);
-  console.log(`💰 Initial SUI balance: ${Number(balanceBefore) / 1e9} SUI\n`);
+  // Check initial balances
+  const suiCoinsBefore = await sdk.client.getCoins({ owner: address, coinType: SUI_TYPE });
+  const suiBalanceBefore = suiCoinsBefore.data.reduce((sum, coin) => sum + BigInt(coin.balance), 0n);
+  console.log(`💰 Initial SUI balance: ${Number(suiBalanceBefore) / 1e9} SUI`);
+
+  const testCoinsBefore = await sdk.client.getCoins({ owner: address, coinType: TEST_TYPE });
+  const testBalanceBefore = testCoinsBefore.data.reduce((sum, coin) => sum + BigInt(coin.balance), 0n);
+  console.log(`💰 Initial TEST balance: ${Number(testBalanceBefore) / 1e6} TEST\n`);
 
   // Get pool state before swap
   console.log('📊 Pool state before swap:');
   try {
     const pool = await sdk.pool.getPool(POOL_ID);
-    console.log(`   Reserve X: ${Number(pool.reserveX) / 1e9} SUI`);
-    console.log(`   Reserve Y: ${Number(pool.reserveY) / 1e9} SUI`);
+    console.log(`   Reserve X (SUI): ${Number(pool.reserveX) / 1e9} SUI`);
+    console.log(`   Reserve Y (TEST): ${Number(pool.reserveY) / 1e6} TEST`);
     console.log(`   LP Supply: ${pool.lpSupply}`);
     console.log(`   Fee BPS: ${pool.feeBps}\n`);
 
     // Calculate swap quote
     const amountIn = 10_000_000n; // 0.01 SUI
-    console.log(`💱 Swapping: ${Number(amountIn) / 1e9} SUI`);
+    console.log(`💱 Swapping: ${Number(amountIn) / 1e9} SUI for TEST`);
 
     const quote = await sdk.pool.getSwapQuote(POOL_ID, amountIn, true);
-    console.log(`   Expected output: ${Number(quote.amountOut) / 1e9} SUI`);
+    console.log(`   Expected output: ${Number(quote.amountOut) / 1e6} TEST`);
     console.log(`   Price impact: ${quote.priceImpact.toFixed(4)}%`);
     console.log(`   Fee: ${Number(quote.fee) / 1e9} SUI\n`);
 
@@ -77,7 +88,7 @@ async function main() {
     const tx = sdk.pool.swapXToY(
       POOL_ID,
       SUI_TYPE,
-      SUI_TYPE,
+      TEST_TYPE,
       null, // Use gas coin for SUI
       amountIn,
       address, // sender address for output coin transfer
@@ -90,8 +101,8 @@ async function main() {
     console.log('✍️  Signing and executing swap transaction...');
 
     // Sign and execute
-    const result = await sdk.client.signAndExecuteTransactionBlock({
-      transactionBlock: tx,
+    const result = await sdk.client.signAndExecuteTransaction({
+      transaction: tx,
       signer: keypair,
       options: {
         showEffects: true,
@@ -121,23 +132,29 @@ async function main() {
     // Get pool state after swap
     console.log('📊 Pool state after swap:');
     const poolAfter = await sdk.pool.getPool(POOL_ID);
-    console.log(`   Reserve X: ${Number(poolAfter.reserveX) / 1e9} SUI`);
-    console.log(`   Reserve Y: ${Number(poolAfter.reserveY) / 1e9} SUI`);
+    console.log(`   Reserve X (SUI): ${Number(poolAfter.reserveX) / 1e9} SUI`);
+    console.log(`   Reserve Y (TEST): ${Number(poolAfter.reserveY) / 1e6} TEST`);
     console.log(`   LP Supply: ${poolAfter.lpSupply}`);
 
     // Calculate reserve changes
     const reserveXChange = Number(poolAfter.reserveX - pool.reserveX) / 1e9;
-    const reserveYChange = Number(poolAfter.reserveY - pool.reserveY) / 1e9;
+    const reserveYChange = Number(poolAfter.reserveY - pool.reserveY) / 1e6;
     console.log(`\n   Reserve X change: ${reserveXChange > 0 ? '+' : ''}${reserveXChange.toFixed(6)} SUI`);
-    console.log(`   Reserve Y change: ${reserveYChange > 0 ? '+' : ''}${reserveYChange.toFixed(6)} SUI\n`);
+    console.log(`   Reserve Y change: ${reserveYChange > 0 ? '+' : ''}${reserveYChange.toFixed(6)} TEST\n`);
 
-    // Check final balance
-    const coinsAfter = await sdk.client.getCoins({ owner: address });
-    const balanceAfter = coinsAfter.data.reduce((sum, coin) => sum + BigInt(coin.balance), 0n);
-    console.log(`💰 Final SUI balance: ${Number(balanceAfter) / 1e9} SUI`);
+    // Check final balances
+    const suiCoinsAfter = await sdk.client.getCoins({ owner: address, coinType: SUI_TYPE });
+    const suiBalanceAfter = suiCoinsAfter.data.reduce((sum, coin) => sum + BigInt(coin.balance), 0n);
+    console.log(`💰 Final SUI balance: ${Number(suiBalanceAfter) / 1e9} SUI`);
 
-    const balanceChange = Number(balanceAfter - balanceBefore) / 1e9;
-    console.log(`   Balance change: ${balanceChange > 0 ? '+' : ''}${balanceChange.toFixed(6)} SUI (including gas)\n`);
+    const testCoinsAfter = await sdk.client.getCoins({ owner: address, coinType: TEST_TYPE });
+    const testBalanceAfter = testCoinsAfter.data.reduce((sum, coin) => sum + BigInt(coin.balance), 0n);
+    console.log(`💰 Final TEST balance: ${Number(testBalanceAfter) / 1e6} TEST`);
+
+    const suiBalanceChange = Number(suiBalanceAfter - suiBalanceBefore) / 1e9;
+    const testBalanceChange = Number(testBalanceAfter - testBalanceBefore) / 1e6;
+    console.log(`   SUI change: ${suiBalanceChange > 0 ? '+' : ''}${suiBalanceChange.toFixed(6)} SUI (including gas)`);
+    console.log(`   TEST change: ${testBalanceChange > 0 ? '+' : ''}${testBalanceChange.toFixed(6)} TEST\n`);
 
     // Verification
     console.log('✅ Verification:');

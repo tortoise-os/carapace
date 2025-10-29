@@ -41,7 +41,14 @@
       "Bash(find:*)",
       "Bash(task move:build:*)",
       "Bash(task move:test)",
-      "Bash(task:*)"
+      "Bash(task:*)",
+      "Bash(python3:*)",
+      "WebFetch(domain:testnet.suivision.xyz)",
+      "Bash(tee:*)",
+      "Read(//private/tmp/**)",
+      "Bash(node -c:*)",
+      "Bash(mkdir:*)",
+      "Bash(timeout 60 sui move test:*)"
     ],
     "deny": [],
     "ask": []
