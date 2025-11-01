@@ -1,6 +1,6 @@
 'use client';
 
-import { TokenIcon, type TokenIconProps } from '@carapace/ui';
+import { TokenIcon, type TokenIconProps } from '@carapace/carapace-ui';
 import { useTokenMetadata } from '@/hooks/use-token-metadata';
 
 interface TokenIconWithMetadataProps extends Omit<TokenIconProps, 'iconUrl' | 'symbol'> {

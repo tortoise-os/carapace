@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useCurrentAccount } from '@mysten/dapp-kit';
-import { Card } from '@carapace/ui';
+import { Card } from '@carapace/carapace-ui';
 import {
   ArrowLeftRight,
   Plus,

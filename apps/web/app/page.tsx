@@ -5,7 +5,7 @@ import {
   RetroGrid,
   DotPattern,
   BlurFade
-} from '@carapace/ui';
+} from '@carapace/carapace-ui';
 
 export default function Home() {
   return (

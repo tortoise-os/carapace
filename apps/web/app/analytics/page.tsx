@@ -3,7 +3,7 @@
 import { ProtocolStats } from '@/components/analytics/protocol-stats';
 import { PoolAnalyticsTable } from '@/components/analytics/pool-analytics-table';
 import { RecentTransactionsWidget } from '@/components/transactions/recent-transactions-widget';
-import { BlurFade, DotPattern } from '@carapace/ui';
+import { BlurFade, DotPattern } from '@carapace/carapace-ui';
 
 export default function AnalyticsPage() {
   return (

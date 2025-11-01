@@ -1,0 +1,62 @@
+name: Publish Carapace Packages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build packages
+        run: bun run build
+
+      - name: Run tests
+        run: bun test
+
+      - name: Publish @carapace/sdk
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish]')
+        working-directory: packages/sdk
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @carapace/strategy-sdk
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish]')
+        working-directory: packages/strategy-sdk
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Summary
+        run: |
+          echo "## 📦 Published Carapace Packages" >> $GITHUB_STEP_SUMMARY
+          echo "- @carapace/sdk" >> $GITHUB_STEP_SUMMARY
+          echo "- @carapace/strategy-sdk" >> $GITHUB_STEP_SUMMARY

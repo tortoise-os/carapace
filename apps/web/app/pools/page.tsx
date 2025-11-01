@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, TrendingUp, Droplet, Star } from 'lucide-react';
-import { BlurFade, MagicCard, Button, DotPattern, ShimmerButton, TokenIcon } from '@carapace/ui';
+import { BlurFade, MagicCard, Button, DotPattern, ShimmerButton, TokenIcon } from '@carapace/carapace-ui';
 import { apiClient, type Pool } from '@/lib/api-client';
 import { LiquidityDialog } from '@/components/liquidity/liquidity-dialog';
 import { useFavoritePools } from '@/lib/hooks/use-favorite-pools';

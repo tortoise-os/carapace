@@ -9,7 +9,7 @@ import {
   DialogTitle,
   Input,
   TokenIcon,
-} from '@carapace/ui';
+} from '@carapace/carapace-ui';
 import { Search, Star, TrendingUp } from 'lucide-react';
 
 interface Token {

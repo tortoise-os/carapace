@@ -8,7 +8,7 @@ import {
   Badge,
   Button,
   DotPattern,
-} from '@carapace/ui';
+} from '@carapace/carapace-ui';
 import {
   TrendingUp,
   TrendingDown,

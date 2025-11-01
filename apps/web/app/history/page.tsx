@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useCurrentAccount } from '@mysten/dapp-kit';
-import { BlurFade, DotPattern, Card, Button } from '@carapace/ui';
+import { BlurFade, DotPattern, Card, Button } from '@carapace/carapace-ui';
 import {
   Wallet,
   ArrowRight,

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, Button } from '@carapace/ui';
-import { BlurFade, DotPattern } from '@carapace/ui';
+import { Card, Button } from '@carapace/carapace-ui';
+import { BlurFade, DotPattern } from '@carapace/carapace-ui';
 import {
   Sliders,
   Bell,

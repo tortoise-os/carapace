@@ -5,7 +5,7 @@ import { EnhancedSwapInterface } from '@/components/swap/enhanced-swap-interface
 import { PriceChart } from '@/components/charts/price-chart';
 import { LiquidityDepthChart } from '@/components/charts/liquidity-depth-chart';
 import { WalletBalanceWidget } from '@/components/wallet/wallet-balance-widget';
-import { BlurFade, DotPattern } from '@carapace/ui';
+import { BlurFade, DotPattern } from '@carapace/carapace-ui';
 
 interface PriceDataPoint {
   timestamp: number;

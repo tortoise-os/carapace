@@ -1,7 +1,7 @@
 'use client';
 
 import { useCurrentAccount } from '@mysten/dapp-kit';
-import { BlurFade, DotPattern, Card, Button } from '@carapace/ui';
+import { BlurFade, DotPattern, Card, Button } from '@carapace/carapace-ui';
 import { Wallet, TrendingUp, DollarSign, Sparkles } from 'lucide-react';
 import { PositionCard } from '@/components/positions/position-card';
 import { useUserPositions } from '@/lib/hooks/use-positions';

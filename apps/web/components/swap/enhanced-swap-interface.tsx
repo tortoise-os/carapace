@@ -9,7 +9,7 @@ import {
   BorderBeam,
   ShimmerButton,
   TokenIcon,
-} from '@carapace/ui';
+} from '@carapace/carapace-ui';
 import { ArrowDown, ChevronDown, Settings, Loader2 } from 'lucide-react';
 import { apiClient, type SwapQuote, type Pool } from '@/lib/api-client';
 import { toast } from 'sonner';

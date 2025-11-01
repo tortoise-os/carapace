@@ -12,7 +12,7 @@ import {
   Button,
   ShimmerButton,
   TokenIcon,
-} from '@carapace/ui';
+} from '@carapace/carapace-ui';
 import { Plus, Minus, Loader2 } from 'lucide-react';
 import type { Pool } from '@/lib/api-client';
 import { toast } from 'sonner';

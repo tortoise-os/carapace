@@ -1,6 +1,6 @@
 'use client';
 
-import { Card } from '@carapace/ui';
+import { Card } from '@carapace/carapace-ui';
 import { useState } from 'react';
 import {
   AreaChart,

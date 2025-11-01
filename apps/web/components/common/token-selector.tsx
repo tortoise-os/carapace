@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, TokenIcon, Input, Button } from '@carapace/ui';
+import { Card, TokenIcon, Input, Button } from '@carapace/carapace-ui';
 import { Search, Check, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useTokens } from '@/lib/hooks/use-tokens';
 import type { Token } from '@/lib/api-client';

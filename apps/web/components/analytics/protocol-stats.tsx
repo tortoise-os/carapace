@@ -1,6 +1,6 @@
 'use client';
 
-import { Card } from '@carapace/ui';
+import { Card } from '@carapace/carapace-ui';
 import { TrendingUp, Activity, DollarSign, Layers } from 'lucide-react';
 import { useProtocolAnalytics, formatCurrency } from '@/lib/hooks/use-analytics';
 

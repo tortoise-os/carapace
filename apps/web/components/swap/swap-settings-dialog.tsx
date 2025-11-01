@@ -9,7 +9,7 @@ import {
   DialogTitle,
   Button,
   Input,
-} from '@carapace/ui';
+} from '@carapace/carapace-ui';
 import { Settings, ExternalLink, AlertTriangle } from 'lucide-react';
 
 interface SwapSettingsDialogProps {

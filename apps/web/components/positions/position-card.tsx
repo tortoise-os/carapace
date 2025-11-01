@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, TokenIcon, Button } from '@carapace/ui';
+import { Card, TokenIcon, Button } from '@carapace/carapace-ui';
 import { TrendingUp, Droplets } from 'lucide-react';
 import type { LiquidityPosition } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/hooks/use-analytics';

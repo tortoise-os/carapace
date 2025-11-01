@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@carapace/ui';
+} from '@carapace/carapace-ui';
 import { Copy, ExternalLink, LogOut } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { WalletSelectorModal } from '@/components/wallet/wallet-selector-modal';

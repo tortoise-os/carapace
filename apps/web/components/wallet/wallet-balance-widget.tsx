@@ -1,7 +1,7 @@
 'use client';
 
 import { useCurrentAccount } from '@mysten/dapp-kit';
-import { Card, TokenIcon } from '@carapace/ui';
+import { Card, TokenIcon } from '@carapace/carapace-ui';
 import { Wallet, TrendingUp, RefreshCw } from 'lucide-react';
 import { useTokens } from '@/lib/hooks/use-tokens';
 import { useTokenBalance } from '@/lib/hooks/use-token-balance';

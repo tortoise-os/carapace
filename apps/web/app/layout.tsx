@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google';
 import Link from 'next/link';
 import './globals.css';
 import { SuiProvider } from '@/providers/sui-provider';
-import { ThemeProvider, ThemeToggle } from '@carapace/ui';
+import { ThemeProvider, ThemeToggle } from '@carapace/carapace-ui';
 import { EnhancedWalletButton } from '@/components/enhanced-wallet-button';
 import { Toaster } from 'sonner';
 

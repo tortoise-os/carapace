@@ -7,7 +7,7 @@ import {
   Card,
   MagicCard,
   BorderBeam,
-} from '@carapace/ui';
+} from '@carapace/carapace-ui';
 import {
   CheckCircle,
   Circle,

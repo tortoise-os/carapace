@@ -8,7 +8,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@carapace/ui';
+} from '@carapace/carapace-ui';
 import { ExternalLink, CheckCircle2, Download } from 'lucide-react';
 
 interface WalletSelectorModalProps {

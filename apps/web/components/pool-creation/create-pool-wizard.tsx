@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Button, Input, TokenIcon } from '@carapace/ui';
+import { Card, Button, Input, TokenIcon } from '@carapace/carapace-ui';
 import { ArrowRight, ArrowLeft, Check, Info } from 'lucide-react';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { toast } from 'sonner';

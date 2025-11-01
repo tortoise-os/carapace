@@ -1,6 +1,6 @@
 'use client';
 
-import { BlurFade, DotPattern } from '@carapace/ui';
+import { BlurFade, DotPattern } from '@carapace/carapace-ui';
 import { CreatePoolWizard } from '@/components/pool-creation/create-pool-wizard';
 
 export default function CreatePoolPage() {

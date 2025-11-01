@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@carapace/sdk": "workspace:*",
-    "@carapace/ui": "workspace:*",
+    "@carapace/carapace-ui": "workspace:*",
     "@mysten/dapp-kit": "^0.14.23",
     "@mysten/sui": "^1.14.0",
     "@radix-ui/react-dialog": "^1.1.2",

@@ -1,7 +1,7 @@
 'use client';
 
 import { ExternalLink, RefreshCw } from 'lucide-react';
-import { Button, Card } from '@carapace/ui';
+import { Button, Card } from '@carapace/carapace-ui';
 import {
   useTransactionHistory,
   formatTransactionType,

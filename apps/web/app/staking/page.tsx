@@ -9,7 +9,7 @@ import {
   Button,
   DotPattern,
   Input,
-} from '@carapace/ui';
+} from '@carapace/carapace-ui';
 import {
   Coins,
   TrendingUp,

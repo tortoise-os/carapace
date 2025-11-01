@@ -1,5 +1,5 @@
 {
-  "name": "@carapace/ui",
+  "name": "@carapace/carapace-ui",
   "version": "0.1.0",
   "type": "module",
   "description": "UI component library for Carapace apps",

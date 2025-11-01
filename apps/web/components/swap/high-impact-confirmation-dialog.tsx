@@ -9,7 +9,7 @@ import {
   DialogDescription,
   DialogFooter,
   Button,
-} from '@carapace/ui';
+} from '@carapace/carapace-ui';
 import type { PriceImpactData } from '@/lib/utils/price-impact';
 import { formatPriceImpact, getPriceImpactWarning } from '@/lib/utils/price-impact';
 

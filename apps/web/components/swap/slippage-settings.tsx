@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Button, Input } from '@carapace/ui';
+import { Card, Button, Input } from '@carapace/carapace-ui';
 import { Settings, AlertTriangle, Check } from 'lucide-react';
 
 interface SlippageSettingsProps {

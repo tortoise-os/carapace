@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, TokenIcon } from '@carapace/ui';
+import { Card, TokenIcon } from '@carapace/carapace-ui';
 import { ArrowUpDown, TrendingUp } from 'lucide-react';
 import { usePoolAnalytics, formatCurrency, formatPercentage } from '@/lib/hooks/use-analytics';
 import type { PoolWithAnalytics } from '@/lib/api-client';

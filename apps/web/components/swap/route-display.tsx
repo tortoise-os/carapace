@@ -1,7 +1,7 @@
 'use client';
 
 import { SwapRoute } from '@/lib/services/route-optimizer';
-import { Card, Badge } from '@carapace/ui';
+import { Card, Badge } from '@carapace/carapace-ui';
 import { ArrowRight, TrendingUp, TrendingDown, Zap, Info } from 'lucide-react';
 
 interface RouteDisplayProps {
