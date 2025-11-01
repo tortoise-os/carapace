@@ -716,4 +716,344 @@ module carapace::pool_tests {
         };
         test::end(scenario);
     }
+
+    // ========== Flash Loan Tests ==========
+
+    #[test]
+    fun test_flash_loan_x_basic() {
+        let mut scenario = test::begin(@0xCAFE);
+        {
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
+        };
+        next_tx(&mut scenario, @0xCAFE);
+        {
+            let mut pool = take_shared<Pool<TokenA, TokenB>>(&scenario);
+
+            // Add liquidity
+            let coin_a = mint_for_testing<TokenA>(100_000, ctx(&mut scenario));
+            let coin_b = mint_for_testing<TokenB>(200_000, ctx(&mut scenario));
+            let lp_token = pool::add_liquidity(&mut pool, coin_a, coin_b, 0, ctx(&mut scenario));
+
+            // Flash borrow token X
+            let borrow_amount = 10_000;
+            let (borrowed, receipt) = pool::flash_borrow_x(&mut pool, borrow_amount, ctx(&mut scenario));
+
+            // Verify borrowed amount
+            assert!(coin::value(&borrowed) == borrow_amount, 0);
+
+            // Calculate expected fee (0.05% = 5 bp)
+            let expected_fee = pool::calculate_flash_loan_fee(borrow_amount);
+            assert!(expected_fee == 5, 1); // 10_000 * 5 / 10_000 = 5
+
+            // Prepare repayment (borrowed + fee)
+            let repay_amount = borrow_amount + expected_fee;
+            let repayment = mint_for_testing<TokenA>(repay_amount, ctx(&mut scenario));
+
+            // Use borrowed coins (burn them for testing)
+            coin::burn_for_testing(borrowed);
+
+            // Repay flash loan
+            pool::repay_flash_loan_x(&mut pool, repayment, receipt);
+
+            // Verify pool reserves increased by fee
+            let (reserve_x, _) = pool::get_reserves(&pool);
+            assert!(reserve_x >= 100_000, 2); // At least initial amount (fee goes to protocol)
+
+            coin::burn_for_testing(lp_token);
+            return_shared(pool);
+        };
+        test::end(scenario);
+    }
+
+    #[test]
+    fun test_flash_loan_y_basic() {
+        let mut scenario = test::begin(@0xCAFE);
+        {
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
+        };
+        next_tx(&mut scenario, @0xCAFE);
+        {
+            let mut pool = take_shared<Pool<TokenA, TokenB>>(&scenario);
+
+            // Add liquidity
+            let coin_a = mint_for_testing<TokenA>(100_000, ctx(&mut scenario));
+            let coin_b = mint_for_testing<TokenB>(200_000, ctx(&mut scenario));
+            let lp_token = pool::add_liquidity(&mut pool, coin_a, coin_b, 0, ctx(&mut scenario));
+
+            // Flash borrow token Y
+            let borrow_amount = 20_000;
+            let (borrowed, receipt) = pool::flash_borrow_y(&mut pool, borrow_amount, ctx(&mut scenario));
+
+            // Verify borrowed amount
+            assert!(coin::value(&borrowed) == borrow_amount, 0);
+
+            // Calculate expected fee (0.05% = 5 bp)
+            let expected_fee = pool::calculate_flash_loan_fee(borrow_amount);
+            assert!(expected_fee == 10, 1); // 20_000 * 5 / 10_000 = 10
+
+            // Prepare repayment
+            let repay_amount = borrow_amount + expected_fee;
+            let repayment = mint_for_testing<TokenB>(repay_amount, ctx(&mut scenario));
+
+            // Use borrowed coins
+            coin::burn_for_testing(borrowed);
+
+            // Repay flash loan
+            pool::repay_flash_loan_y(&mut pool, repayment, receipt);
+
+            // Verify pool reserves
+            let (_, reserve_y) = pool::get_reserves(&pool);
+            assert!(reserve_y >= 200_000, 2);
+
+            coin::burn_for_testing(lp_token);
+            return_shared(pool);
+        };
+        test::end(scenario);
+    }
+
+    #[test]
+    fun test_flash_loan_large_amount() {
+        let mut scenario = test::begin(@0xCAFE);
+        {
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
+        };
+        next_tx(&mut scenario, @0xCAFE);
+        {
+            let mut pool = take_shared<Pool<TokenA, TokenB>>(&scenario);
+
+            // Add liquidity
+            let coin_a = mint_for_testing<TokenA>(1_000_000, ctx(&mut scenario));
+            let coin_b = mint_for_testing<TokenB>(2_000_000, ctx(&mut scenario));
+            let lp_token = pool::add_liquidity(&mut pool, coin_a, coin_b, 0, ctx(&mut scenario));
+
+            // Flash borrow large amount
+            let borrow_amount = 500_000;
+            let (borrowed, receipt) = pool::flash_borrow_x(&mut pool, borrow_amount, ctx(&mut scenario));
+
+            assert!(coin::value(&borrowed) == borrow_amount, 0);
+
+            // Fee: 500_000 * 5 / 10_000 = 250
+            let fee = pool::calculate_flash_loan_fee(borrow_amount);
+            assert!(fee == 250, 1);
+
+            let repayment = mint_for_testing<TokenA>(borrow_amount + fee, ctx(&mut scenario));
+            coin::burn_for_testing(borrowed);
+            pool::repay_flash_loan_x(&mut pool, repayment, receipt);
+
+            coin::burn_for_testing(lp_token);
+            return_shared(pool);
+        };
+        test::end(scenario);
+    }
+
+    #[test]
+    fun test_flash_loan_fee_calculation() {
+        let scenario = test::begin(@0xCAFE);
+        {
+            // Test various amounts
+            assert!(pool::calculate_flash_loan_fee(10_000) == 5, 0);      // 0.05%
+            assert!(pool::calculate_flash_loan_fee(100_000) == 50, 1);    // 0.05%
+            assert!(pool::calculate_flash_loan_fee(1_000_000) == 500, 2); // 0.05%
+            assert!(pool::calculate_flash_loan_fee(1_000) == 0, 3);       // Below 1 bp rounds to 0
+        };
+        test::end(scenario);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = carapace::pool::EPoolPaused)]
+    fun test_flash_loan_when_paused() {
+        let mut scenario = test::begin(@0xCAFE);
+        {
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
+        };
+        next_tx(&mut scenario, @0xCAFE);
+        {
+            use carapace::pool::AdminCap;
+            let mut pool = take_shared<Pool<TokenA, TokenB>>(&scenario);
+            let admin_cap = test::take_from_sender<AdminCap>(&scenario);
+
+            // Add liquidity
+            let coin_a = mint_for_testing<TokenA>(100_000, ctx(&mut scenario));
+            let coin_b = mint_for_testing<TokenB>(200_000, ctx(&mut scenario));
+            let lp_token = pool::add_liquidity(&mut pool, coin_a, coin_b, 0, ctx(&mut scenario));
+
+            // Pause the pool
+            pool::pause(&mut pool, &admin_cap);
+
+            // Try flash loan (should fail)
+            let (borrowed, receipt) = pool::flash_borrow_x(&mut pool, 10_000, ctx(&mut scenario));
+
+            // Cleanup (won't reach here)
+            coin::burn_for_testing(borrowed);
+            let repayment = mint_for_testing<TokenA>(10_005, ctx(&mut scenario));
+            pool::repay_flash_loan_x(&mut pool, repayment, receipt);
+
+            coin::burn_for_testing(lp_token);
+            test::return_to_sender(&scenario, admin_cap);
+            return_shared(pool);
+        };
+        test::end(scenario);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = carapace::pool::EInvalidFlashSwapRepayment)]
+    fun test_flash_loan_insufficient_repayment() {
+        let mut scenario = test::begin(@0xCAFE);
+        {
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
+        };
+        next_tx(&mut scenario, @0xCAFE);
+        {
+            let mut pool = take_shared<Pool<TokenA, TokenB>>(&scenario);
+
+            // Add liquidity
+            let coin_a = mint_for_testing<TokenA>(100_000, ctx(&mut scenario));
+            let coin_b = mint_for_testing<TokenB>(200_000, ctx(&mut scenario));
+            let lp_token = pool::add_liquidity(&mut pool, coin_a, coin_b, 0, ctx(&mut scenario));
+
+            // Flash loan
+            let (borrowed, receipt) = pool::flash_borrow_x(&mut pool, 10_000, ctx(&mut scenario));
+            coin::burn_for_testing(borrowed);
+
+            // Try to repay without fee (should fail)
+            let repayment = mint_for_testing<TokenA>(10_000, ctx(&mut scenario)); // Missing fee!
+            pool::repay_flash_loan_x(&mut pool, repayment, receipt);
+
+            coin::burn_for_testing(lp_token);
+            return_shared(pool);
+        };
+        test::end(scenario);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = carapace::pool::EZeroAmount)]
+    fun test_flash_loan_zero_amount() {
+        let mut scenario = test::begin(@0xCAFE);
+        {
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
+        };
+        next_tx(&mut scenario, @0xCAFE);
+        {
+            let mut pool = take_shared<Pool<TokenA, TokenB>>(&scenario);
+
+            // Add liquidity
+            let coin_a = mint_for_testing<TokenA>(100_000, ctx(&mut scenario));
+            let coin_b = mint_for_testing<TokenB>(200_000, ctx(&mut scenario));
+            let lp_token = pool::add_liquidity(&mut pool, coin_a, coin_b, 0, ctx(&mut scenario));
+
+            // Try to borrow zero amount (should fail)
+            let (borrowed, receipt) = pool::flash_borrow_x(&mut pool, 0, ctx(&mut scenario));
+
+            // Cleanup (won't reach here)
+            coin::burn_for_testing(borrowed);
+            let repayment = mint_for_testing<TokenA>(0, ctx(&mut scenario));
+            pool::repay_flash_loan_x(&mut pool, repayment, receipt);
+
+            coin::burn_for_testing(lp_token);
+            return_shared(pool);
+        };
+        test::end(scenario);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = carapace::pool::EInsufficientLiquidity)]
+    fun test_flash_loan_exceeds_reserves() {
+        let mut scenario = test::begin(@0xCAFE);
+        {
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
+        };
+        next_tx(&mut scenario, @0xCAFE);
+        {
+            let mut pool = take_shared<Pool<TokenA, TokenB>>(&scenario);
+
+            // Add liquidity
+            let coin_a = mint_for_testing<TokenA>(100_000, ctx(&mut scenario));
+            let coin_b = mint_for_testing<TokenB>(200_000, ctx(&mut scenario));
+            let lp_token = pool::add_liquidity(&mut pool, coin_a, coin_b, 0, ctx(&mut scenario));
+
+            // Try to borrow more than reserves (should fail)
+            let (borrowed, receipt) = pool::flash_borrow_x(&mut pool, 100_000, ctx(&mut scenario));
+
+            // Cleanup (won't reach here)
+            coin::burn_for_testing(borrowed);
+            let repayment = mint_for_testing<TokenA>(100_050, ctx(&mut scenario));
+            pool::repay_flash_loan_x(&mut pool, repayment, receipt);
+
+            coin::burn_for_testing(lp_token);
+            return_shared(pool);
+        };
+        test::end(scenario);
+    }
+
+    #[test]
+    fun test_flash_loan_overpayment_allowed() {
+        let mut scenario = test::begin(@0xCAFE);
+        {
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
+        };
+        next_tx(&mut scenario, @0xCAFE);
+        {
+            let mut pool = take_shared<Pool<TokenA, TokenB>>(&scenario);
+
+            // Add liquidity
+            let coin_a = mint_for_testing<TokenA>(100_000, ctx(&mut scenario));
+            let coin_b = mint_for_testing<TokenB>(200_000, ctx(&mut scenario));
+            let lp_token = pool::add_liquidity(&mut pool, coin_a, coin_b, 0, ctx(&mut scenario));
+
+            // Flash loan
+            let (borrowed, receipt) = pool::flash_borrow_x(&mut pool, 10_000, ctx(&mut scenario));
+            coin::burn_for_testing(borrowed);
+
+            // Overpay (should succeed)
+            let repayment = mint_for_testing<TokenA>(11_000, ctx(&mut scenario)); // More than required
+            pool::repay_flash_loan_x(&mut pool, repayment, receipt);
+
+            // Extra payment should remain in pool
+            let (reserve_x, _) = pool::get_reserves(&pool);
+            assert!(reserve_x > 100_000, 0);
+
+            coin::burn_for_testing(lp_token);
+            return_shared(pool);
+        };
+        test::end(scenario);
+    }
+
+    #[test]
+    fun test_flash_loan_protocol_fee_collection() {
+        let mut scenario = test::begin(@0xCAFE);
+        {
+            pool::create_pool_for_testing<TokenA, TokenB>(ctx(&mut scenario));
+        };
+        next_tx(&mut scenario, @0xCAFE);
+        {
+            let mut pool = take_shared<Pool<TokenA, TokenB>>(&scenario);
+
+            // Add liquidity
+            let coin_a = mint_for_testing<TokenA>(100_000, ctx(&mut scenario));
+            let coin_b = mint_for_testing<TokenB>(200_000, ctx(&mut scenario));
+            let lp_token = pool::add_liquidity(&mut pool, coin_a, coin_b, 0, ctx(&mut scenario));
+
+            // Get initial protocol fees (not used in this test but showing the pattern)
+            let (_initial_fee_x, _) = pool::get_protocol_fees(&pool);
+
+            // Flash loan
+            let borrow_amount = 100_000;
+            let (borrowed, receipt) = pool::flash_borrow_y(&mut pool, borrow_amount, ctx(&mut scenario));
+
+            let fee = pool::calculate_flash_loan_fee(borrow_amount);
+            let repayment = mint_for_testing<TokenB>(borrow_amount + fee, ctx(&mut scenario));
+
+            coin::burn_for_testing(borrowed);
+            pool::repay_flash_loan_y(&mut pool, repayment, receipt);
+
+            // Check protocol fees increased
+            let (_, final_fee_y) = pool::get_protocol_fees(&pool);
+            // Protocol fee = fee * protocol_fee_bps / 10000 = 50 * 1667 / 10000 = 8
+            assert!(final_fee_y > 0, 0);
+
+            coin::burn_for_testing(lp_token);
+            return_shared(pool);
+        };
+        test::end(scenario);
+    }
 }

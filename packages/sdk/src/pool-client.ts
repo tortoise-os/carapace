@@ -366,4 +366,78 @@ export class PoolClient {
 
     return tx;
   }
+
+  /**
+   * Build flash loan borrow transaction for token X
+   */
+  flashBorrowX(
+    poolId: ObjectId,
+    typeX: string,
+    typeY: string,
+    amount: bigint,
+  ): { tx: Transaction; borrowedCoin: any; receipt: any } {
+    const tx = new Transaction();
+
+    const [borrowedCoin, receipt] = tx.moveCall({
+      target: `${this.packageId}::pool::flash_borrow_x`,
+      typeArguments: [typeX, typeY],
+      arguments: [
+        tx.object(poolId),
+        tx.pure.u64(amount),
+      ],
+    });
+
+    return { tx, borrowedCoin, receipt };
+  }
+
+  /**
+   * Build flash loan borrow transaction for token Y
+   */
+  flashBorrowY(
+    poolId: ObjectId,
+    typeX: string,
+    typeY: string,
+    amount: bigint,
+  ): { tx: Transaction; borrowedCoin: any; receipt: any } {
+    const tx = new Transaction();
+
+    const [borrowedCoin, receipt] = tx.moveCall({
+      target: `${this.packageId}::pool::flash_borrow_y`,
+      typeArguments: [typeX, typeY],
+      arguments: [
+        tx.object(poolId),
+        tx.pure.u64(amount),
+      ],
+    });
+
+    return { tx, borrowedCoin, receipt };
+  }
+
+  /**
+   * Calculate flash loan fee
+   */
+  calculateFlashLoanFee(amount: bigint, feeBps: number = 5): bigint {
+    return (amount * BigInt(feeBps)) / BigInt(CONSTANTS.BPS_DENOMINATOR);
+  }
+
+  /**
+   * Get flash loan quote
+   */
+  async getFlashLoanQuote(
+    poolId: ObjectId,
+    amount: bigint,
+    feeBps: number = 5,
+  ): Promise<{
+    borrowAmount: bigint;
+    feeAmount: bigint;
+    totalRepayment: bigint;
+  }> {
+    const feeAmount = this.calculateFlashLoanFee(amount, feeBps);
+
+    return {
+      borrowAmount: amount,
+      feeAmount,
+      totalRepayment: amount + feeAmount,
+    };
+  }
 }

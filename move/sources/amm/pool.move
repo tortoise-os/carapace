@@ -27,6 +27,9 @@ module carapace::pool {
     /// Protocol fee (% of swap fees)
     const DEFAULT_PROTOCOL_FEE_BPS: u64 = 1667;  // 16.67% (1/6)
 
+    /// Flash loan fee (in basis points)
+    const FLASH_LOAN_FEE_BPS: u64 = 5;  // 0.05%
+
     /// Admin capability for pool management
     public struct AdminCap has key, store {
         id: object::UID,
@@ -57,6 +60,14 @@ module carapace::pool {
         borrowed_y: u64,
         repay_x: u64,
         repay_y: u64,
+    }
+
+    /// Flash loan receipt (Hot Potato) for single token flash loans
+    /// Must be consumed by repay_flash_loan in the same transaction
+    public struct FlashLoan<phantom T> {
+        pool_id: object::ID,
+        amount: u64,
+        fee: u64,
     }
 
     /// Pool creation event
@@ -107,6 +118,20 @@ module carapace::pool {
         borrowed_y: u64,
         repaid_x: u64,
         repaid_y: u64,
+    }
+
+    /// Flash loan borrowed event
+    public struct FlashLoanBorrowed<phantom T> has copy, drop {
+        pool_id: object::ID,
+        amount: u64,
+        fee: u64,
+    }
+
+    /// Flash loan repaid event
+    public struct FlashLoanRepaid<phantom T> has copy, drop {
+        pool_id: object::ID,
+        amount: u64,
+        fee: u64,
     }
 
     /// Create a new liquidity pool and share it
@@ -586,6 +611,166 @@ module carapace::pool {
             repaid_x,
             repaid_y,
         });
+    }
+
+    /// Flash borrow token X from the pool
+    /// Returns borrowed coins and a FlashLoan receipt (hot potato)
+    /// The receipt MUST be consumed by calling repay_flash_loan_x in the same transaction
+    ///
+    /// This provides a simpler interface compared to flash_swap for single-token borrows
+    /// Compatible with the Hatch flash loan pattern
+    public fun flash_borrow_x<X, Y>(
+        pool: &mut Pool<X, Y>,
+        amount: u64,
+        ctx: &mut TxContext
+    ): (Coin<X>, FlashLoan<X>) {
+        assert!(!pool.paused, EPoolPaused);
+        assert!(amount > 0, EZeroAmount);
+
+        let reserve_x = balance::value(&pool.reserve_x);
+        assert!(amount < reserve_x, EInsufficientLiquidity);
+
+        // Calculate flash loan fee
+        let fee = calculate_flash_loan_fee(amount);
+
+        // Extract coins from pool
+        let borrowed_balance = balance::split(&mut pool.reserve_x, amount);
+        let borrowed_coin = coin::from_balance(borrowed_balance, ctx);
+
+        // Create flash loan receipt (hot potato)
+        let receipt = FlashLoan<X> {
+            pool_id: object::uid_to_inner(&pool.id),
+            amount,
+            fee,
+        };
+
+        // Emit flash loan borrowed event
+        sui::event::emit(FlashLoanBorrowed<X> {
+            pool_id: object::uid_to_inner(&pool.id),
+            amount,
+            fee,
+        });
+
+        (borrowed_coin, receipt)
+    }
+
+    /// Flash borrow token Y from the pool
+    /// Returns borrowed coins and a FlashLoan receipt (hot potato)
+    /// The receipt MUST be consumed by calling repay_flash_loan_y in the same transaction
+    ///
+    /// This provides a simpler interface compared to flash_swap for single-token borrows
+    /// Compatible with the Hatch flash loan pattern
+    public fun flash_borrow_y<X, Y>(
+        pool: &mut Pool<X, Y>,
+        amount: u64,
+        ctx: &mut TxContext
+    ): (Coin<Y>, FlashLoan<Y>) {
+        assert!(!pool.paused, EPoolPaused);
+        assert!(amount > 0, EZeroAmount);
+
+        let reserve_y = balance::value(&pool.reserve_y);
+        assert!(amount < reserve_y, EInsufficientLiquidity);
+
+        // Calculate flash loan fee
+        let fee = calculate_flash_loan_fee(amount);
+
+        // Extract coins from pool
+        let borrowed_balance = balance::split(&mut pool.reserve_y, amount);
+        let borrowed_coin = coin::from_balance(borrowed_balance, ctx);
+
+        // Create flash loan receipt (hot potato)
+        let receipt = FlashLoan<Y> {
+            pool_id: object::uid_to_inner(&pool.id),
+            amount,
+            fee,
+        };
+
+        // Emit flash loan borrowed event
+        sui::event::emit(FlashLoanBorrowed<Y> {
+            pool_id: object::uid_to_inner(&pool.id),
+            amount,
+            fee,
+        });
+
+        (borrowed_coin, receipt)
+    }
+
+    /// Repay flash loan for token X
+    /// Consumes the FlashLoan receipt and repays the borrowed tokens plus fee
+    public fun repay_flash_loan_x<X, Y>(
+        pool: &mut Pool<X, Y>,
+        repayment: Coin<X>,
+        receipt: FlashLoan<X>,
+    ) {
+        let FlashLoan { pool_id, amount, fee } = receipt;
+
+        // Verify receipt matches this pool
+        assert!(pool_id == object::uid_to_inner(&pool.id), ENotAuthorized);
+
+        // Verify repayment amount includes fee
+        let repayment_value = coin::value(&repayment);
+        assert!(repayment_value >= amount + fee, EInvalidFlashSwapRepayment);
+
+        // Add repayment to reserves
+        balance::join(&mut pool.reserve_x, coin::into_balance(repayment));
+
+        // Collect protocol fee from the flash loan fee
+        if (fee > 0) {
+            let protocol_fee = math::apply_fee(fee, pool.protocol_fee_bps);
+            if (protocol_fee > 0) {
+                let fee_balance = balance::split(&mut pool.reserve_x, protocol_fee);
+                balance::join(&mut pool.protocol_fee_x, fee_balance);
+            };
+        };
+
+        // Emit flash loan repaid event
+        sui::event::emit(FlashLoanRepaid<X> {
+            pool_id,
+            amount,
+            fee,
+        });
+    }
+
+    /// Repay flash loan for token Y
+    /// Consumes the FlashLoan receipt and repays the borrowed tokens plus fee
+    public fun repay_flash_loan_y<X, Y>(
+        pool: &mut Pool<X, Y>,
+        repayment: Coin<Y>,
+        receipt: FlashLoan<Y>,
+    ) {
+        let FlashLoan { pool_id, amount, fee } = receipt;
+
+        // Verify receipt matches this pool
+        assert!(pool_id == object::uid_to_inner(&pool.id), ENotAuthorized);
+
+        // Verify repayment amount includes fee
+        let repayment_value = coin::value(&repayment);
+        assert!(repayment_value >= amount + fee, EInvalidFlashSwapRepayment);
+
+        // Add repayment to reserves
+        balance::join(&mut pool.reserve_y, coin::into_balance(repayment));
+
+        // Collect protocol fee from the flash loan fee
+        if (fee > 0) {
+            let protocol_fee = math::apply_fee(fee, pool.protocol_fee_bps);
+            if (protocol_fee > 0) {
+                let fee_balance = balance::split(&mut pool.reserve_y, protocol_fee);
+                balance::join(&mut pool.protocol_fee_y, fee_balance);
+            };
+        };
+
+        // Emit flash loan repaid event
+        sui::event::emit(FlashLoanRepaid<Y> {
+            pool_id,
+            amount,
+            fee,
+        });
+    }
+
+    /// Calculate flash loan fee for a given amount
+    /// Fee = amount * FLASH_LOAN_FEE_BPS / BPS_DENOMINATOR
+    public fun calculate_flash_loan_fee(amount: u64): u64 {
+        math::apply_fee(amount, FLASH_LOAN_FEE_BPS)
     }
 
     // ============================================================================
