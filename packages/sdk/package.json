@@ -1,58 +1,58 @@
 {
-  "name": "@carapace/sdk",
-  "version": "0.1.0",
-  "type": "module",
-  "description": "TypeScript SDK for Carapace DeFi on Sui",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
-  "exports": {
-    ".": {
-      "bun": "./src/index.ts",
-      "import": "./src/index.ts",
-      "types": "./src/index.ts"
-    }
-  },
-  "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "typecheck": "tsc --noEmit",
-    "test": "bun test"
-  },
-  "dependencies": {
-    "@mysten/sui": "^1.14.0"
-  },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "typescript": "^5.6.2"
-  },
-  "peerDependencies": {
-    "@mysten/sui": "^1.14.0"
-  },
-  "keywords": [
-    "sui",
-    "move",
-    "defi",
-    "amm",
-    "dex",
-    "carapace",
-    "tortoise-os",
-    "sdk",
-    "blockchain",
-    "web3"
-  ],
-  "author": "TortoiseOS Team",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tortoise-os/carapace.git",
-    "directory": "packages/sdk"
-  },
-  "homepage": "https://github.com/tortoise-os/carapace/tree/main/packages/sdk",
-  "bugs": {
-    "url": "https://github.com/tortoise-os/carapace/issues"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  }
+	"name": "@carapace/sdk",
+	"version": "0.1.0",
+	"type": "module",
+	"description": "TypeScript SDK for Carapace DeFi on Sui",
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
+	"exports": {
+		".": {
+			"bun": "./src/index.ts",
+			"import": "./src/index.ts",
+			"types": "./src/index.ts"
+		}
+	},
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch",
+		"typecheck": "tsc --noEmit",
+		"test": "bun test"
+	},
+	"dependencies": {
+		"@mysten/sui": "^1.14.0"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"typescript": "^5.6.2"
+	},
+	"peerDependencies": {
+		"@mysten/sui": "^1.14.0"
+	},
+	"keywords": [
+		"sui",
+		"move",
+		"defi",
+		"amm",
+		"dex",
+		"carapace",
+		"tortoise-os",
+		"sdk",
+		"blockchain",
+		"web3"
+	],
+	"author": "TortoiseOS Team",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tortoise-os/carapace.git",
+		"directory": "packages/sdk"
+	},
+	"homepage": "https://github.com/tortoise-os/carapace/tree/main/packages/sdk",
+	"bugs": {
+		"url": "https://github.com/tortoise-os/carapace/issues"
+	},
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	}
 }

@@ -20,6 +20,9 @@ pnpm-debug.log*
 coverage/
 *.lcov
 .nyc_output
+playwright-report/
+test-results/
+playwright/.cache/
 
 # Environment
 .env
@@ -44,7 +47,8 @@ Thumbs.db
 build/
 .sui/
 move/build/
-*.lock
+# Keep Move.lock for dependency tracking
+# *.lock
 
 # Docker
 .docker/
@@ -63,6 +67,10 @@ move/build/
 tmp/
 temp/
 *.tmp
+# Ignore temporary shell scripts in root
+/*.sh
+!install.sh
+!setup.sh
 
 # AI/ML
 models/

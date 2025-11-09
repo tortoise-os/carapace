@@ -1,4 +1,10 @@
 // UI Components
+
+// Theme Components
+export * from "./components/theme-provider";
+export * from "./components/theme-toggle";
+// Token Components
+export * from "./components/token-icon";
 export * from "./components/ui/accordion";
 export * from "./components/ui/avatar";
 export * from "./components/ui/badge";
@@ -21,13 +27,6 @@ export * from "./components/ui/retro-grid";
 export * from "./components/ui/ripple";
 export * from "./components/ui/shimmer-button";
 export * from "./components/ui/text-animate";
-
-// Theme Components
-export * from "./components/theme-provider";
-export * from "./components/theme-toggle";
-
-// Token Components
-export * from "./components/token-icon";
 
 // Utilities
 export * from "./lib/utils";

@@ -1,18 +1,18 @@
 {
-  "network": "testnet",
-  "packageId": "0x998379bb53423871a9e4f8f779c339c096622209309452995ae5ed395779106e",
-  "modules": ["math", "pool", "vault"],
-  "transactionDigest": "634BTGx1aokEPnv3Mgo2KXugEAuaXcFobM6N8YtAW1Ts",
-  "deployedAt": "2025-10-22",
-  "upgradeCapId": "0x5797e75440dc5d6b830b7ea063f6dc2420f26e68af70a73cc0fbbbf7aee78fbb",
-  "deployer": "0xe91b754c809f16c3a88e7be33a56b348532c377fbea30ed92ea34371c68466b9",
-  "gasCost": {
-    "storageCost": "52189200",
-    "computationCost": "1000000",
-    "total": "52211080"
-  },
-  "explorer": {
-    "transaction": "https://testnet.suivision.xyz/txblock/634BTGx1aokEPnv3Mgo2KXugEAuaXcFobM6N8YtAW1Ts",
-    "package": "https://testnet.suivision.xyz/package/0x998379bb53423871a9e4f8f779c339c096622209309452995ae5ed395779106e"
-  }
+	"network": "testnet",
+	"packageId": "0x998379bb53423871a9e4f8f779c339c096622209309452995ae5ed395779106e",
+	"modules": ["math", "pool", "vault"],
+	"transactionDigest": "634BTGx1aokEPnv3Mgo2KXugEAuaXcFobM6N8YtAW1Ts",
+	"deployedAt": "2025-10-22",
+	"upgradeCapId": "0x5797e75440dc5d6b830b7ea063f6dc2420f26e68af70a73cc0fbbbf7aee78fbb",
+	"deployer": "0xe91b754c809f16c3a88e7be33a56b348532c377fbea30ed92ea34371c68466b9",
+	"gasCost": {
+		"storageCost": "52189200",
+		"computationCost": "1000000",
+		"total": "52211080"
+	},
+	"explorer": {
+		"transaction": "https://testnet.suivision.xyz/txblock/634BTGx1aokEPnv3Mgo2KXugEAuaXcFobM6N8YtAW1Ts",
+		"package": "https://testnet.suivision.xyz/package/0x998379bb53423871a9e4f8f779c339c096622209309452995ae5ed395779106e"
+	}
 }

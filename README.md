@@ -50,13 +50,29 @@ This project serves as the liquidity backbone for the broader TortoiseOS ecosyst
 | **DevOps** | Docker Compose, Task automation |
 | **Testing** | Bun Test, Playwright |
 
+## Development Status
+
+**Current State:** Active Development - Phase 1
+
+This project is under active development. The following components are functional:
+- ✅ Frontend web app (Next.js)
+- ✅ E2E testing with Playwright
+- ✅ Move smart contracts (building and testing)
+- ✅ SDK for blockchain interaction
+- ⚠️ Type checking (has errors to fix)
+- ⚠️ Build process (blocked by type errors)
+- ⚠️ Linting (setup in progress)
+
+For detailed status, see [FUNCTIONAL_STATUS.md](./FUNCTIONAL_STATUS.md)
+
 ## Quick Start
 
 ### Prerequisites
 
 - [Bun](https://bun.sh) >= 1.1.0
-- [Docker](https://www.docker.com/) and Docker Compose
-- [Sui CLI](https://docs.sui.io/build/install) >= 1.0.0
+- [Docker](https://www.docker.com/) and Docker Compose (optional, for database & monitoring)
+- [Sui CLI](https://docs.sui.io/build/install) >= 1.0.0 (for Move contract development)
+- [Task](https://taskfile.dev) (optional, provides helpful automation commands)
 
 ### Installation
 
@@ -68,17 +84,44 @@ cd carapace
 # Install dependencies
 bun install
 
-# Start Docker services (Sui local network, Walrus, etc.)
-docker compose up -d
-
-# Initialize Sui environment
-task sui:init
-
-# Start development servers
+# Start development server (web app only)
 bun run dev
 ```
 
-The web app will be available at `http://localhost:3501` and the API at `http://localhost:3500`.
+The web app will be available at `http://localhost:3501`.
+
+**Verified Working Commands:**
+- ✅ `bun install` - Install dependencies
+- ✅ `bun run dev` - Start development server
+- ✅ `bun test` - Run E2E tests (requires Playwright browsers: `bunx playwright install chromium`)
+- ✅ `bun run format` - Format code with Prettier
+
+### Optional: Docker Services
+
+If you want to run the full stack with database, monitoring, and API:
+
+```bash
+# Start Docker services (from tooling/docker directory)
+cd tooling/docker
+docker compose up -d
+cd ../..
+
+# Or use Task automation (if Task is installed)
+task docker:up
+```
+
+### Optional: Sui Development Setup
+
+For Move contract development:
+
+```bash
+# Initialize Sui environment (requires Sui CLI)
+task sui:init
+
+# Or manually
+sui client new-env --alias localnet --rpc http://127.0.0.1:9000
+sui client switch --env localnet
+```
 
 ## Project Structure
 
@@ -109,52 +152,105 @@ carapace/
 
 ### Available Commands
 
+#### Core Development Commands (No additional tools required)
+
 ```bash
 # Development
-bun run dev              # Start all services in dev mode
-bun run dev:web          # Start Next.js web app only
-bun run dev:api          # Start Express API only
+bun run dev              # Start web app in dev mode (localhost:3501)
 
 # Building
-bun run build            # Build all packages
-bun run build:web        # Build web app
-bun run build:api        # Build API
+bun run build            # Build all apps and packages
 
 # Testing
-bun test                 # Run all tests
-bun test:move            # Test Move contracts
-bun test:e2e             # Run E2E tests with Playwright
+bun test                 # Run E2E tests with Playwright
+bun run test:unit        # Run unit tests (if any)
+
+# Code Quality
+bun run lint             # Lint all code (setup in progress)
+bun run type-check       # TypeScript type checking (has some errors to fix)
+bun run format           # Format code with Prettier
+bun run format -- --check # Check formatting without writing
+```
+
+#### Task Automation Commands (Requires [Task](https://taskfile.dev) CLI)
+
+```bash
+# Development
+task dev                 # Start all services (Docker + Web)
+task dev:web             # Start Next.js web app only
+task dev:api             # Start API server
 
 # Sui Development
 task sui:init            # Initialize Sui environment
-task sui:publish         # Publish Move contracts
-task sui:test            # Test Move contracts
-task sui:deploy          # Deploy to testnet/mainnet
+task sui:check           # Check if Sui CLI is installed
+task sui:balance         # Check SUI balance
+task sui:faucet          # Request tokens from faucet
 
-# Linting & Formatting
-bun run lint             # Lint all code
-bun run format           # Format with Prettier
-bun run typecheck        # TypeScript type checking
+# Move Contracts
+task move:build          # Build Move contracts
+task move:test           # Test Move contracts
+task move:publish:local  # Publish to local network
+task move:publish:testnet # Publish to testnet
+
+# Docker Services
+task docker:up           # Start Docker services
+task docker:down         # Stop Docker services
+task docker:logs         # View Docker logs
+
+# Testing
+task test                # Run all tests (Move + E2E)
+task test:e2e            # Run E2E tests
+task test:move           # Run Move contract tests
+
+# Building
+task build               # Build all packages
+task build:web           # Build web app only
+
+# Utilities
+task setup               # Complete project setup
+task status              # Show status of all services
+task clean               # Clean build artifacts
+```
+
+#### Workspace-specific Commands
+
+```bash
+# Web App (from apps/web)
+cd apps/web
+bun run dev              # Start Next.js dev server
+bun run build            # Build production bundle
+bun run test:e2e         # Run Playwright tests
+bun run test:e2e:ui      # Run Playwright with UI mode
 ```
 
 ### Working with Move Contracts
 
+Requires: [Sui CLI](https://docs.sui.io/build/install)
+
 ```bash
-# Create new Move module
+# Using Task (recommended)
+task move:build          # Build contracts
+task move:test           # Test contracts
+task move:publish:local  # Publish to local network
+
+# Using Sui CLI directly
 cd move
-sui move new <module-name>
+sui move build           # Build Move contracts
+sui move test            # Test Move contracts
+```
 
-# Build Move contracts
-sui move build
+**Publishing Contracts:**
 
-# Test Move contracts
-sui move test
+```bash
+# Local network (requires local Sui node running)
+task move:publish:local
 
-# Publish to local network
-task sui:publish:local
+# Testnet (requires testnet SUI tokens)
+task move:publish:testnet
 
-# Publish to testnet
-task sui:publish:testnet
+# Or manually
+cd move
+sui client publish --gas-budget 100000000
 ```
 
 ## Architecture

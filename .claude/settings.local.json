@@ -48,7 +48,9 @@
       "Read(//private/tmp/**)",
       "Bash(node -c:*)",
       "Bash(mkdir:*)",
-      "Bash(timeout 60 sui move test:*)"
+      "Bash(timeout 60 sui move test:*)",
+      "Bash(timeout 60 bun test:*)",
+      "Bash(sui:*)"
     ],
     "deny": [],
     "ask": []

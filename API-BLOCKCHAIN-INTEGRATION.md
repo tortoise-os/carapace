@@ -23,15 +23,17 @@ Successfully integrated real blockchain data fetching into the Carapace API, rep
    - Tests all pool endpoints with real blockchain data
    - Validates health, pools list, pool details, quotes, and prices
 
-###  Modified Files
+### Modified Files
 
 **`apps/api/src/routes/pools.ts`**
+
 - Changed from simple Elysia plugin to factory function accepting SDK
 - All endpoints now try: blockchain → DB → mock data (in that order)
 - Caching applied to all data fetches
 - Added blockchain service integration
 
 **Endpoints Updated:**
+
 - `GET /api/pools` - List all pools (blockchain + cache)
 - `GET /api/pools/:id` - Get specific pool (blockchain + cache)
 - `GET /api/pools/:id/quote` - Real swap quotes from chain
@@ -40,6 +42,7 @@ Successfully integrated real blockchain data fetching into the Carapace API, rep
 - `POST /api/pools/:id/swap` - Create swap transactions
 
 **`apps/api/src/index.ts`**
+
 - Updated to pass SDK instance to pool plugin factory
 - Fixed import to remove unused `t` from Elysia
 - Fixed `getClient()` → `client` (SDK API change)
@@ -61,6 +64,7 @@ Mock Data (fallback)
 ## Testing Results
 
 ### Server Start Logs
+
 ```
 ✅ Database connected
 
@@ -76,6 +80,7 @@ Server running at http://0.0.0.0:3500
 ```
 
 ### Known Test Pool
+
 - **Pool ID:** `0x6828cc09b4466dd7753a457aaa8a328f32e189729b178ce38252a03ab8190951`
 - **Token X:** `0x2::sui::SUI`
 - **Token Y:** `0xad1a82cc599cca382ee2888ebe7220061f0654332543aab37f84db34f9a6e06e::test_coin::TEST_COIN`
@@ -85,6 +90,7 @@ Server running at http://0.0.0.0:3500
 ## Cache Configuration
 
 From `.env`:
+
 ```
 CACHE_TTL_POOLS=60     # 60 seconds for pool data
 CACHE_TTL_QUOTES=30    # 30 seconds for swap quotes
@@ -94,15 +100,18 @@ REDIS_URL=redis://localhost:3503
 ## Future Enhancements
 
 ### 1. Heimdall.xyz Integration (Phase 1M)
+
 **Status:** Planned but not yet implemented
 
 **Benefits:**
+
 - Historical price/volume/liquidity data
 - Real-time WebSocket event streams
 - Pre-indexed data (faster than direct RPC)
 - Cross-chain data aggregation
 
 **Implementation:**
+
 ```bash
 # Install Heimdall CLI
 npm install -g @heimdahl/cli
@@ -112,22 +121,27 @@ npm install -g @heimdahl/cli
 ```
 
 **Files to Create:**
+
 - `apps/api/src/services/heimdahl/event-monitor.ts`
 - `apps/api/src/services/heimdahl/cli-wrapper.ts`
 - Update `Taskfile.yml` with event query tasks
 
 ### 2. Pool Discovery Enhancement
+
 Currently hardcodes one pool ID. Improve by:
+
 - Scanning PoolCreated events on startup
 - Periodic background discovery
 - Admin API to manually add pools
 
 ### 3. Historical Data
+
 - Requires indexer or Heimdahl
 - Store historical snapshots in database
 - Generate charts and analytics
 
 ### 4. WebSocket Support
+
 - Real-time pool updates
 - Subscribe to specific pool changes
 - Push notifications for significant events
@@ -135,36 +149,43 @@ Currently hardcodes one pool ID. Improve by:
 ## API Endpoints
 
 ### Health Check
+
 ```bash
 GET /health
 ```
 
 ### List Pools
+
 ```bash
 GET /api/pools?limit=100&offset=0
 ```
 
 ### Get Pool Details
+
 ```bash
 GET /api/pools/0x6828cc09...
 ```
 
 ### Get Swap Quote
+
 ```bash
 GET /api/pools/0x6828cc09.../quote?amountIn=10000000&isXToY=true
 ```
 
 ### Get Spot Price
+
 ```bash
 GET /api/pools/0x6828cc09.../price
 ```
 
 ### Get Price History (Mock Data)
+
 ```bash
 GET /api/pools/0x6828cc09.../price-history?timeframe=24h&interval=1h
 ```
 
 ### Create Swap Transaction
+
 ```bash
 POST /api/pools/0x6828cc09.../swap
 Content-Type: application/json

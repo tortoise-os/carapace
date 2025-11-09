@@ -74,13 +74,35 @@ tasks:
       - sui --version || echo "⚠️  Sui CLI not installed. Install from https://docs.sui.io/build/install"
 
   sui:init:
-    desc: Initialize Sui environment
+    desc: Initialize Sui environment (for local development)
     cmds:
       - task: sui:check
-      - sui client active-env || sui client new-env --alias localnet --rpc http://127.0.0.1:9000
+      - |
+        if ! sui client envs | grep -q "localnet"; then
+          echo "Creating localnet environment..."
+          sui client new-env --alias localnet --rpc http://127.0.0.1:9000 || {
+            echo "⚠️  Failed to create localnet environment."
+            echo "Make sure a local Sui node is running on http://127.0.0.1:9000"
+            echo "Alternatively, use 'task move:publish:testnet' to deploy to testnet"
+            exit 1
+          }
+        fi
       - sui client switch --env localnet
       - sui client active-address || sui client new-address ed25519
       - task: sui:faucet
+
+  sui:init:testnet:
+    desc: Initialize Sui testnet environment
+    cmds:
+      - task: sui:check
+      - |
+        if ! sui client envs | grep -q "testnet"; then
+          echo "Creating testnet environment..."
+          sui client new-env --alias testnet --rpc https://fullnode.testnet.sui.io:443
+        fi
+      - sui client switch --env testnet
+      - sui client active-address || sui client new-address ed25519
+      - echo "✅ Testnet environment ready. Request testnet SUI from https://discord.gg/sui"
 
   sui:faucet:
     desc: Request tokens from faucet
@@ -128,17 +150,28 @@ tasks:
       - sui move test --coverage
 
   move:publish:local:
-    desc: Publish Move contracts to local network
+    desc: Publish Move contracts to local network (requires local Sui node)
     dir: "{{.MOVE_DIR}}"
     cmds:
       - task: sui:init
-      - sui client publish --gas-budget 100000000 --verify-deps
+      - sui client publish --gas-budget 100000000
 
   move:publish:testnet:
     desc: Publish Move contracts to testnet
     dir: "{{.MOVE_DIR}}"
     cmds:
+      - |
+        echo "Publishing to testnet..."
+        if ! sui client envs | grep -q "testnet"; then
+          echo "Testnet environment not found. Creating..."
+          task sui:init:testnet
+        fi
       - sui client switch --env testnet
+      - |
+        echo "Checking SUI balance..."
+        sui client gas
+        echo ""
+        echo "Publishing contract (this may take a minute)..."
       - sui client publish --gas-budget 100000000 --verify-deps
 
   move:publish:mainnet:
