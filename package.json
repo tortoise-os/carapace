@@ -16,6 +16,7 @@
 		"test": "turbo run test:e2e --filter=web",
 		"test:unit": "bun test --filter='!**/*.spec.ts'",
 		"lint": "turbo lint && bun lint:repo",
+		"lint:fix": "turbo lint -- --fix",
 		"format": "biome format --write .",
 		"format:check": "biome format .",
 		"lint:repo": "bunx sherif@latest",
