@@ -56,7 +56,7 @@ export class RouteOptimizer {
 		amountIn: string,
 	): SwapRoute | null {
 		const routes = this.findAllRoutes(tokenIn, tokenOut, amountIn);
-		return routes.length > 0 ? routes[0] : null;
+		return routes.length > 0 ? (routes[0] ?? null) : null;
 	}
 
 	/**
@@ -161,10 +161,23 @@ export class RouteOptimizer {
 	 * Build a complete route from hops
 	 */
 	private buildRoute(hops: RouteHop[]): SwapRoute {
-		const path = [hops[0].tokenIn, ...hops.map((hop) => hop.tokenOut)];
+		if (hops.length === 0) {
+			throw new Error("Cannot build route from empty hops array");
+		}
 
-		const totalAmountIn = hops[0].amountIn;
-		const totalAmountOut = hops[hops.length - 1].amountOut;
+		const firstHop = hops[0];
+		if (!firstHop) {
+			throw new Error("First hop is undefined");
+		}
+
+		const path = [firstHop.tokenIn, ...hops.map((hop) => hop.tokenOut)];
+
+		const totalAmountIn = firstHop.amountIn;
+		const lastHop = hops[hops.length - 1];
+		if (!lastHop) {
+			throw new Error("Last hop is undefined");
+		}
+		const totalAmountOut = lastHop.amountOut;
 
 		// Calculate total price impact (multiplicative)
 		const totalPriceImpact =
@@ -206,8 +219,8 @@ export class RouteOptimizer {
 
 		// Find best multi-hop route (2+ hops)
 		const multiHopRoutes = allRoutes.filter((route) => route.hops.length > 1);
-		const bestMultiHopRoute =
-			multiHopRoutes.length > 0 ? multiHopRoutes[0] : null;
+		const bestMultiHopRoute: SwapRoute | null =
+			multiHopRoutes.length > 0 ? (multiHopRoutes[0] ?? null) : null;
 
 		let savingsPercent = 0;
 		if (directRoute && bestMultiHopRoute) {

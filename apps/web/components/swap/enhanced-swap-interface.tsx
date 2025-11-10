@@ -234,11 +234,16 @@ export function EnhancedSwapInterface() {
 			const minAmountOut = (BigInt(quote.amountOut) * 995n) / 1000n; // 0.5% slippage
 
 			// Build transaction - for SUI/SUI pool, we use swapXToY
+			const coinObjectId = coins.data[0]?.coinObjectId ?? null;
+			if (!coinObjectId) {
+				throw new Error("No coin available for swap");
+			}
+
 			const tx = sdk.pool.swapXToY(
 				poolId,
 				tokenIn.address,
 				tokenOut.address,
-				coins.data[0]?.coinObjectId,
+				coinObjectId,
 				amountInSmallest,
 				account.address, // sender address for output coin transfer
 				minAmountOut,
@@ -314,6 +319,7 @@ export function EnhancedSwapInterface() {
 							</span>
 							{tokenInBalance.balance > 0n && (
 								<button
+									type="button"
 									onClick={handleMaxClick}
 									className="text-xs text-accent hover:text-accent/80 font-semibold px-2 py-1 rounded bg-accent/10 hover:bg-accent/20 transition-colors"
 								>

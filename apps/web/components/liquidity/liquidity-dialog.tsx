@@ -206,11 +206,15 @@ export function LiquidityDialog({
 						<>
 							{/* Token X Input */}
 							<div className="space-y-2">
-								<label className="text-sm font-semibold text-muted-foreground">
+								<label
+									htmlFor="liquidity-amount-x"
+									className="text-sm font-semibold text-muted-foreground"
+								>
 									{tokenXSymbol} Amount
 								</label>
 								<div className="flex items-center gap-2 p-4 bg-muted rounded-xl">
 									<Input
+										id="liquidity-amount-x"
 										type="text"
 										placeholder="0.0"
 										value={amountX}
@@ -227,11 +231,15 @@ export function LiquidityDialog({
 
 							{/* Token Y Input */}
 							<div className="space-y-2">
-								<label className="text-sm font-semibold text-muted-foreground">
+								<label
+									htmlFor="liquidity-amount-y"
+									className="text-sm font-semibold text-muted-foreground"
+								>
 									{tokenYSymbol} Amount
 								</label>
 								<div className="flex items-center gap-2 p-4 bg-muted rounded-xl">
 									<Input
+										id="liquidity-amount-y"
 										type="text"
 										placeholder="0.0"
 										value={amountY}
@@ -302,11 +310,15 @@ export function LiquidityDialog({
 						<>
 							{/* LP Token Input */}
 							<div className="space-y-2">
-								<label className="text-sm font-semibold text-muted-foreground">
+								<label
+									htmlFor="liquidity-lp-amount"
+									className="text-sm font-semibold text-muted-foreground"
+								>
 									LP Token Amount
 								</label>
 								<div className="flex items-center gap-2 p-4 bg-muted rounded-xl">
 									<Input
+										id="liquidity-lp-amount"
 										type="text"
 										placeholder="0.0"
 										value={lpAmount}

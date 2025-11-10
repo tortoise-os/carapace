@@ -209,7 +209,10 @@ export function TokenSelectorModal({
 				<div className="border-t p-4 bg-muted/30">
 					<p className="text-xs text-muted-foreground text-center">
 						Can't find a token?{" "}
-						<button className="text-primary hover:underline font-medium">
+						<button
+							type="button"
+							className="text-primary hover:underline font-medium"
+						>
 							Import custom token
 						</button>
 					</p>
@@ -279,6 +282,7 @@ function TokenRow({
 					</div>
 				)}
 				<button
+					type="button"
 					onClick={(e) => {
 						e.stopPropagation();
 						onToggleFavorite();

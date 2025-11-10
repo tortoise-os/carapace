@@ -17,7 +17,10 @@ export default function Home() {
 
 				<div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 					<BlurFade delay={0.2}>
-						<button className="group mb-4 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/30 hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md">
+						<button
+							type="button"
+							className="group mb-4 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/30 hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md"
+						>
 							<span className="text-sm font-semibold text-primary group-hover:text-accent transition-colors">
 								Powered by AI & Sui Blockchain
 							</span>
@@ -43,13 +46,19 @@ export default function Home() {
 					<BlurFade delay={0.8}>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
 							<Link href="/swap">
-								<button className="bg-brand-gradient text-white text-lg px-10 py-4 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-2">
+								<button
+									type="button"
+									className="bg-brand-gradient text-white text-lg px-10 py-4 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-2"
+								>
 									Start Trading
 									<ArrowRight className="h-5 w-5" />
 								</button>
 							</Link>
 							<Link href="/pools">
-								<button className="text-lg px-10 py-4 rounded-lg border-2 border-border hover:border-primary hover:bg-accent/5 transition-all duration-200 font-semibold">
+								<button
+									type="button"
+									className="text-lg px-10 py-4 rounded-lg border-2 border-border hover:border-primary hover:bg-accent/5 transition-all duration-200 font-semibold"
+								>
 									Explore Pools
 								</button>
 							</Link>
@@ -100,9 +109,10 @@ export default function Home() {
 								gradient: "bg-accent-gradient-emerald", // Growth, prosperity, yields - GREEN
 								cardGradient: "from-accent-emerald/25 to-brand-seafoam/20", // Emerald green background
 							},
-						].map((feature, i) => (
-							<BlurFade key={i} delay={feature.delay}>
+						].map((feature, _i) => (
+							<BlurFade key={feature.title} delay={feature.delay}>
 								<button
+									type="button"
 									className={`card card-hover p-8 h-full group cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-left w-full shadow-md hover:shadow-xl bg-gradient-to-br ${feature.cardGradient} hover:from-primary/10 hover:to-accent/10`}
 								>
 									<div
@@ -149,8 +159,9 @@ export default function Home() {
 								gradient: "from-brand-teal/25 to-brand-cyan/20",
 							}, // Primary feature - TEAL
 						].map((stat, i) => (
-							<BlurFade key={i} delay={0.2 + i * 0.1}>
+							<BlurFade key={stat.label} delay={0.2 + i * 0.1}>
 								<button
+									type="button"
 									className={`text-center p-6 rounded-lg bg-gradient-to-br ${stat.gradient} hover:from-primary/10 hover:to-accent/10 transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 shadow-sm hover:shadow-lg w-full group`}
 								>
 									<div className="text-5xl md:text-6xl font-bold text-brand-gradient mb-3 group-hover:scale-110 transition-transform duration-200">
@@ -177,7 +188,10 @@ export default function Home() {
 							Join thousands of traders experiencing the future of DeFi
 						</p>
 						<Link href="/swap">
-							<button className="bg-brand-gradient text-white text-lg px-12 py-5 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto">
+							<button
+								type="button"
+								className="bg-brand-gradient text-white text-lg px-12 py-5 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto"
+							>
 								Launch App
 								<ArrowRight className="h-5 w-5" />
 							</button>

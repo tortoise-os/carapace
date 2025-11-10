@@ -268,7 +268,7 @@ export default function RoadmapPage() {
 										className="w-full h-full transform -rotate-90"
 										viewBox="0 0 100 100"
 									>
-										{/* Background circle */}
+										<title>Roadmap Progress</title> {/* Background circle */}
 										<circle
 											cx="50"
 											cy="50"
@@ -430,8 +430,9 @@ export default function RoadmapPage() {
 					<div className="flex flex-wrap gap-3 justify-center">
 						{["all", "P1", "P2", "P3"].map((priority) => (
 							<button
+								type="button"
 								key={priority}
-								onClick={() => setSelectedPriority(priority as any)}
+								onClick={() => setSelectedPriority(priority as RoadmapPriority)}
 								className={`px-6 py-3 rounded-lg font-semibold transition-all ${
 									selectedPriority === priority
 										? "bg-brand-gradient text-white shadow-lg scale-105"

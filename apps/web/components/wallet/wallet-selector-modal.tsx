@@ -69,6 +69,7 @@ export function WalletSelectorModal({
 							</div>
 							{wallets.map((wallet) => (
 								<button
+									type="button"
 									key={wallet.name}
 									onClick={() => handleConnect(wallet.name)}
 									disabled={connecting !== null}

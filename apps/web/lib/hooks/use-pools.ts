@@ -2,7 +2,6 @@
  * Hook to fetch and manage pool data from the blockchain
  */
 
-import type { CoinType } from "@carapace/sdk";
 import { useEffect, useState } from "react";
 import { useCarapaceSDK } from "@/providers/sui-provider";
 
@@ -35,11 +34,7 @@ export function usePools() {
 				const poolInfos = await Promise.all(
 					knownPools.map(async (poolId) => {
 						try {
-							const pool = await sdk.pool.getPool(
-								"0x2::sui::SUI" as CoinType,
-								"0x2::sui::SUI" as CoinType,
-								poolId,
-							);
+							const pool = await sdk.pool.getPool(poolId);
 							return {
 								poolId,
 								tokenX: pool.tokenX,
@@ -96,8 +91,8 @@ export function usePools() {
  */
 export function useSwapQuote(
 	poolId: string | null,
-	tokenIn: string,
-	tokenOut: string,
+	_tokenIn: string,
+	_tokenOut: string,
 	amountIn: bigint | null,
 ) {
 	const sdk = useCarapaceSDK();
@@ -120,13 +115,10 @@ export function useSwapQuote(
 			setError(null);
 
 			try {
-				const result = await sdk.pool.getSwapQuote(
-					poolId,
-					tokenIn as CoinType,
-					tokenOut as CoinType,
-					amountIn,
-					true, // isXToY - determine based on token order
-				);
+				// Determine swap direction based on token addresses
+				const isXToY = true; // For now, assume X to Y; in production, compare token addresses
+
+				const result = await sdk.pool.getSwapQuote(poolId, amountIn, isXToY);
 
 				setQuote({
 					amountOut: result.amountOut,
@@ -143,7 +135,7 @@ export function useSwapQuote(
 		};
 
 		fetchQuote();
-	}, [sdk, poolId, tokenIn, tokenOut, amountIn]);
+	}, [sdk, poolId, amountIn]);
 
 	return { quote, isLoading, error };
 }

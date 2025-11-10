@@ -129,7 +129,7 @@ export default function StakingPage() {
 				lockPeriod: selectedLockPeriod,
 			};
 
-			const _position = liquidityMiningService.stake(params, account.address);
+			liquidityMiningService.stake(params, account.address);
 
 			toast.success(
 				`Successfully staked ${stakeAmount} LP tokens in ${selectedProgram.poolName} pool!`,
@@ -150,8 +150,8 @@ export default function StakingPage() {
 			setStakeAmount("");
 			setSelectedLockPeriod(0);
 			setSelectedProgram(null);
-		} catch (error: any) {
-			toast.error(error.message || "Failed to stake");
+		} catch (error: unknown) {
+			toast.error((error as Error).message || "Failed to stake");
 		}
 	};
 
@@ -182,8 +182,8 @@ export default function StakingPage() {
 			setPositions(userPositions);
 			setStats(userStats);
 			setClaimHistory(history);
-		} catch (error: any) {
-			toast.error(error.message || "Failed to unstake");
+		} catch (error: unknown) {
+			toast.error((error as Error).message || "Failed to unstake");
 		}
 	};
 
@@ -210,8 +210,8 @@ export default function StakingPage() {
 
 			setPositions(userPositions);
 			setClaimHistory(history);
-		} catch (error: any) {
-			toast.error(error.message || "Failed to claim rewards");
+		} catch (error: unknown) {
+			toast.error((error as Error).message || "Failed to claim rewards");
 		}
 	};
 
@@ -311,8 +311,8 @@ export default function StakingPage() {
 									value: stats.totalProgramsParticipating.toString(),
 									icon: Users,
 								},
-							].map((stat, i) => (
-								<Card key={i} className="p-4">
+							].map((stat) => (
+								<Card key={stat.label} className="p-4">
 									<div className="flex items-center justify-between mb-2">
 										<span className="text-sm text-muted-foreground">
 											{stat.label}
@@ -623,10 +623,14 @@ export default function StakingPage() {
 								<div className="space-y-4">
 									{/* Amount Input */}
 									<div>
-										<label className="block text-sm font-medium mb-2">
+										<label
+											htmlFor="stake-amount"
+											className="block text-sm font-medium mb-2"
+										>
 											LP Token Amount
 										</label>
 										<Input
+											id="stake-amount"
 											type="number"
 											placeholder="0.0"
 											value={stakeAmount}
@@ -636,10 +640,13 @@ export default function StakingPage() {
 
 									{/* Lock Period Selection */}
 									<div>
-										<label className="block text-sm font-medium mb-2">
+										<label
+											htmlFor="lock-period"
+											className="block text-sm font-medium mb-2"
+										>
 											Lock Period
 										</label>
-										<div className="grid grid-cols-3 gap-2">
+										<div id="lock-period" className="grid grid-cols-3 gap-2">
 											{LOCK_PERIOD_OPTIONS.map((option) => (
 												<Button
 													key={option.days}

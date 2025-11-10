@@ -63,6 +63,7 @@ export function PriceChart({
 	const isPositive = priceChange >= 0;
 
 	// Custom tooltip
+	// biome-ignore lint/suspicious/noExplicitAny: Recharts tooltip type is complex
 	const CustomTooltip = ({ active, payload }: any) => {
 		if (active && payload && payload.length) {
 			const data = payload[0].payload;
@@ -106,6 +107,7 @@ export function PriceChart({
 				<div className="flex gap-1 bg-muted rounded-lg p-1">
 					{TIMEFRAMES.map((tf) => (
 						<button
+							type="button"
 							key={tf.value}
 							onClick={() => setTimeframe(tf.value)}
 							className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${

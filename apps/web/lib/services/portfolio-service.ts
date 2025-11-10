@@ -9,13 +9,13 @@ import type {
 } from "../types/portfolio";
 
 // Mock price data (in production, fetch from price oracles like Pyth)
-const MOCK_PRICES: Record<string, { price: number; change24h: number }> = {
+const MOCK_PRICES = {
 	SUI: { price: 2.35, change24h: 5.2 },
 	USDC: { price: 1.0, change24h: 0.1 },
 	BTC: { price: 45000, change24h: -2.3 },
 	ETH: { price: 2800, change24h: 3.1 },
 	USDT: { price: 1.0, change24h: 0.0 },
-};
+} as const;
 
 export class PortfolioService {
 	/**
@@ -193,19 +193,21 @@ export class PortfolioService {
 		const sortedByChange = [...tokenBalances].sort(
 			(a, b) => b.change24h - a.change24h,
 		);
+		const firstToken = sortedByChange[0];
+		const lastToken = sortedByChange[sortedByChange.length - 1];
+
 		const topGainer =
-			sortedByChange.length > 0 && sortedByChange[0].change24h > 0
+			firstToken && firstToken.change24h > 0
 				? {
-						token: sortedByChange[0].tokenSymbol,
-						change: sortedByChange[0].change24h,
+						token: firstToken.tokenSymbol,
+						change: firstToken.change24h,
 					}
 				: null;
 		const topLoser =
-			sortedByChange.length > 0 &&
-			sortedByChange[sortedByChange.length - 1].change24h < 0
+			lastToken && lastToken.change24h < 0
 				? {
-						token: sortedByChange[sortedByChange.length - 1].tokenSymbol,
-						change: sortedByChange[sortedByChange.length - 1].change24h,
+						token: lastToken.tokenSymbol,
+						change: lastToken.change24h,
 					}
 				: null;
 
@@ -243,8 +245,10 @@ export class PortfolioService {
 		const weekAgoValue = history.length >= 7 ? getDayAgoValue(7) : currentValue;
 		const monthAgoValue =
 			history.length >= 30 ? getDayAgoValue(30) : currentValue;
-		const firstValue =
-			history.length > 0 ? history[0].totalValue : currentValue;
+		const firstHistoryItem = history[0];
+		const firstValue = firstHistoryItem
+			? firstHistoryItem.totalValue
+			: currentValue;
 
 		const daily = currentValue - dayAgoValue;
 		const weekly = currentValue - weekAgoValue;
@@ -344,11 +348,20 @@ export class PortfolioService {
 		}
 
 		// Check for individual token concentration
+		if (portfolio.tokenBalances.length === 0) {
+			return suggestions;
+		}
+
+		const firstToken = portfolio.tokenBalances[0];
+		if (!firstToken) {
+			return suggestions;
+		}
+
 		const topToken = portfolio.tokenBalances.reduce(
 			(max, token) => (token.allocation > max.allocation ? token : max),
-			portfolio.tokenBalances[0],
+			firstToken,
 		);
-		if (topToken && topToken.allocation > 50) {
+		if (topToken.allocation > 50) {
 			suggestions.push({
 				message: `${topToken.tokenSymbol} represents ${topToken.allocation.toFixed(1)}% of your portfolio. Consider diversifying.`,
 				severity: "high",

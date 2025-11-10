@@ -85,7 +85,10 @@ export function SwapSettingsDialog({
 					{/* Slippage Tolerance */}
 					<div className="space-y-3">
 						<div className="flex items-center justify-between">
-							<label className="text-sm font-semibold">
+							<label
+								htmlFor="swap-slippage-custom"
+								className="text-sm font-semibold"
+							>
 								Slippage Tolerance
 							</label>
 							<span className="text-xs text-muted-foreground">
@@ -109,6 +112,7 @@ export function SwapSettingsDialog({
 
 						<div className="flex items-center gap-2">
 							<Input
+								id="swap-slippage-custom"
 								type="number"
 								placeholder="Custom"
 								value={customSlippage}
@@ -144,11 +148,12 @@ export function SwapSettingsDialog({
 
 					{/* Transaction Deadline */}
 					<div className="space-y-3">
-						<label className="text-sm font-semibold">
+						<label htmlFor="swap-deadline" className="text-sm font-semibold">
 							Transaction Deadline
 						</label>
 						<div className="flex items-center gap-2">
 							<Input
+								id="swap-deadline"
 								type="number"
 								value={deadline}
 								onChange={(e) => setDeadline(e.target.value)}
@@ -166,9 +171,15 @@ export function SwapSettingsDialog({
 
 					{/* RPC Endpoint */}
 					<div className="space-y-3">
-						<label className="text-sm font-semibold">RPC Endpoint</label>
+						<label
+							htmlFor="swap-rpc-endpoint"
+							className="text-sm font-semibold"
+						>
+							RPC Endpoint
+						</label>
 						<div className="flex items-center gap-2">
 							<Input
+								id="swap-rpc-endpoint"
 								type="text"
 								value={rpc}
 								onChange={(e) => setRpc(e.target.value)}
@@ -186,9 +197,15 @@ export function SwapSettingsDialog({
 
 					{/* Explorer */}
 					<div className="space-y-3">
-						<label className="text-sm font-semibold">Block Explorer</label>
+						<label
+							htmlFor="swap-block-explorer"
+							className="text-sm font-semibold"
+						>
+							Block Explorer
+						</label>
 						<div className="flex items-center gap-2">
 							<select
+								id="swap-block-explorer"
 								value={explorer}
 								onChange={(e) => setExplorer(e.target.value)}
 								className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
@@ -208,10 +225,11 @@ export function SwapSettingsDialog({
 
 					{/* Gas Budget */}
 					<div className="space-y-3">
-						<label className="text-sm font-semibold">
+						<label htmlFor="swap-gas-budget" className="text-sm font-semibold">
 							Gas Budget (Optional)
 						</label>
 						<Input
+							id="swap-gas-budget"
 							type="text"
 							value={gasBudget}
 							onChange={(e) => setGasBudget(e.target.value)}
@@ -227,12 +245,18 @@ export function SwapSettingsDialog({
 					{/* Using Ledger */}
 					<div className="flex items-center justify-between p-4 bg-muted rounded-lg">
 						<div className="space-y-1">
-							<label className="text-sm font-semibold">Using a Ledger</label>
+							<label
+								htmlFor="swap-ledger-toggle"
+								className="text-sm font-semibold"
+							>
+								Using a Ledger
+							</label>
 							<p className="text-xs text-muted-foreground">
 								Enable blind signing for Ledger hardware wallet
 							</p>
 						</div>
 						<Button
+							id="swap-ledger-toggle"
 							variant={usingLedger ? "default" : "outline"}
 							size="sm"
 							onClick={() => setUsingLedger(!usingLedger)}

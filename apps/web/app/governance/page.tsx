@@ -154,8 +154,8 @@ export default function GovernancePage() {
 			// Refresh data
 			const allProposals = governanceService.getProposals();
 			setProposals(allProposals);
-		} catch (error: any) {
-			toast.error(error.message || "Failed to vote");
+		} catch (error: unknown) {
+			toast.error((error as Error).message || "Failed to vote");
 		}
 	};
 
@@ -263,8 +263,8 @@ export default function GovernancePage() {
 									icon: TrendingUp,
 									color: "text-green-600",
 								},
-							].map((stat, i) => (
-								<Card key={i} className="p-4">
+							].map((stat, _i) => (
+								<Card key={stat.label} className="p-4">
 									<div className="flex items-center justify-between mb-2">
 										<span className="text-sm text-muted-foreground">
 											{stat.label}

@@ -289,7 +289,7 @@
   - [ ] Prototype MCP tools for vault automation
 
 #### 6.0A Code Review - awesome-seal Ecosystem
-**Reference**: See [AWESOME_SEAL_EVALUATION.md](./AWESOME_SEAL_EVALUATION.md) for comprehensive analysis
+**Reference**: See [AWESOME_SEAL_EVALUATION.md](AWESOME_SEAL_EVALUATION.md) for comprehensive analysis
 **Time Saved**: 5-7 weeks across Phase 1F and Phase 1K
 
 - [ ] **Deep dive into Nautilus enclave patterns** (Week 10)
@@ -587,7 +587,7 @@
   - [ ] Cache last-known-good model in contract
 
 #### 7K.5A awesome-seal Security Enhancements
-**Reference**: See [AWESOME_SEAL_EVALUATION.md](./AWESOME_SEAL_EVALUATION.md) Section 7
+**Reference**: See [AWESOME_SEAL_EVALUATION.md](AWESOME_SEAL_EVALUATION.md) Section 7
 
 - [ ] **TEE attestation hardening (Lockin Bot patterns)**
   - [ ] Apply Lockin Bot zero-trust key vault architecture
@@ -1354,7 +1354,7 @@
 - See [SUI_DEFI_COMPETITIVE_LANDSCAPE.md](./SUI_DEFI_COMPETITIVE_LANDSCAPE.md) for market analysis
 - See [IMPLEMENTATION_CHECKLIST.md](./IMPLEMENTATION_CHECKLIST.md) for actionable development tasks
 - See [AUDIT_PREPARATION_CHECKLIST.md](./AUDIT_PREPARATION_CHECKLIST.md) for detailed audit prep
-- See [AWESOME_SEAL_EVALUATION.md](./AWESOME_SEAL_EVALUATION.md) for Seal ecosystem integration analysis
+- See [AWESOME_SEAL_EVALUATION.md](AWESOME_SEAL_EVALUATION.md) for Seal ecosystem integration analysis
 - Percolator enhancements prioritize security, MEV protection, and scalability
 - Heimdahl.xyz integration enhances data infrastructure for AI/ML, cross-chain operations, and security monitoring
 - awesome-seal integration provides TEE patterns, encryption SDKs, and token-gated access control

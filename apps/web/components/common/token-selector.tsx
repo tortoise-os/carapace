@@ -100,6 +100,7 @@ export function TokenSelector({
 
 							return (
 								<button
+									type="button"
 									key={token.id}
 									onClick={() => handleSelect(token)}
 									className={`w-full p-4 flex items-center gap-3 hover:bg-accent/50 transition-colors ${

@@ -66,7 +66,7 @@ export interface Proposal {
 export interface ProposalAction {
 	target: string; // Contract address
 	function: string; // Function to call
-	parameters: any[]; // Function parameters
+	parameters: unknown[]; // Function parameters
 	value?: string; // Optional SUI value to send
 	description: string;
 }

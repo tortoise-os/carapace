@@ -173,10 +173,16 @@ function Step1SelectTokens({
 
 			<div className="space-y-4">
 				<div>
-					<label className="text-sm font-medium mb-2 block">Token A</label>
-					<div className="grid grid-cols-2 gap-2">
+					<label
+						htmlFor="pool-token-a"
+						className="text-sm font-medium mb-2 block"
+					>
+						Token A
+					</label>
+					<div id="pool-token-a" className="grid grid-cols-2 gap-2">
 						{availableTokens.map((token) => (
 							<button
+								type="button"
 								key={token.address}
 								onClick={() => onSelectTokenA(token)}
 								disabled={tokenB?.address === token.address}
@@ -205,10 +211,16 @@ function Step1SelectTokens({
 				</div>
 
 				<div>
-					<label className="text-sm font-medium mb-2 block">Token B</label>
-					<div className="grid grid-cols-2 gap-2">
+					<label
+						htmlFor="pool-token-b"
+						className="text-sm font-medium mb-2 block"
+					>
+						Token B
+					</label>
+					<div id="pool-token-b" className="grid grid-cols-2 gap-2">
 						{availableTokens.map((token) => (
 							<button
+								type="button"
 								key={token.address}
 								onClick={() => onSelectTokenB(token)}
 								disabled={tokenA?.address === token.address}
@@ -277,6 +289,7 @@ function Step2SelectFee({
 			<div className="space-y-3">
 				{FEE_TIERS.map((tier) => (
 					<button
+						type="button"
 						key={tier.value}
 						onClick={() => onSelectFee(tier.value)}
 						className={`w-full p-4 border-2 rounded-lg transition-colors text-left ${
@@ -356,10 +369,14 @@ function Step3SetPrice({
 
 			<div className="space-y-4">
 				<div className="bg-muted rounded-lg p-4">
-					<label className="text-sm font-medium mb-2 block">
+					<label
+						htmlFor="pool-initial-price"
+						className="text-sm font-medium mb-2 block"
+					>
 						Initial Price (1 {tokenA.symbol} = ? {tokenB.symbol})
 					</label>
 					<Input
+						id="pool-initial-price"
 						type="number"
 						placeholder="0.00"
 						value={initialPrice}
@@ -369,7 +386,10 @@ function Step3SetPrice({
 				</div>
 
 				<div className="bg-muted rounded-lg p-4">
-					<label className="text-sm font-medium mb-2 block">
+					<label
+						htmlFor="pool-amount-a"
+						className="text-sm font-medium mb-2 block"
+					>
 						{tokenA.symbol} Amount
 					</label>
 					<div className="flex items-center gap-2">
@@ -379,6 +399,7 @@ function Step3SetPrice({
 							gradient="bg-brand-gradient-ocean"
 						/>
 						<Input
+							id="pool-amount-a"
 							type="number"
 							placeholder="0.00"
 							value={amountA}
@@ -389,7 +410,10 @@ function Step3SetPrice({
 				</div>
 
 				<div className="bg-muted rounded-lg p-4">
-					<label className="text-sm font-medium mb-2 block">
+					<label
+						htmlFor="pool-amount-b"
+						className="text-sm font-medium mb-2 block"
+					>
 						{tokenB.symbol} Amount
 					</label>
 					<div className="flex items-center gap-2">
@@ -399,6 +423,7 @@ function Step3SetPrice({
 							gradient="bg-brand-gradient-seafoam"
 						/>
 						<Input
+							id="pool-amount-b"
 							type="number"
 							placeholder="0.00"
 							value={amountB}

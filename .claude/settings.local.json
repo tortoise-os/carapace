@@ -50,7 +50,12 @@
       "Bash(mkdir:*)",
       "Bash(timeout 60 sui move test:*)",
       "Bash(timeout 60 bun test:*)",
-      "Bash(sui:*)"
+      "Bash(sui:*)",
+      "Bash(bunx biome check:*)",
+      "Bash(biome check:*)",
+      "Bash(1 --max-diagnostics=50)",
+      "Bash(bunx biome:*)",
+      "Bash(1 --max-diagnostics=30)"
     ],
     "deny": [],
     "ask": []

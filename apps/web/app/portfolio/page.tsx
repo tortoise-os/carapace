@@ -305,8 +305,11 @@ export default function PortfolioPage() {
 								<div className="flex-1">
 									<h3 className="font-semibold mb-2">Portfolio Optimization</h3>
 									<ul className="space-y-2">
-										{suggestions.map((suggestion, i) => (
-											<li key={i} className="text-sm text-muted-foreground">
+										{suggestions.map((suggestion, _i) => (
+											<li
+												key={suggestion.message}
+												className="text-sm text-muted-foreground"
+											>
 												• {suggestion.message}
 											</li>
 										))}
@@ -375,9 +378,9 @@ export default function PortfolioPage() {
 							<h2 className="text-xl font-bold">Token Balances</h2>
 						</div>
 						<div className="space-y-3">
-							{portfolio.tokenBalances.map((token, index) => (
+							{portfolio.tokenBalances.map((token, _index) => (
 								<div
-									key={index}
+									key={token.tokenSymbol}
 									className="flex items-center justify-between p-4 bg-muted/30 rounded-lg"
 								>
 									<div className="flex items-center gap-3">
@@ -425,8 +428,11 @@ export default function PortfolioPage() {
 								<h2 className="text-xl font-bold">Liquidity Positions</h2>
 							</div>
 							<div className="space-y-3">
-								{portfolio.liquidityPositions.map((position, index) => (
-									<div key={index} className="p-4 bg-muted/30 rounded-lg">
+								{portfolio.liquidityPositions.map((position, _index) => (
+									<div
+										key={position.poolId}
+										className="p-4 bg-muted/30 rounded-lg"
+									>
 										<div className="flex items-center justify-between mb-3">
 											<div>
 												<p className="font-semibold">
@@ -480,9 +486,9 @@ export default function PortfolioPage() {
 							<h2 className="text-xl font-bold">Recent Transactions</h2>
 						</div>
 						<div className="space-y-3">
-							{transactions.map((tx, index) => (
+							{transactions.map((tx, _index) => (
 								<div
-									key={index}
+									key={tx.txDigest}
 									className="flex items-center justify-between p-4 bg-muted/30 rounded-lg"
 								>
 									<div className="flex items-center gap-3">
@@ -500,9 +506,9 @@ export default function PortfolioPage() {
 									</div>
 									<div className="flex items-center gap-4">
 										<div className="text-right">
-											{tx.tokens.map((token, i) => (
+											{tx.tokens.map((token, _i) => (
 												<p
-													key={i}
+													key={token.symbol}
 													className={`text-sm ${
 														token.amount.startsWith("-")
 															? "text-red-600"

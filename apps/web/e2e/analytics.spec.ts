@@ -154,10 +154,6 @@ test.describe("Analytics Dashboard", () => {
 		// Wait for data to load
 		await page.waitForTimeout(1500);
 
-		// Get first TVL value
-		const firstCell = page.locator("tbody tr").first().locator("td").nth(1);
-		const _firstValue = await firstCell.textContent();
-
 		// Click TVL header twice to reverse order
 		const tvlHeader = page.getByText("TVL").first();
 		await tvlHeader.click();
@@ -195,9 +191,8 @@ test.describe("Analytics Dashboard", () => {
 		// Wait for initial data load
 		await page.waitForTimeout(1500);
 
-		// Get initial TVL value
+		// Get TVL card
 		const tvlCard = page.locator("text=Total Value Locked").locator("..");
-		const _initialValue = await tvlCard.textContent();
 
 		// Wait for auto-refresh (30 seconds in production, but should happen)
 		// For testing, we just verify the card is still there

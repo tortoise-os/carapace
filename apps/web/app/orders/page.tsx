@@ -231,7 +231,7 @@ export default function OrdersPage() {
 							color: "text-orange-600",
 						},
 					].map((stat, i) => (
-						<BlurFade key={i} delay={0.2 + i * 0.05}>
+						<BlurFade key={stat.label} delay={0.2 + i * 0.05}>
 							<Card className="p-4">
 								<div className="flex items-center justify-between mb-2">
 									<span className="text-sm text-muted-foreground">

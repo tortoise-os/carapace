@@ -127,7 +127,7 @@ export function useTokensMetadata(coinTypes: string[]): {
 		return () => {
 			cancelled = true;
 		};
-	}, [sdk, coinTypes.length, coinTypes[index]]);
+	}, [sdk, coinTypes]);
 
 	return { metadataMap, loading, error };
 }

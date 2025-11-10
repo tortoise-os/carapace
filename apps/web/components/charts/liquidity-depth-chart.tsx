@@ -99,7 +99,7 @@ export function LiquidityDepthChart({
 			askLiquidity: point.cumulativeLiquidity,
 		})),
 	].sort((a, b) => a.price - b.price);
-
+	// biome-ignore lint/suspicious/noExplicitAny: Recharts tooltip type is complex
 	const CustomTooltip = ({ active, payload }: any) => {
 		if (active && payload && payload.length) {
 			const price = payload[0]?.payload?.price;

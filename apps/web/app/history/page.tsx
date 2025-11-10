@@ -189,6 +189,7 @@ export default function HistoryPage() {
 								{["all", "swap", "add_liquidity", "remove_liquidity"].map(
 									(f) => (
 										<button
+											type="button"
 											key={f}
 											onClick={() => setFilter(f)}
 											className={`px-3 py-1 text-sm rounded-md transition-colors ${

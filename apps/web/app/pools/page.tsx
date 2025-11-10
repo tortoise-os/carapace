@@ -101,7 +101,7 @@ export default function PoolsPage() {
 							cardGradient: "from-accent-purple/30 to-accent-violet/25",
 						}, // Creation, growth - PURPLE
 					].map((stat, i) => (
-						<BlurFade key={i} delay={0.2 + i * 0.1}>
+						<BlurFade key={stat.label} delay={0.2 + i * 0.1}>
 							<MagicCard
 								className={`p-6 card group cursor-pointer hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 shadow-md hover:shadow-xl bg-gradient-to-br ${stat.cardGradient}`}
 							>
@@ -140,6 +140,7 @@ export default function PoolsPage() {
 										{/* Pool Info */}
 										<div className="flex items-center gap-4 group-hover/card:scale-[1.01] transition-transform">
 											<button
+												type="button"
 												onClick={() => toggleFavorite(pool.pool_id)}
 												className="p-2 rounded-lg hover:bg-accent/50 transition-colors"
 												title={

@@ -62,6 +62,7 @@ export function WalletBalanceWidget() {
 					<h3 className="font-semibold">Wallet Balances</h3>
 				</div>
 				<button
+					type="button"
 					onClick={handleRefresh}
 					disabled={refreshing}
 					className="p-2 rounded-lg hover:bg-accent/50 transition-colors disabled:opacity-50"

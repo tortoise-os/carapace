@@ -1,0 +1,8 @@
+{
+  "name": "tasks",
+  "version": "1.0.0",
+  "description": "Taskfile configurations for development and CI workflows",
+  "private": true,
+  "type": "module",
+  "files": ["dev.yml", "ci.yml"]
+}

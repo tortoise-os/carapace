@@ -33,8 +33,8 @@ export function RouteDisplay({
 		>
 			{/* Route Path Visualization */}
 			<div className="flex items-center gap-2 mb-4">
-				{route.path.map((token, index) => (
-					<div key={index} className="flex items-center gap-2">
+				{route.path.map((token) => (
+					<div key={token} className="flex items-center gap-2">
 						<div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent/10 border border-accent/20">
 							<div className="w-6 h-6 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-xs font-bold text-white">
 								{getTokenSymbol(token).charAt(0)}
@@ -56,7 +56,7 @@ export function RouteDisplay({
 					<div className="text-xs text-muted-foreground mb-1">Output</div>
 					<div className="text-sm font-bold">
 						{parseFloat(route.totalAmountOut).toFixed(4)}{" "}
-						{getTokenSymbol(route.path[route.path.length - 1])}
+						{getTokenSymbol(route.path[route.path.length - 1] || "")}
 					</div>
 				</div>
 
@@ -116,7 +116,7 @@ export function RouteDisplay({
 					<div className="mt-2 space-y-2">
 						{route.hops.map((hop, index) => (
 							<div
-								key={index}
+								key={`${hop.tokenIn}-${hop.tokenOut}-${hop.amountOut}`}
 								className="flex items-center justify-between p-2 rounded bg-muted/50 border border-muted"
 							>
 								<div className="flex items-center gap-2">
@@ -170,7 +170,7 @@ export function RouteComparison({
 			</div>
 
 			{routes.map((route, index) => {
-				let showComparison;
+				let showComparison: { savings: number; better: boolean } | undefined;
 				if (directRoute && route.hops.length > 1) {
 					const directOutput = parseFloat(directRoute.totalAmountOut);
 					const multiHopOutput = parseFloat(route.totalAmountOut);
@@ -184,7 +184,7 @@ export function RouteComparison({
 
 				return (
 					<RouteDisplay
-						key={index}
+						key={`route-${route.path.join("-")}-${route.totalAmountOut}`}
 						route={route}
 						isSelected={index === selectedRouteIndex}
 						onSelect={() => onSelectRoute(index)}

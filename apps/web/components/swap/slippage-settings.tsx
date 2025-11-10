@@ -71,6 +71,7 @@ export function SlippageSettings({
 		<div className="relative">
 			{/* Settings Button */}
 			<button
+				type="button"
 				onClick={() => setIsOpen(!isOpen)}
 				className="p-2 rounded-lg hover:bg-accent/50 transition-colors relative"
 				title="Transaction settings"
@@ -95,6 +96,7 @@ export function SlippageSettings({
 						<div className="flex items-center justify-between mb-6">
 							<h3 className="text-lg font-semibold">Transaction Settings</h3>
 							<button
+								type="button"
 								onClick={() => setIsOpen(false)}
 								className="text-muted-foreground hover:text-foreground"
 							>
@@ -105,7 +107,10 @@ export function SlippageSettings({
 						{/* Slippage Tolerance */}
 						<div className="space-y-4">
 							<div>
-								<label className="text-sm font-medium block mb-3">
+								<label
+									htmlFor="slippage-tolerance-input"
+									className="text-sm font-medium block mb-3"
+								>
 									Slippage Tolerance
 								</label>
 
@@ -113,6 +118,7 @@ export function SlippageSettings({
 								<div className="grid grid-cols-3 gap-2 mb-3">
 									{PRESET_SLIPPAGES.map((value) => (
 										<button
+											type="button"
 											key={value}
 											onClick={() => handlePresetClick(value)}
 											className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -129,6 +135,7 @@ export function SlippageSettings({
 								{/* Custom Input */}
 								<div className="relative">
 									<Input
+										id="slippage-tolerance-input"
 										type="number"
 										placeholder="Custom"
 										value={customSlippage}
@@ -161,11 +168,15 @@ export function SlippageSettings({
 							{/* Transaction Deadline */}
 							{onDeadlineChange && (
 								<div>
-									<label className="text-sm font-medium block mb-3">
+									<label
+										htmlFor="transaction-deadline-input"
+										className="text-sm font-medium block mb-3"
+									>
 										Transaction Deadline
 									</label>
 									<div className="relative">
 										<Input
+											id="transaction-deadline-input"
 											type="number"
 											value={customDeadline}
 											onChange={(e) => handleDeadlineChange(e.target.value)}

@@ -183,7 +183,9 @@ export default function RootLayout({
 											<ul className="space-y-2 text-sm text-muted-foreground">
 												<li>
 													<a
-														href="#"
+														href="https://twitter.com"
+														target="_blank"
+														rel="noopener noreferrer"
 														className="hover:text-primary transition-colors"
 													>
 														Twitter
@@ -191,7 +193,9 @@ export default function RootLayout({
 												</li>
 												<li>
 													<a
-														href="#"
+														href="https://discord.com"
+														target="_blank"
+														rel="noopener noreferrer"
 														className="hover:text-primary transition-colors"
 													>
 														Discord
@@ -199,7 +203,9 @@ export default function RootLayout({
 												</li>
 												<li>
 													<a
-														href="#"
+														href="https://github.com"
+														target="_blank"
+														rel="noopener noreferrer"
 														className="hover:text-primary transition-colors"
 													>
 														GitHub
@@ -207,7 +213,9 @@ export default function RootLayout({
 												</li>
 												<li>
 													<a
-														href="#"
+														href="https://docs.sui.io"
+														target="_blank"
+														rel="noopener noreferrer"
 														className="hover:text-primary transition-colors"
 													>
 														Docs

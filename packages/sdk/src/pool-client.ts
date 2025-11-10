@@ -422,7 +422,7 @@ export class PoolClient {
 	 * Get flash loan quote
 	 */
 	async getFlashLoanQuote(
-		poolId: ObjectId,
+		_poolId: ObjectId,
 		amount: bigint,
 		feeBps: number = 5,
 	): Promise<{

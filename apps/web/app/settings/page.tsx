@@ -59,7 +59,10 @@ export default function SettingsPage() {
 		}
 	}, []);
 
-	const handleChange = (key: keyof UserSettings, value: any) => {
+	const handleChange = (
+		key: keyof UserSettings,
+		value: string | boolean | number,
+	) => {
 		setSettings((prev) => ({ ...prev, [key]: value }));
 		setHasChanges(true);
 		setSaved(false);
@@ -124,18 +127,18 @@ export default function SettingsPage() {
 							<div>
 								<label className="block text-sm font-medium mb-2">
 									Default Slippage Tolerance (%)
+									<input
+										type="number"
+										step="0.1"
+										min="0.1"
+										max="50"
+										value={settings.defaultSlippage}
+										onChange={(e) =>
+											handleChange("defaultSlippage", e.target.value)
+										}
+										className="w-full px-3 py-2 rounded-lg border bg-background mt-2"
+									/>
 								</label>
-								<input
-									type="number"
-									step="0.1"
-									min="0.1"
-									max="50"
-									value={settings.defaultSlippage}
-									onChange={(e) =>
-										handleChange("defaultSlippage", e.target.value)
-									}
-									className="w-full px-3 py-2 rounded-lg border bg-background"
-								/>
 								<p className="text-xs text-muted-foreground mt-1">
 									Applied automatically when swapping tokens
 								</p>
@@ -144,18 +147,18 @@ export default function SettingsPage() {
 							<div>
 								<label className="block text-sm font-medium mb-2">
 									Transaction Deadline (minutes)
+									<input
+										type="number"
+										step="1"
+										min="1"
+										max="60"
+										value={settings.transactionDeadline}
+										onChange={(e) =>
+											handleChange("transactionDeadline", e.target.value)
+										}
+										className="w-full px-3 py-2 rounded-lg border bg-background mt-2"
+									/>
 								</label>
-								<input
-									type="number"
-									step="1"
-									min="1"
-									max="60"
-									value={settings.transactionDeadline}
-									onChange={(e) =>
-										handleChange("transactionDeadline", e.target.value)
-									}
-									className="w-full px-3 py-2 rounded-lg border bg-background"
-								/>
 								<p className="text-xs text-muted-foreground mt-1">
 									Transaction will revert if pending for longer than this
 								</p>
@@ -203,33 +206,36 @@ export default function SettingsPage() {
 							<div>
 								<label className="block text-sm font-medium mb-2">
 									Currency
+									<select
+										value={settings.currency}
+										onChange={(e) => handleChange("currency", e.target.value)}
+										className="w-full px-3 py-2 rounded-lg border bg-background mt-2"
+									>
+										<option value="USD">USD ($)</option>
+										<option value="EUR">EUR (€)</option>
+										<option value="GBP">GBP (£)</option>
+									</select>
 								</label>
-								<select
-									value={settings.currency}
-									onChange={(e) => handleChange("currency", e.target.value)}
-									className="w-full px-3 py-2 rounded-lg border bg-background"
-								>
-									<option value="USD">USD ($)</option>
-									<option value="EUR">EUR (€)</option>
-									<option value="GBP">GBP (£)</option>
-								</select>
 							</div>
 
 							<div>
 								<label className="block text-sm font-medium mb-2">
 									Decimal Places
+									<input
+										type="number"
+										step="1"
+										min="2"
+										max="8"
+										value={settings.decimalPlaces}
+										onChange={(e) =>
+											handleChange(
+												"decimalPlaces",
+												parseInt(e.target.value, 10),
+											)
+										}
+										className="w-full px-3 py-2 rounded-lg border bg-background mt-2"
+									/>
 								</label>
-								<input
-									type="number"
-									step="1"
-									min="2"
-									max="8"
-									value={settings.decimalPlaces}
-									onChange={(e) =>
-										handleChange("decimalPlaces", parseInt(e.target.value, 10))
-									}
-									className="w-full px-3 py-2 rounded-lg border bg-background"
-								/>
 								<p className="text-xs text-muted-foreground mt-1">
 									Number of decimal places to show for token amounts
 								</p>
