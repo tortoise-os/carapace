@@ -69,14 +69,16 @@ export class FlashLoanClient {
 	 * The callback receives the transaction, borrowed coin, and receipt
 	 * It must return the repayment coin
 	 */
-	async executeFlashLoan<X extends CoinType, Y extends CoinType>(
+	async executeFlashLoan(
 		request: FlashLoanRequest,
+		coinTypeX: string,
+		coinTypeY: string,
 		callback: (tx: Transaction, borrowedCoin: any, receipt: any) => any,
 		sender: string,
 		options?: FlashLoanOptions,
 	): Promise<FlashLoanResult> {
 		// Build transaction
-		const tx = this.builder.buildFlashLoanTransaction<X, Y>(request, callback);
+		const tx = this.builder.buildFlashLoanTransaction(request, coinTypeX, coinTypeY, callback);
 
 		// Set gas budget if provided
 		if (options?.gasBudget) {
@@ -117,32 +119,38 @@ export class FlashLoanClient {
 	 * Build a flash loan transaction without executing it
 	 * Useful for dry-run testing or custom execution
 	 */
-	buildFlashLoanTx<X extends CoinType, Y extends CoinType>(
+	buildFlashLoanTx(
 		request: FlashLoanRequest,
+		coinTypeX: string,
+		coinTypeY: string,
 		callback: (tx: Transaction, borrowedCoin: any, receipt: any) => any,
 	): Transaction {
-		return this.builder.buildFlashLoanTransaction<X, Y>(request, callback);
+		return this.builder.buildFlashLoanTransaction(request, coinTypeX, coinTypeY, callback);
 	}
 
 	/**
 	 * Execute a simple arbitrage using flash loans
 	 * Borrows from borrowPool, swaps on swapPool, repays to borrowPool
 	 */
-	async executeArbitrage<X extends CoinType, Y extends CoinType>(
+	async executeArbitrage(
 		borrowPoolId: ObjectId,
 		swapPoolId: ObjectId,
 		borrowAmount: bigint,
 		minReturnAmount: bigint,
 		isTokenX: boolean,
+		coinTypeX: string,
+		coinTypeY: string,
 		sender: string,
 		options?: FlashLoanOptions,
 	): Promise<FlashLoanResult> {
-		const tx = this.builder.buildArbitrageFlashLoan<X, Y>(
+		const tx = this.builder.buildArbitrageFlashLoan(
 			borrowPoolId,
 			swapPoolId,
 			borrowAmount,
 			minReturnAmount,
 			isTokenX,
+			coinTypeX,
+			coinTypeY,
 		);
 
 		if (options?.gasBudget) {

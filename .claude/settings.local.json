@@ -55,7 +55,11 @@
       "Bash(biome check:*)",
       "Bash(1 --max-diagnostics=50)",
       "Bash(bunx biome:*)",
-      "Bash(1 --max-diagnostics=30)"
+      "Bash(1 --max-diagnostics=30)",
+      "Bash(turbo run:*)",
+      "WebFetch(domain:www.linkedin.com)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs"
     ],
     "deny": [],
     "ask": []

@@ -2,493 +2,487 @@
  * Pool Routes (Elysia Plugin)
  */
 
-import type { CarapaceSDK } from "@carapace/sdk";
-import { Elysia, t } from "elysia";
-import { config } from "../config";
-import { poolQueries } from "../db/client";
-import { mockDataProvider } from "../db/mock-data";
-import { BlockchainService } from "../services/blockchain-service";
-import { cacheService } from "../services/cache-service";
-import type { PoolDiscoveryService } from "../services/pool-discovery";
+import type { CarapaceSDK } from "@carapace/sdk"
+import { Elysia, t } from "elysia"
+import { config } from "../config"
+import { poolQueries } from "../db/client"
+import { mockDataProvider } from "../db/mock-data"
+import { BlockchainService } from "../services/blockchain-service"
+import { cacheService } from "../services/cache-service"
+import type { PoolDiscoveryService } from "../services/pool-discovery"
 
 interface PriceDataPoint {
-	timestamp: number;
-	price: number;
-	volume: number;
-	high: number;
-	low: number;
-	open: number;
-	close: number;
+  timestamp: number
+  price: number
+  volume: number
+  high: number
+  low: number
+  open: number
+  close: number
 }
 
 // Helper function to generate mock historical price data
 function getHistoricalPriceData(
-	poolId: string,
-	timeframe: string,
-	interval: string,
+  poolId: string,
+  timeframe: string,
+  interval: string
 ): PriceDataPoint[] | null {
-	const pool = mockDataProvider.getPool(poolId);
-	if (!pool) return null;
+  const pool = mockDataProvider.getPool(poolId)
+  if (!pool) return null
 
-	const currentPrice = mockDataProvider.getSpotPrice(poolId) || 2.0;
-	const now = Date.now();
+  const currentPrice = mockDataProvider.getSpotPrice(poolId) || 2.0
+  const now = Date.now()
 
-	// Calculate number of data points based on timeframe and interval
-	const timeframeMs = parseTimeframe(timeframe);
-	const intervalMs = parseInterval(interval);
-	const numPoints = Math.min(Math.floor(timeframeMs / intervalMs), 500); // Max 500 points
+  // Calculate number of data points based on timeframe and interval
+  const timeframeMs = parseTimeframe(timeframe)
+  const intervalMs = parseInterval(interval)
+  const numPoints = Math.min(Math.floor(timeframeMs / intervalMs), 500) // Max 500 points
 
-	const dataPoints: PriceDataPoint[] = [];
+  const dataPoints: PriceDataPoint[] = []
 
-	for (let i = numPoints - 1; i >= 0; i--) {
-		const timestamp = now - i * intervalMs;
+  for (let i = numPoints - 1; i >= 0; i--) {
+    const timestamp = now - i * intervalMs
 
-		// Generate realistic-looking price fluctuations
-		const randomFactor = 1 + (Math.random() - 0.5) * 0.1; // ±5% variation
-		const trendFactor = 1 + (i / numPoints) * 0.05; // Slight upward trend
-		const basePrice = currentPrice * randomFactor * trendFactor;
+    // Generate realistic-looking price fluctuations
+    const randomFactor = 1 + (Math.random() - 0.5) * 0.1 // ±5% variation
+    const trendFactor = 1 + (i / numPoints) * 0.05 // Slight upward trend
+    const basePrice = currentPrice * randomFactor * trendFactor
 
-		const volatility = basePrice * 0.02; // 2% volatility
-		const open = basePrice + (Math.random() - 0.5) * volatility;
-		const close = basePrice + (Math.random() - 0.5) * volatility;
-		const high = Math.max(open, close) + Math.random() * volatility;
-		const low = Math.min(open, close) - Math.random() * volatility;
+    const volatility = basePrice * 0.02 // 2% volatility
+    const open = basePrice + (Math.random() - 0.5) * volatility
+    const close = basePrice + (Math.random() - 0.5) * volatility
+    const high = Math.max(open, close) + Math.random() * volatility
+    const low = Math.min(open, close) - Math.random() * volatility
 
-		// Generate volume with some randomness
-		const baseVolume = 10000 + Math.random() * 50000;
+    // Generate volume with some randomness
+    const baseVolume = 10000 + Math.random() * 50000
 
-		dataPoints.push({
-			timestamp,
-			price: close,
-			volume: baseVolume,
-			high,
-			low,
-			open,
-			close,
-		});
-	}
+    dataPoints.push({
+      timestamp,
+      price: close,
+      volume: baseVolume,
+      high,
+      low,
+      open,
+      close,
+    })
+  }
 
-	return dataPoints;
+  return dataPoints
 }
 
 function parseTimeframe(timeframe: string): number {
-	const map: Record<string, number> = {
-		"1h": 60 * 60 * 1000,
-		"24h": 24 * 60 * 60 * 1000,
-		"7d": 7 * 24 * 60 * 60 * 1000,
-		"30d": 30 * 24 * 60 * 60 * 1000,
-		"1y": 365 * 24 * 60 * 60 * 1000,
-	};
-	return map[timeframe] || map["24h"]!;
+  const map: Record<string, number> = {
+    "1h": 60 * 60 * 1000,
+    "24h": 24 * 60 * 60 * 1000,
+    "7d": 7 * 24 * 60 * 60 * 1000,
+    "30d": 30 * 24 * 60 * 60 * 1000,
+    "1y": 365 * 24 * 60 * 60 * 1000,
+  }
+  return map[timeframe] ?? map["24h"] ?? 86400000
 }
 
 function parseInterval(interval: string): number {
-	const map: Record<string, number> = {
-		"1m": 60 * 1000,
-		"5m": 5 * 60 * 1000,
-		"15m": 15 * 60 * 1000,
-		"1h": 60 * 60 * 1000,
-		"1d": 24 * 60 * 60 * 1000,
-	};
-	return map[interval] || map["1h"]!;
+  const map: Record<string, number> = {
+    "1m": 60 * 1000,
+    "5m": 5 * 60 * 1000,
+    "15m": 15 * 60 * 1000,
+    "1h": 60 * 60 * 1000,
+    "1d": 24 * 60 * 60 * 1000,
+  }
+  return map[interval] ?? map["1h"] ?? 3600000
 }
 
-export const createPoolPlugin = (
-	sdk: CarapaceSDK,
-	discoveryService?: PoolDiscoveryService,
-) => {
-	// Get discovered pool IDs if discovery service is available
-	const discoveredPoolIds = discoveryService?.getPoolIds() || [];
-	const blockchainService = new BlockchainService(sdk, discoveredPoolIds);
+export const createPoolPlugin = (sdk: CarapaceSDK, discoveryService?: PoolDiscoveryService) => {
+  // Get discovered pool IDs if discovery service is available
+  const discoveredPoolIds = discoveryService?.getPoolIds() || []
+  const blockchainService = new BlockchainService(sdk, discoveredPoolIds)
 
-	return (
-		new Elysia({ prefix: "/api/pools" })
-			.decorate("sdk", sdk)
-			.decorate("discoveryService", discoveryService)
-			/**
-			 * GET /api/pools
-			 * List all pools
-			 */
-			.get(
-				"/",
-				async ({ query }) => {
-					try {
-						const limit = Math.min(
-							parseInt(query.limit as string) || 100,
-							1000,
-						);
-						const offset = parseInt(query.offset as string) || 0;
+  return (
+    new Elysia({ prefix: "/api/pools" })
+      .decorate("sdk", sdk)
+      .decorate("discoveryService", discoveryService)
+      /**
+       * GET /api/pools
+       * List all pools
+       */
+      .get(
+        "/",
+        async ({ query }) => {
+          try {
+            const limit = Math.min(parseInt(query.limit as string, 10) || 100, 1000)
+            const offset = parseInt(query.offset as string, 10) || 0
 
-						// Try to get from cache first
-						const cacheKey = `pools:all:${limit}:${offset}`;
-						let pools = await cacheService.get<any[]>(cacheKey);
+            // Try to get from cache first
+            const cacheKey = `pools:all:${limit}:${offset}`
+            // biome-ignore lint/suspicious/noExplicitAny: Cache service generic requires any for flexibility
+            let pools = await cacheService.get<any[]>(cacheKey)
 
-						if (!pools) {
-							// Fetch from blockchain
-							console.log("Fetching pools from blockchain...");
-							pools = await blockchainService.getAllPools();
+            if (!pools) {
+              // Fetch from blockchain
+              console.log("Fetching pools from blockchain...")
+              pools = await blockchainService.getAllPools()
 
-							// If blockchain returns empty, try database, then fall back to mock data
-							if (!pools || pools.length === 0) {
-								try {
-									pools = await poolQueries.getAll(limit, offset);
-									if (!pools || pools.length === 0) {
-										console.log("No pools found, using mock data");
-										pools = mockDataProvider.getAllPools(limit, offset);
-									}
-								} catch (dbError) {
-									console.log("Database unavailable, using mock data");
-									pools = mockDataProvider.getAllPools(limit, offset);
-								}
-							}
+              // If blockchain returns empty, try database, then fall back to mock data
+              if (!pools || pools.length === 0) {
+                try {
+                  pools = await poolQueries.getAll(limit, offset)
+                  if (!pools || pools.length === 0) {
+                    console.log("No pools found, using mock data")
+                    pools = mockDataProvider.getAllPools(limit, offset)
+                  }
+                } catch (_dbError) {
+                  console.log("Database unavailable, using mock data")
+                  pools = mockDataProvider.getAllPools(limit, offset)
+                }
+              }
 
-							// Cache for 60 seconds
-							if (pools && pools.length > 0) {
-								await cacheService.set(cacheKey, pools, config.cache.pools);
-							}
-						}
+              // Cache for 60 seconds
+              if (pools && pools.length > 0) {
+                await cacheService.set(cacheKey, pools, config.cache.pools)
+              }
+            }
 
-						// Apply pagination
-						const paginatedPools = pools.slice(offset, offset + limit);
+            // Apply pagination
+            const paginatedPools = pools.slice(offset, offset + limit)
 
-						return {
-							success: true,
-							data: paginatedPools,
-							meta: {
-								limit,
-								offset,
-								count: paginatedPools.length,
-								total: pools.length,
-							},
-						};
-					} catch (error) {
-						console.error("Error fetching pools:", error);
-						throw new Error("Failed to fetch pools");
-					}
-				},
-				{
-					query: t.Object({
-						limit: t.Optional(t.String()),
-						offset: t.Optional(t.String()),
-					}),
-				},
-			)
+            return {
+              success: true,
+              data: paginatedPools,
+              meta: {
+                limit,
+                offset,
+                count: paginatedPools.length,
+                total: pools.length,
+              },
+            }
+          } catch (error) {
+            console.error("Error fetching pools:", error)
+            throw new Error("Failed to fetch pools")
+          }
+        },
+        {
+          query: t.Object({
+            limit: t.Optional(t.String()),
+            offset: t.Optional(t.String()),
+          }),
+        }
+      )
 
-			/**
-			 * GET /api/pools/:id
-			 * Get pool details
-			 */
-			.get(
-				"/:id",
-				async ({ params, set }) => {
-					try {
-						const { id } = params;
+      /**
+       * GET /api/pools/:id
+       * Get pool details
+       */
+      .get(
+        "/:id",
+        async ({ params, set }) => {
+          try {
+            const { id } = params
 
-						// Try to get from cache first
-						const cacheKey = `pool:${id}`;
-						let pool = await cacheService.get<any>(cacheKey);
+            // Try to get from cache first
+            const cacheKey = `pool:${id}`
+            // biome-ignore lint/suspicious/noExplicitAny: Cache service generic requires any for flexibility
+            let pool = await cacheService.get<any>(cacheKey)
 
-						if (!pool) {
-							// Fetch from blockchain
-							console.log(`Fetching pool ${id} from blockchain...`);
-							pool = await blockchainService.getPool(id);
+            if (!pool) {
+              // Fetch from blockchain
+              console.log(`Fetching pool ${id} from blockchain...`)
+              pool = await blockchainService.getPool(id)
 
-							// If not on blockchain, try database, then fall back to mock data
-							if (!pool) {
-								try {
-									pool = await poolQueries.getById(id);
-									if (!pool) {
-										pool = mockDataProvider.getPool(id);
-									}
-								} catch (dbError) {
-									console.log("Database unavailable, trying mock data");
-									pool = mockDataProvider.getPool(id);
-								}
-							}
+              // If not on blockchain, try database, then fall back to mock data
+              if (!pool) {
+                try {
+                  pool = await poolQueries.getById(id)
+                  if (!pool) {
+                    pool = mockDataProvider.getPool(id)
+                  }
+                } catch (_dbError) {
+                  console.log("Database unavailable, trying mock data")
+                  pool = mockDataProvider.getPool(id)
+                }
+              }
 
-							// Cache for 60 seconds
-							if (pool) {
-								await cacheService.set(cacheKey, pool, config.cache.pools);
-							}
-						}
+              // Cache for 60 seconds
+              if (pool) {
+                await cacheService.set(cacheKey, pool, config.cache.pools)
+              }
+            }
 
-						if (!pool) {
-							set.status = 404;
-							return {
-								success: false,
-								error: "Pool not found",
-							};
-						}
+            if (!pool) {
+              set.status = 404
+              return {
+                success: false,
+                error: "Pool not found",
+              }
+            }
 
-						return {
-							success: true,
-							data: pool,
-						};
-					} catch (error) {
-						console.error("Error fetching pool:", error);
-						throw new Error("Failed to fetch pool");
-					}
-				},
-				{
-					params: t.Object({
-						id: t.String(),
-					}),
-				},
-			)
+            return {
+              success: true,
+              data: pool,
+            }
+          } catch (error) {
+            console.error("Error fetching pool:", error)
+            throw new Error("Failed to fetch pool")
+          }
+        },
+        {
+          params: t.Object({
+            id: t.String(),
+          }),
+        }
+      )
 
-			/**
-			 * GET /api/pools/:id/quote
-			 * Get swap quote
-			 */
-			.get(
-				"/:id/quote",
-				async ({ params, query, set }) => {
-					try {
-						const { id } = params;
-						const { amountIn, isXToY } = query;
+      /**
+       * GET /api/pools/:id/quote
+       * Get swap quote
+       */
+      .get(
+        "/:id/quote",
+        async ({ params, query, set }) => {
+          try {
+            const { id } = params
+            const { amountIn, isXToY } = query
 
-						if (!amountIn || isXToY === undefined) {
-							set.status = 400;
-							return {
-								success: false,
-								error: "Missing required parameters: amountIn, isXToY",
-							};
-						}
+            if (!amountIn || isXToY === undefined) {
+              set.status = 400
+              return {
+                success: false,
+                error: "Missing required parameters: amountIn, isXToY",
+              }
+            }
 
-						const amountInBigInt = BigInt(amountIn);
-						const isXToYBool = isXToY === "true";
+            const amountInBigInt = BigInt(amountIn)
+            const isXToYBool = isXToY === "true"
 
-						// Try to get from cache first
-						const cacheKey = `quote:${id}:${amountIn}:${isXToY}`;
-						let quote = await cacheService.get<any>(cacheKey);
+            // Try to get from cache first
+            const cacheKey = `quote:${id}:${amountIn}:${isXToY}`
+            // biome-ignore lint/suspicious/noExplicitAny: Cache service generic requires any for flexibility
+            let quote = await cacheService.get<any>(cacheKey)
 
-						if (!quote) {
-							// Fetch from blockchain
-							console.log(`Calculating quote for pool ${id}...`);
-							const blockchainQuote = await blockchainService.getSwapQuote(
-								id,
-								amountInBigInt,
-								isXToYBool,
-							);
+            if (!quote) {
+              // Fetch from blockchain
+              console.log(`Calculating quote for pool ${id}...`)
+              const blockchainQuote = await blockchainService.getSwapQuote(
+                id,
+                amountInBigInt,
+                isXToYBool
+              )
 
-							if (blockchainQuote) {
-								quote = blockchainQuote;
-							} else {
-								// Fall back to mock calculation
-								const mockQuote = mockDataProvider.calculateSwapOutput(
-									id,
-									amountInBigInt,
-									isXToYBool,
-								);
+              if (blockchainQuote) {
+                quote = blockchainQuote
+              } else {
+                // Fall back to mock calculation
+                const mockQuote = mockDataProvider.calculateSwapOutput(
+                  id,
+                  amountInBigInt,
+                  isXToYBool
+                )
 
-								if (!mockQuote) {
-									set.status = 404;
-									return {
-										success: false,
-										error: "Pool not found",
-									};
-								}
+                if (!mockQuote) {
+                  set.status = 404
+                  return {
+                    success: false,
+                    error: "Pool not found",
+                  }
+                }
 
-								quote = {
-									amountIn: amountInBigInt.toString(),
-									amountOut: mockQuote.amountOut.toString(),
-									priceImpact: mockQuote.priceImpact,
-									fee: mockQuote.fee.toString(),
-									route: [id],
-								};
-							}
+                quote = {
+                  amountIn: amountInBigInt.toString(),
+                  amountOut: mockQuote.amountOut.toString(),
+                  priceImpact: mockQuote.priceImpact,
+                  fee: mockQuote.fee.toString(),
+                  route: [id],
+                }
+              }
 
-							// Cache for 30 seconds (quotes change frequently)
-							await cacheService.set(cacheKey, quote, config.cache.quotes);
-						}
+              // Cache for 30 seconds (quotes change frequently)
+              await cacheService.set(cacheKey, quote, config.cache.quotes)
+            }
 
-						return {
-							success: true,
-							data: quote,
-						};
-					} catch (error) {
-						console.error("Error getting quote:", error);
-						throw new Error("Failed to get quote");
-					}
-				},
-				{
-					params: t.Object({
-						id: t.String(),
-					}),
-					query: t.Object({
-						amountIn: t.String(),
-						isXToY: t.String(),
-					}),
-				},
-			)
+            return {
+              success: true,
+              data: quote,
+            }
+          } catch (error) {
+            console.error("Error getting quote:", error)
+            throw new Error("Failed to get quote")
+          }
+        },
+        {
+          params: t.Object({
+            id: t.String(),
+          }),
+          query: t.Object({
+            amountIn: t.String(),
+            isXToY: t.String(),
+          }),
+        }
+      )
 
-			/**
-			 * GET /api/pools/:id/price
-			 * Get spot price
-			 */
-			.get(
-				"/:id/price",
-				async ({ params, set }) => {
-					try {
-						const { id } = params;
+      /**
+       * GET /api/pools/:id/price
+       * Get spot price
+       */
+      .get(
+        "/:id/price",
+        async ({ params, set }) => {
+          try {
+            const { id } = params
 
-						// Try to get from cache first
-						const cacheKey = `price:${id}`;
-						let price = await cacheService.get<number>(cacheKey);
+            // Try to get from cache first
+            const cacheKey = `price:${id}`
+            let price = await cacheService.get<number>(cacheKey)
 
-						if (price === null) {
-							// Fetch from blockchain
-							console.log(`Fetching price for pool ${id}...`);
-							price = await blockchainService.getSpotPrice(id);
+            if (price === null) {
+              // Fetch from blockchain
+              console.log(`Fetching price for pool ${id}...`)
+              price = await blockchainService.getSpotPrice(id)
 
-							// If not on blockchain, try mock data
-							if (price === null) {
-								price = mockDataProvider.getSpotPrice(id);
-							}
+              // If not on blockchain, try mock data
+              if (price === null) {
+                price = mockDataProvider.getSpotPrice(id)
+              }
 
-							// Cache for 30 seconds
-							if (price !== null) {
-								await cacheService.set(cacheKey, price, config.cache.quotes);
-							}
-						}
+              // Cache for 30 seconds
+              if (price !== null) {
+                await cacheService.set(cacheKey, price, config.cache.quotes)
+              }
+            }
 
-						if (price === null) {
-							set.status = 404;
-							return {
-								success: false,
-								error: "Pool not found",
-							};
-						}
+            if (price === null) {
+              set.status = 404
+              return {
+                success: false,
+                error: "Pool not found",
+              }
+            }
 
-						return {
-							success: true,
-							data: { price },
-						};
-					} catch (error) {
-						console.error("Error getting price:", error);
-						throw new Error("Failed to get price");
-					}
-				},
-				{
-					params: t.Object({
-						id: t.String(),
-					}),
-				},
-			)
+            return {
+              success: true,
+              data: { price },
+            }
+          } catch (error) {
+            console.error("Error getting price:", error)
+            throw new Error("Failed to get price")
+          }
+        },
+        {
+          params: t.Object({
+            id: t.String(),
+          }),
+        }
+      )
 
-			/**
-			 * GET /api/pools/:id/price-history
-			 * Get historical price data
-			 * Note: Requires indexer for real data. Currently returns mock data.
-			 */
-			.get(
-				"/:id/price-history",
-				async ({ params, query, set }) => {
-					try {
-						const { id } = params;
-						const { timeframe = "24h", interval = "1h" } = query;
+      /**
+       * GET /api/pools/:id/price-history
+       * Get historical price data
+       * Note: Requires indexer for real data. Currently returns mock data.
+       */
+      .get(
+        "/:id/price-history",
+        async ({ params, query, set }) => {
+          try {
+            const { id } = params
+            const { timeframe = "24h", interval = "1h" } = query
 
-						// TODO: Implement with indexer for real historical data
-						// For now, use mock data
-						console.log(
-							"⚠️  Using mock historical data. Implement indexer for real data.",
-						);
+            // TODO: Implement with indexer for real historical data
+            // For now, use mock data
+            console.log("⚠️  Using mock historical data. Implement indexer for real data.")
 
-						// Generate mock historical data
-						const dataPoints = getHistoricalPriceData(id, timeframe, interval);
+            // Generate mock historical data
+            const dataPoints = getHistoricalPriceData(id, timeframe, interval)
 
-						if (!dataPoints) {
-							set.status = 404;
-							return {
-								success: false,
-								error: "Pool not found",
-							};
-						}
+            if (!dataPoints) {
+              set.status = 404
+              return {
+                success: false,
+                error: "Pool not found",
+              }
+            }
 
-						return {
-							success: true,
-							data: dataPoints,
-							meta: {
-								notice:
-									"Historical data is currently mocked. Real data requires indexer.",
-							},
-						};
-					} catch (error) {
-						console.error("Error getting price history:", error);
-						throw new Error("Failed to get price history");
-					}
-				},
-				{
-					params: t.Object({
-						id: t.String(),
-					}),
-					query: t.Object({
-						timeframe: t.Optional(t.String()), // 1h, 24h, 7d, 30d, 1y
-						interval: t.Optional(t.String()), // 1m, 5m, 15m, 1h, 1d
-					}),
-				},
-			)
+            return {
+              success: true,
+              data: dataPoints,
+              meta: {
+                notice: "Historical data is currently mocked. Real data requires indexer.",
+              },
+            }
+          } catch (error) {
+            console.error("Error getting price history:", error)
+            throw new Error("Failed to get price history")
+          }
+        },
+        {
+          params: t.Object({
+            id: t.String(),
+          }),
+          query: t.Object({
+            timeframe: t.Optional(t.String()), // 1h, 24h, 7d, 30d, 1y
+            interval: t.Optional(t.String()), // 1m, 5m, 15m, 1h, 1d
+          }),
+        }
+      )
 
-			/**
-			 * POST /api/pools/:id/swap
-			 * Get swap transaction
-			 */
-			.post(
-				"/:id/swap",
-				async ({ params, body, sdk }) => {
-					try {
-						const { id } = params;
+      /**
+       * POST /api/pools/:id/swap
+       * Get swap transaction
+       */
+      .post(
+        "/:id/swap",
+        async ({ params, body, sdk }) => {
+          try {
+            const { id } = params
 
-						const tx = body.isXToY
-							? sdk.pool.swapXToY(
-									id,
-									body.tokenIn,
-									body.tokenOut,
-									body.coinIn,
-									BigInt(body.amountIn),
-									body.senderAddress,
-									body.minAmountOut ? BigInt(body.minAmountOut) : 0n,
-								)
-							: sdk.pool.swapYToX(
-									id,
-									body.tokenIn,
-									body.tokenOut,
-									body.coinIn,
-									BigInt(body.amountIn),
-									body.senderAddress,
-									body.minAmountOut ? BigInt(body.minAmountOut) : 0n,
-								);
+            const tx = body.isXToY
+              ? sdk.pool.swapXToY(
+                  id,
+                  body.tokenIn,
+                  body.tokenOut,
+                  body.coinIn,
+                  BigInt(body.amountIn),
+                  body.senderAddress,
+                  body.minAmountOut ? BigInt(body.minAmountOut) : 0n
+                )
+              : sdk.pool.swapYToX(
+                  id,
+                  body.tokenIn,
+                  body.tokenOut,
+                  body.coinIn,
+                  BigInt(body.amountIn),
+                  body.senderAddress,
+                  body.minAmountOut ? BigInt(body.minAmountOut) : 0n
+                )
 
-						// Serialize transaction
-						const txBytes = await tx.build({
-							client: sdk.client,
-						});
+            // Serialize transaction
+            const txBytes = await tx.build({
+              client: sdk.client,
+            })
 
-						return {
-							success: true,
-							data: {
-								transaction: Buffer.from(txBytes).toString("base64"),
-							},
-						};
-					} catch (error) {
-						console.error("Error creating swap tx:", error);
-						throw new Error("Failed to create swap transaction");
-					}
-				},
-				{
-					params: t.Object({
-						id: t.String(),
-					}),
-					body: t.Object({
-						tokenIn: t.String(),
-						tokenOut: t.String(),
-						coinIn: t.String(),
-						amountIn: t.String(),
-						senderAddress: t.String(),
-						minAmountOut: t.Optional(t.String()),
-						isXToY: t.Boolean(),
-					}),
-				},
-			)
-	);
-};
+            return {
+              success: true,
+              data: {
+                transaction: Buffer.from(txBytes).toString("base64"),
+              },
+            }
+          } catch (error) {
+            console.error("Error creating swap tx:", error)
+            throw new Error("Failed to create swap transaction")
+          }
+        },
+        {
+          params: t.Object({
+            id: t.String(),
+          }),
+          body: t.Object({
+            tokenIn: t.String(),
+            tokenOut: t.String(),
+            coinIn: t.String(),
+            amountIn: t.String(),
+            senderAddress: t.String(),
+            minAmountOut: t.Optional(t.String()),
+            isXToY: t.Boolean(),
+          }),
+        }
+      )
+  )
+}

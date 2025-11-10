@@ -30,7 +30,17 @@
 			},
 			"suspicious": {
 				"noExplicitAny": "warn",
-				"useIterableCallbackReturn": "warn"
+				"useIterableCallbackReturn": "warn",
+				"noImplicitAnyLet": "warn",
+				"noArrayIndexKey": "warn"
+			},
+			"performance": {
+				"noImgElement": "warn"
+			},
+			"a11y": {
+				"noSvgWithoutTitle": "warn",
+				"useKeyWithClickEvents": "warn",
+				"noStaticElementInteractions": "warn"
 			}
 		}
 	},

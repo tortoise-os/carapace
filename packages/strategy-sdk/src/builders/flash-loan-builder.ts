@@ -13,14 +13,16 @@ export class FlashLoanBuilder {
 	/**
 	 * Build flash borrow transaction for token X
 	 */
-	buildFlashBorrowX<X extends CoinType, Y extends CoinType>(
+	buildFlashBorrowX(
 		tx: Transaction,
 		poolId: ObjectId,
 		amount: bigint,
+		coinTypeX: string,
+		coinTypeY: string,
 	): { borrowedCoin: any; receipt: any } {
 		const [borrowedCoin, receipt] = tx.moveCall({
 			target: `${this.packageId}::pool::flash_borrow_x`,
-			typeArguments: [X as string, Y as string],
+			typeArguments: [coinTypeX, coinTypeY],
 			arguments: [tx.object(poolId), tx.pure.u64(amount)],
 		});
 
@@ -30,14 +32,16 @@ export class FlashLoanBuilder {
 	/**
 	 * Build flash borrow transaction for token Y
 	 */
-	buildFlashBorrowY<X extends CoinType, Y extends CoinType>(
+	buildFlashBorrowY(
 		tx: Transaction,
 		poolId: ObjectId,
 		amount: bigint,
+		coinTypeX: string,
+		coinTypeY: string,
 	): { borrowedCoin: any; receipt: any } {
 		const [borrowedCoin, receipt] = tx.moveCall({
 			target: `${this.packageId}::pool::flash_borrow_y`,
-			typeArguments: [X as string, Y as string],
+			typeArguments: [coinTypeX, coinTypeY],
 			arguments: [tx.object(poolId), tx.pure.u64(amount)],
 		});
 
@@ -47,15 +51,17 @@ export class FlashLoanBuilder {
 	/**
 	 * Build flash repay transaction for token X
 	 */
-	buildFlashRepayX<X extends CoinType, Y extends CoinType>(
+	buildFlashRepayX(
 		tx: Transaction,
 		poolId: ObjectId,
 		repaymentCoin: any,
 		receipt: any,
+		coinTypeX: string,
+		coinTypeY: string,
 	): void {
 		tx.moveCall({
 			target: `${this.packageId}::pool::repay_flash_loan_x`,
-			typeArguments: [X as string, Y as string],
+			typeArguments: [coinTypeX, coinTypeY],
 			arguments: [tx.object(poolId), repaymentCoin, receipt],
 		});
 	}
@@ -63,15 +69,17 @@ export class FlashLoanBuilder {
 	/**
 	 * Build flash repay transaction for token Y
 	 */
-	buildFlashRepayY<X extends CoinType, Y extends CoinType>(
+	buildFlashRepayY(
 		tx: Transaction,
 		poolId: ObjectId,
 		repaymentCoin: any,
 		receipt: any,
+		coinTypeX: string,
+		coinTypeY: string,
 	): void {
 		tx.moveCall({
 			target: `${this.packageId}::pool::repay_flash_loan_y`,
-			typeArguments: [X as string, Y as string],
+			typeArguments: [coinTypeX, coinTypeY],
 			arguments: [tx.object(poolId), repaymentCoin, receipt],
 		});
 	}
@@ -80,25 +88,27 @@ export class FlashLoanBuilder {
 	 * Build a complete flash loan transaction
 	 * This is a template that can be customized with the callback
 	 */
-	buildFlashLoanTransaction<X extends CoinType, Y extends CoinType>(
+	buildFlashLoanTransaction(
 		request: FlashLoanRequest,
+		coinTypeX: string,
+		coinTypeY: string,
 		callback: (tx: Transaction, borrowedCoin: any, receipt: any) => any,
 	): Transaction {
 		const tx = new Transaction();
 
 		// Borrow
 		const { borrowedCoin, receipt } = request.isTokenX
-			? this.buildFlashBorrowX<X, Y>(tx, request.poolId, request.amount)
-			: this.buildFlashBorrowY<X, Y>(tx, request.poolId, request.amount);
+			? this.buildFlashBorrowX(tx, request.poolId, request.amount, coinTypeX, coinTypeY)
+			: this.buildFlashBorrowY(tx, request.poolId, request.amount, coinTypeX, coinTypeY);
 
 		// Execute custom logic with borrowed coins (callback)
 		const repaymentCoin = callback(tx, borrowedCoin, receipt);
 
 		// Repay
 		if (request.isTokenX) {
-			this.buildFlashRepayX<X, Y>(tx, request.poolId, repaymentCoin, receipt);
+			this.buildFlashRepayX(tx, request.poolId, repaymentCoin, receipt, coinTypeX, coinTypeY);
 		} else {
-			this.buildFlashRepayY<X, Y>(tx, request.poolId, repaymentCoin, receipt);
+			this.buildFlashRepayY(tx, request.poolId, repaymentCoin, receipt, coinTypeX, coinTypeY);
 		}
 
 		return tx;
@@ -108,27 +118,31 @@ export class FlashLoanBuilder {
 	 * Build simple flash loan for arbitrage
 	 * Borrows from one pool, swaps on another, repays
 	 */
-	buildArbitrageFlashLoan<X extends CoinType, Y extends CoinType>(
+	buildArbitrageFlashLoan(
 		borrowPoolId: ObjectId,
 		swapPoolId: ObjectId,
 		borrowAmount: bigint,
 		minReturnAmount: bigint,
 		isTokenX: boolean,
+		coinTypeX: string,
+		coinTypeY: string,
 	): Transaction {
-		return this.buildFlashLoanTransaction<X, Y>(
+		return this.buildFlashLoanTransaction(
 			{
 				poolId: borrowPoolId,
 				tokenType: (isTokenX ? "X" : "Y") as any,
 				amount: borrowAmount,
 				isTokenX,
 			},
+			coinTypeX,
+			coinTypeY,
 			(tx, borrowedCoin, receipt) => {
 				// Swap borrowed coins on different pool
 				const [swappedCoin] = tx.moveCall({
 					target: isTokenX
 						? `${this.packageId}::pool::swap_x_to_y`
 						: `${this.packageId}::pool::swap_y_to_x`,
-					typeArguments: [X as string, Y as string],
+					typeArguments: [coinTypeX, coinTypeY],
 					arguments: [
 						tx.object(swapPoolId),
 						borrowedCoin,

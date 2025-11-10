@@ -1,105 +1,97 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import {
-	apiClient,
-	type PoolWithAnalytics,
-	type ProtocolAnalytics,
-} from "@/lib/api-client";
+import { useEffect, useState } from "react"
+import { apiClient, type PoolWithAnalytics, type ProtocolAnalytics } from "@/lib/api-client"
 
 export function useProtocolAnalytics() {
-	const [analytics, setAnalytics] = useState<ProtocolAnalytics | null>(null);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<Error | null>(null);
+  const [analytics, setAnalytics] = useState<ProtocolAnalytics | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
-	const fetchAnalytics = async () => {
-		try {
-			setLoading(true);
-			setError(null);
-			const data = await apiClient.getProtocolAnalytics();
-			setAnalytics(data);
-		} catch (err) {
-			setError(
-				err instanceof Error ? err : new Error("Failed to fetch analytics"),
-			);
-		} finally {
-			setLoading(false);
-		}
-	};
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const data = await apiClient.getProtocolAnalytics()
+      setAnalytics(data)
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error("Failed to fetch analytics"))
+    } finally {
+      setLoading(false)
+    }
+  }
 
-	useEffect(() => {
-		fetchAnalytics();
-		// Refresh every 30 seconds
-		const interval = setInterval(fetchAnalytics, 30000);
-		return () => clearInterval(interval);
-	}, [fetchAnalytics]);
+  useEffect(() => {
+    fetchAnalytics()
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchAnalytics, 30000)
+    return () => clearInterval(interval)
+    // biome-ignore lint/correctness/useExhaustiveDependencies: fetchAnalytics intentionally not wrapped
+  }, [fetchAnalytics])
 
-	return {
-		analytics,
-		loading,
-		error,
-		refetch: fetchAnalytics,
-	};
+  return {
+    analytics,
+    loading,
+    error,
+    refetch: fetchAnalytics,
+  }
 }
 
 export function usePoolAnalytics(params?: {
-	limit?: number;
-	sortBy?: "tvl" | "volume24h" | "apr";
-	order?: "asc" | "desc";
+  limit?: number
+  sortBy?: "tvl" | "volume24h" | "apr"
+  order?: "asc" | "desc"
 }) {
-	const [pools, setPools] = useState<PoolWithAnalytics[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<Error | null>(null);
+  const [pools, setPools] = useState<PoolWithAnalytics[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
-	const fetchPools = async () => {
-		try {
-			setLoading(true);
-			setError(null);
-			const data = await apiClient.getPoolAnalytics(params);
-			setPools(data);
-		} catch (err) {
-			setError(
-				err instanceof Error
-					? err
-					: new Error("Failed to fetch pool analytics"),
-			);
-		} finally {
-			setLoading(false);
-		}
-	};
+  const fetchPools = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const data = await apiClient.getPoolAnalytics(params)
+      setPools(data)
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error("Failed to fetch pool analytics"))
+    } finally {
+      setLoading(false)
+    }
+  }
 
-	useEffect(() => {
-		fetchPools();
-	}, [fetchPools]);
+  useEffect(() => {
+    fetchPools()
+    // biome-ignore lint/correctness/useExhaustiveDependencies: fetchPools intentionally not wrapped
+  }, [fetchPools])
 
-	return {
-		pools,
-		loading,
-		error,
-		refetch: fetchPools,
-	};
+  return {
+    pools,
+    loading,
+    error,
+    refetch: fetchPools,
+  }
 }
 
 export function formatCurrency(value: string | number): string {
-	const num = typeof value === "string" ? parseFloat(value) : value;
+  const num = typeof value === "string" ? parseFloat(value) : value
 
-	if (Number.isNaN(num)) return "$0.00";
+  if (Number.isNaN(num)) return "$0.00"
 
-	if (num >= 1_000_000_000) {
-		return `$${(num / 1_000_000_000).toFixed(2)}B`;
-	}
+  if (num >= 1_000_000_000) {
+    return `$${(num / 1_000_000_000).toFixed(2)}B`
+  }
 
-	if (num >= 1_000_000) {
-		return `$${(num / 1_000_000).toFixed(2)}M`;
-	}
+  if (num >= 1_000_000) {
+    return `$${(num / 1_000_000).toFixed(2)}M`
+  }
 
-	if (num >= 1_000) {
-		return `$${(num / 1_000).toFixed(2)}K`;
-	}
+  if (num >= 1_000) {
+    return `$${(num / 1_000).toFixed(2)}K`
+  }
 
-	return `$${num.toFixed(2)}`;
+  return `$${num.toFixed(2)}`
 }
 
 export function formatPercentage(value: number): string {
-	return `${value.toFixed(2)}%`;
+  return `${value.toFixed(2)}%`
 }

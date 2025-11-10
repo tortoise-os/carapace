@@ -48,6 +48,7 @@ export function TokenIcon({
   if (iconUrl) {
     return (
       <div className={cn("relative rounded-full overflow-hidden", sizeClass, className)}>
+        {/* biome-ignore lint/performance/noImgElement: Shared UI library, consumer can optimize */}
         <img
           src={iconUrl}
           alt={symbol}

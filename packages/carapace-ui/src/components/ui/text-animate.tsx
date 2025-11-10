@@ -294,7 +294,6 @@ const TextAnimateBase = ({
     case "line":
       segments = children.split("\n")
       break
-    case "text":
     default:
       segments = [children]
       break
@@ -361,6 +360,7 @@ const TextAnimateBase = ({
         {accessible && <span className="sr-only">{children}</span>}
         {segments.map((segment, i) => (
           <motion.span
+            // biome-ignore lint/suspicious/noArrayIndexKey: Segments with index provide stable keys for animation
             key={`${by}-${segment}-${i}`}
             variants={finalVariants.item}
             custom={i * staggerTimings[by]}

@@ -31,7 +31,8 @@ export const Ripple = memo(function Ripple({
 
         return (
           <div
-            key={i}
+            // biome-ignore lint/suspicious/noArrayIndexKey: Fixed circle count creates stable elements
+            key={`ripple-${i}`}
             className={`absolute animate-ripple rounded-full bg-foreground/25 shadow-xl border [--i:${i}]`}
             style={
               {

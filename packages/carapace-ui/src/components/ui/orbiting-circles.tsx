@@ -26,6 +26,7 @@ export default function OrbitingCircles({
           xmlns="http://www.w3.org/2000/svg"
           version="1.1"
           className="pointer-events-none absolute inset-0 size-full"
+          aria-hidden="true"
         >
           <circle
             className="stroke-border stroke-1 dark:stroke-border"
