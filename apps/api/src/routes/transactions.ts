@@ -12,13 +12,15 @@ export const createTransactionPlugin = (app: Elysia) =>
       // Get transaction history for an address
       .get(
         "/history/:address",
+        // @ts-expect-error - sdk is decorated on parent app
         async ({ params, query, sdk }) => {
           const { address } = params
           const { limit, cursor, poolId, type } = query
 
           const service = new TransactionHistoryService(
-            (sdk as CarapaceSDK).client,
-            (sdk as CarapaceSDK).packageId
+            // biome-ignore lint/suspicious/noExplicitAny: Type compatibility between SuiJsonRpcClient and SuiClient
+            (sdk as CarapaceSDK).client as any,
+            (sdk as CarapaceSDK).packageIds.carapace
           )
 
           const result = await service.getTransactionHistory(address, {
@@ -49,13 +51,15 @@ export const createTransactionPlugin = (app: Elysia) =>
       // Get transaction history for a pool
       .get(
         "/pool/:poolId",
+        // @ts-expect-error - sdk is decorated on parent app
         async ({ params, query, sdk }) => {
           const { poolId } = params
           const { limit, cursor } = query
 
           const service = new TransactionHistoryService(
-            (sdk as CarapaceSDK).client,
-            (sdk as CarapaceSDK).packageId
+            // biome-ignore lint/suspicious/noExplicitAny: Type compatibility between SuiJsonRpcClient and SuiClient
+            (sdk as CarapaceSDK).client as any,
+            (sdk as CarapaceSDK).packageIds.carapace
           )
 
           const result = await service.getPoolTransactionHistory(poolId, {
@@ -82,6 +86,7 @@ export const createTransactionPlugin = (app: Elysia) =>
       // Get transaction details by digest
       .get(
         "/:digest",
+        // @ts-expect-error - sdk is decorated on parent app
         async ({ params, sdk }) => {
           const { digest } = params
 

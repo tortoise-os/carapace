@@ -71,8 +71,11 @@ export class MockDataProvider {
     const index = this.pools.findIndex((p) => p.pool_id === poolId)
     if (index === -1) return undefined
 
+    const currentPool = this.pools[index]
+    if (!currentPool) return undefined
+
     this.pools[index] = {
-      ...this.pools[index],
+      ...currentPool,
       ...data,
       updated_at: new Date().toISOString(),
     }

@@ -33,7 +33,7 @@ export function RouteDisplay({
     >
       {/* Route Path Visualization */}
       <div className="flex items-center gap-2 mb-4">
-        {route.path.map((token) => (
+        {route.path.map((token, index) => (
           <div key={token} className="flex items-center gap-2">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent/10 border border-accent/20">
               <div className="w-6 h-6 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-xs font-bold text-white">
@@ -164,7 +164,7 @@ export function RouteComparison({
       </div>
 
       {routes.map((route, index) => {
-        let showComparison: { savings: number; better: boolean } | undefined
+        let showComparison: { directOutput: string; savingsPercent: number } | undefined
         if (directRoute && route.hops.length > 1) {
           const directOutput = parseFloat(directRoute.totalAmountOut)
           const multiHopOutput = parseFloat(route.totalAmountOut)

@@ -1,0 +1,9 @@
+{
+  "name": "@carapace/tooling-docs",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Documentation generation and organization scripts for Carapace",
+  "scripts": {
+    "organize": "./src/organize-docs.sh"
+  }
+}

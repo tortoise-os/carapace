@@ -1,4 +1,4 @@
-import type { SuiClient } from "@mysten/sui/client"
+import type { SuiClient } from "@mysten/sui.js/client"
 import { Elysia, t } from "elysia"
 
 export interface Token {
@@ -175,8 +175,13 @@ export const createTokensPlugin = (_client: SuiClient) => {
             throw new Error("Token not found")
           }
 
+          const currentToken = tokens[index]
+          if (!currentToken) {
+            throw new Error("Token not found")
+          }
+
           const updated: Token = {
-            ...tokens[index],
+            ...currentToken,
             ...body,
             updatedAt: new Date().toISOString(),
           }
@@ -201,9 +206,14 @@ export const createTokensPlugin = (_client: SuiClient) => {
           throw new Error("Token not found")
         }
 
+        const token = tokens[index]
+        if (!token) {
+          throw new Error("Token not found")
+        }
+
         // Soft delete by disabling
-        tokens[index].enabled = false
-        tokens[index].updatedAt = new Date().toISOString()
+        token.enabled = false
+        token.updatedAt = new Date().toISOString()
 
         return { success: true }
       })

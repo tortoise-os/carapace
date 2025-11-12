@@ -97,6 +97,7 @@ export const createPositionsPlugin = new Elysia({ prefix: "/api/positions" })
    * GET /api/positions/:address
    * Get all liquidity positions for a user
    */
+  // @ts-expect-error - sdk is decorated on parent app
   .get("/:address", async ({ params, sdk }) => {
     try {
       const { address } = params
@@ -112,7 +113,7 @@ export const createPositionsPlugin = new Elysia({ prefix: "/api/positions" })
         // For now, create mock positions
         const mockLpBalance = "1000000000" // 1 LP token (9 decimals)
 
-        if (mockLpBalance !== "0") {
+        if (parseFloat(mockLpBalance) !== 0) {
           const position = calculatePosition(
             mockLpBalance,
             pool.lpSupply,
@@ -146,6 +147,7 @@ export const createPositionsPlugin = new Elysia({ prefix: "/api/positions" })
    * GET /api/positions/:address/:poolId
    * Get specific position details
    */
+  // @ts-expect-error - sdk is decorated on parent app
   .get("/:address/:poolId", async ({ params, sdk }) => {
     try {
       const { address, poolId } = params
@@ -179,6 +181,7 @@ export const createPositionsPlugin = new Elysia({ prefix: "/api/positions" })
    * POST /api/positions/calculate-add
    * Calculate amounts for adding liquidity
    */
+  // @ts-expect-error - sdk is decorated on parent app
   .post("/calculate-add", async ({ body, sdk }) => {
     try {
       const { poolId, tokenXAmount, tokenYAmount } = body as {
@@ -246,6 +249,7 @@ export const createPositionsPlugin = new Elysia({ prefix: "/api/positions" })
    * POST /api/positions/calculate-remove
    * Calculate amounts for removing liquidity
    */
+  // @ts-expect-error - sdk is decorated on parent app
   .post("/calculate-remove", async ({ body, sdk }) => {
     try {
       const { poolId, lpTokenAmount } = body as {

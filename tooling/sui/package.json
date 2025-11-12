@@ -1,0 +1,11 @@
+{
+  "name": "@carapace/tooling-sui",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Sui network operation scripts for Carapace",
+  "type": "module",
+  "scripts": {},
+  "dependencies": {
+    "@carapace/sdk": "workspace:*"
+  }
+}

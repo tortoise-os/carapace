@@ -32,6 +32,7 @@ interface PoolData {
   reserve_x: string
   reserve_y: string
   lp_supply: string
+  fee_bps?: string
 }
 
 /**
@@ -80,7 +81,7 @@ function calculatePoolAnalytics(pool: PoolData): PoolAnalytics {
   const volume7d = volume24h * 7
 
   // Calculate fees
-  const feeBps = parseInt(pool.fee_bps, 10) || 30
+  const feeBps = parseInt(pool.fee_bps || "30", 10)
   const fees24h = volume24h * (feeBps / 10000)
   const fees7d = volume7d * (feeBps / 10000)
 
@@ -105,7 +106,8 @@ export const createAnalyticsPlugin = new Elysia({ prefix: "/api/analytics" })
    */
   .get("/protocol", async () => {
     try {
-      let pools: Awaited<ReturnType<typeof poolQueries.getAll>>
+      // biome-ignore lint/suspicious/noExplicitAny: Mixed return types from database (Row[]) and mock data (Pool[])
+      let pools: any
       try {
         pools = await poolQueries.getAll(1000, 0)
         if (!pools || pools.length === 0) {
@@ -116,7 +118,7 @@ export const createAnalyticsPlugin = new Elysia({ prefix: "/api/analytics" })
         pools = mockDataProvider.getAllPools(1000, 0)
       }
 
-      const analytics = calculateProtocolAnalytics(pools)
+      const analytics = calculateProtocolAnalytics(pools as unknown as PoolData[])
 
       return {
         success: true,
@@ -141,7 +143,8 @@ export const createAnalyticsPlugin = new Elysia({ prefix: "/api/analytics" })
         const sortBy = query.sortBy || "tvl" // tvl, volume24h, apr
         const order = query.order || "desc" // asc, desc
 
-        let pools: Awaited<ReturnType<typeof poolQueries.getAll>>
+        // biome-ignore lint/suspicious/noExplicitAny: Mixed return types from database (Row[]) and mock data (Pool[])
+        let pools: any
         try {
           pools = await poolQueries.getAll(limit, offset)
           if (!pools || pools.length === 0) {
@@ -153,13 +156,15 @@ export const createAnalyticsPlugin = new Elysia({ prefix: "/api/analytics" })
         }
 
         // Calculate analytics for each pool
-        const poolsWithAnalytics = pools.map((pool) => ({
+        // biome-ignore lint/suspicious/noExplicitAny: Pool type varies between database and mock data
+        const poolsWithAnalytics = pools.map((pool: any) => ({
           ...pool,
-          analytics: calculatePoolAnalytics(pool),
+          analytics: calculatePoolAnalytics(pool as unknown as PoolData),
         }))
 
         // Sort by requested field
-        poolsWithAnalytics.sort((a, b) => {
+        // biome-ignore lint/suspicious/noExplicitAny: Pool with analytics has dynamic structure
+        poolsWithAnalytics.sort((a: any, b: any) => {
           const aVal = parseFloat(a.analytics[sortBy as keyof PoolAnalytics] as string)
           const bVal = parseFloat(b.analytics[sortBy as keyof PoolAnalytics] as string)
           return order === "desc" ? bVal - aVal : aVal - bVal
@@ -214,7 +219,7 @@ export const createAnalyticsPlugin = new Elysia({ prefix: "/api/analytics" })
         throw new Error("Pool not found")
       }
 
-      const analytics = calculatePoolAnalytics(pool)
+      const analytics = calculatePoolAnalytics(pool as unknown as PoolData)
 
       return {
         success: true,

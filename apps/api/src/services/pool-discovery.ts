@@ -178,7 +178,8 @@ export class PoolDiscoveryService {
             MoveEventType: `${config.sui.packageIds.carapace}::pool::PoolCreated`,
           },
           limit: 50,
-          cursor: cursor || undefined,
+          // biome-ignore lint/suspicious/noExplicitAny: EventId type compatibility with string cursor
+          cursor: cursor ? (cursor as any) : undefined,
         })
 
         for (const event of response.data) {
@@ -219,7 +220,7 @@ export class PoolDiscoveryService {
 
         // Check if there are more results
         if (response.hasNextPage && response.nextCursor) {
-          cursor = response.nextCursor as string
+          cursor = String(response.nextCursor)
         } else {
           hasMore = false
         }

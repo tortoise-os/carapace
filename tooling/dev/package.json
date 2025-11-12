@@ -1,0 +1,9 @@
+{
+  "name": "@carapace/tooling-dev",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Development environment scripts for Carapace",
+  "scripts": {
+    "cleanup-ports": "./src/cleanup-ports.sh"
+  }
+}

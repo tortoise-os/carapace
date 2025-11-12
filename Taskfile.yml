@@ -25,6 +25,11 @@ tasks:
     cmds:
       - bun run dev
 
+  dev:cleanup:
+    desc: Clean up development ports (interactive)
+    cmds:
+      - ./tooling/dev/src/cleanup-ports.sh
+
   # Installation
   install:
     desc: Install all dependencies

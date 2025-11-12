@@ -3,7 +3,7 @@
  * Queries blockchain events and provides transaction history
  */
 
-import type { SuiClient, SuiEvent } from "@mysten/sui/client"
+import type { SuiClient, SuiEvent } from "@mysten/sui.js/client"
 
 export interface Transaction {
   id: string
@@ -107,7 +107,7 @@ export class TransactionHistoryService {
       return {
         transactions: limitedTransactions,
         hasNextPage,
-        nextCursor: hasNextPage ? limitedTransactions[limitedTransactions.length - 1]?.id : null,
+        nextCursor: hasNextPage ? (limitedTransactions[limitedTransactions.length - 1]?.id ?? null) : null,
       }
     } catch (error) {
       console.error("Error fetching transaction history:", error)

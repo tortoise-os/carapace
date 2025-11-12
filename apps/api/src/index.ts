@@ -58,8 +58,10 @@ async function start() {
       .use(createTransactionPlugin)
       .use(createAnalyticsPlugin)
       .use(createPositionsPlugin)
-      .use(createTokensPlugin(sdk.client))
-      .use(createTransactionHistoryPlugin(sdk.client))
+      // biome-ignore lint/suspicious/noExplicitAny: Type compatibility between SuiJsonRpcClient and SuiClient
+      .use(createTokensPlugin(sdk.client as any))
+      // biome-ignore lint/suspicious/noExplicitAny: Type compatibility between SuiJsonRpcClient and SuiClient
+      .use(createTransactionHistoryPlugin(sdk.client as any))
       .onError(({ code, error, set }) => {
         console.error("Error:", error)
 

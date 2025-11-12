@@ -1,0 +1,14 @@
+{
+  "name": "@carapace/tooling-testing",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Testing utilities and E2E tests for Carapace",
+  "type": "module",
+  "scripts": {
+    "e2e-blockchain": "bun run src/e2e-blockchain-test.ts",
+    "test-api": "bun run src/test-api.ts"
+  },
+  "dependencies": {
+    "@carapace/sdk": "workspace:*"
+  }
+}

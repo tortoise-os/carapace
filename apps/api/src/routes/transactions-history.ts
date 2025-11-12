@@ -1,4 +1,4 @@
-import type { SuiClient } from "@mysten/sui/client"
+import type { SuiClient } from "@mysten/sui.js/client"
 import { Elysia, t } from "elysia"
 
 export interface Transaction {
@@ -134,9 +134,7 @@ export const createTransactionHistoryPlugin = (_client: SuiClient) => {
       // GET /api/transactions/stats/:address - Get transaction statistics
       .get(
         "/stats/:address",
-        async ({ params }) => {
-          const _address = params.address
-
+        async () => {
           // Mock statistics
           return {
             totalTransactions: 1000,

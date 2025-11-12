@@ -1,0 +1,9 @@
+{
+  "name": "@carapace/tooling-demo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Demo and graphics generation scripts for Carapace",
+  "scripts": {
+    "export-graphics": "./src/export-all.sh"
+  }
+}

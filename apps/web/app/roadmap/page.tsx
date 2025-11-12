@@ -4,11 +4,13 @@ import { BlurFade, BorderBeam, Card, DotPattern, MagicCard } from "@carapace/car
 import { Calendar, CheckCircle, Circle, GitBranch, Sparkles, TrendingUp, Zap } from "lucide-react"
 import { useState } from "react"
 
+type RoadmapPriority = "P1" | "P2" | "P3"
+
 interface Feature {
   name: string
   status: "completed" | "in-progress" | "planned"
   description: string
-  priority: "P1" | "P2" | "P3"
+  priority: RoadmapPriority
 }
 
 const ROADMAP: Feature[] = [
