@@ -1,0 +1,23 @@
+{
+  "name": "@carapace/x402-facilitator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sui x402 payment facilitator service",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "start": "bun run dist/index.js",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@carapace/x402-types": "workspace:*",
+    "@mysten/sui": "^1.14.0",
+    "elysia": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.2",
+    "typescript": "^5.6.3"
+  }
+}
