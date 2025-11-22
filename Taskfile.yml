@@ -349,7 +349,32 @@ tasks:
   test:e2e:
     desc: Run E2E tests
     cmds:
-      - cd apps/web && bun run test:e2e
+      - cd tooling/e2e && bun run test
+
+  test:e2e:ui:
+    desc: Run E2E tests in UI mode
+    cmds:
+      - cd tooling/e2e && bun run test:ui
+
+  test:e2e:headed:
+    desc: Run E2E tests in headed mode
+    cmds:
+      - cd tooling/e2e && bun run test:headed
+
+  test:e2e:debug:
+    desc: Debug E2E tests
+    cmds:
+      - cd tooling/e2e && bun run test:debug
+
+  test:e2e:chromium:
+    desc: Run E2E tests in Chromium only
+    cmds:
+      - cd tooling/e2e && bun run test:chromium
+
+  test:e2e:report:
+    desc: Show E2E test report
+    cmds:
+      - cd tooling/e2e && bun run report
 
   test:coverage:
     desc: Run tests with coverage
@@ -430,12 +455,12 @@ tasks:
   grafana:
     desc: Open Grafana dashboard
     cmds:
-      - open http://localhost:3030
+      - open http://localhost:3604
 
   prometheus:
     desc: Open Prometheus dashboard
     cmds:
-      - open http://localhost:9090
+      - open http://localhost:3605
 
   # Cleanup
   clean:

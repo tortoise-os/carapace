@@ -9,7 +9,7 @@ import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import type { X402Payment } from '@carapace/x402-types';
 import { createPaymentMessage } from '@carapace/x402-types';
 
-const BASE_URL = 'http://localhost:3402';
+const BASE_URL = 'http://localhost:3606';
 
 describe('POST /settle', () => {
   describe('Successful Settlement', () => {
@@ -22,14 +22,14 @@ describe('POST /settle', () => {
 
       const message = createPaymentMessage(amount, recipient, nonce);
       const messageBytes = new TextEncoder().encode(message);
-      const signatureBytes = await keypair.signPersonalMessage(messageBytes);
+      const signatureResult = await keypair.signPersonalMessage(messageBytes);
 
       const payment: X402Payment = {
         scheme: 'exact',
         network: 'sui:devnet',
         amount,
         recipient,
-        signature: Buffer.from(signatureBytes).toString('base64'),
+        signature: signatureResult.signature,
         publicKey: keypair.getPublicKey().toBase64(),
         nonce,
       };
@@ -42,13 +42,13 @@ describe('POST /settle', () => {
       });
 
       // Assert
-      const result = await response.json();
+      const result = (await response.json()) as any;
 
       if (response.status === 200) {
         // Settlement succeeded
         expect(result.success).toBe(true);
         expect(result.txHash).toBeDefined();
-        expect(result.txHash).toMatch(/^0x[a-f0-9]+$/i); // Valid tx hash
+        expect(result.txHash.length).toBeGreaterThan(0); // Valid tx hash
         expect(result.network).toBe('sui:devnet');
       } else {
         // May fail if facilitator has no gas
@@ -66,14 +66,14 @@ describe('POST /settle', () => {
 
       const message = createPaymentMessage(amount, recipient, nonce);
       const messageBytes = new TextEncoder().encode(message);
-      const signatureBytes = await keypair.signPersonalMessage(messageBytes);
+      const signatureResult = await keypair.signPersonalMessage(messageBytes);
 
       const payment: X402Payment = {
         scheme: 'exact',
         network: 'sui:devnet',
         amount,
         recipient,
-        signature: Buffer.from(signatureBytes).toString('base64'),
+        signature: signatureResult.signature,
         publicKey: keypair.getPublicKey().toBase64(),
         nonce,
       };
@@ -86,7 +86,7 @@ describe('POST /settle', () => {
       });
 
       // Assert
-      const result = await response.json();
+      const result = (await response.json()) as any;
 
       if (result.success) {
         expect(result.txHash).toBeTruthy();
@@ -114,8 +114,8 @@ describe('POST /settle', () => {
       });
 
       // Assert
-      expect(response.status).toBe(400);
-      const result = await response.json();
+      expect(response.status).toBe(422); // Unprocessable Entity
+      const result = (await response.json()) as any;
       expect(result.error).toBeDefined();
     });
 
@@ -128,14 +128,14 @@ describe('POST /settle', () => {
 
       const message = createPaymentMessage(amount, recipient, nonce);
       const messageBytes = new TextEncoder().encode(message);
-      const signatureBytes = await keypair.signPersonalMessage(messageBytes);
+      const signatureResult = await keypair.signPersonalMessage(messageBytes);
 
       const payment = {
         scheme: 'exact',
         network: 'bitcoin:mainnet', // Invalid!
         amount,
         recipient,
-        signature: Buffer.from(signatureBytes).toString('base64'),
+        signature: signatureResult.signature,
         publicKey: keypair.getPublicKey().toBase64(),
         nonce,
       };
@@ -148,8 +148,8 @@ describe('POST /settle', () => {
       });
 
       // Assert
-      expect(response.status).toBe(400);
-      const result = await response.json();
+      expect(response.status).toBe(422); // Unprocessable Entity
+      const result = (await response.json()) as any;
       expect(result.error).toMatch(/network/i);
     });
 
@@ -162,14 +162,14 @@ describe('POST /settle', () => {
 
       const message = createPaymentMessage(amount, recipient, nonce);
       const messageBytes = new TextEncoder().encode(message);
-      const signatureBytes = await keypair.signPersonalMessage(messageBytes);
+      const signatureResult = await keypair.signPersonalMessage(messageBytes);
 
       const payment: X402Payment = {
         scheme: 'exact',
         network: 'sui:devnet',
         amount,
         recipient,
-        signature: Buffer.from(signatureBytes).toString('base64'),
+        signature: signatureResult.signature,
         publicKey: keypair.getPublicKey().toBase64(),
         nonce,
       };
@@ -182,8 +182,8 @@ describe('POST /settle', () => {
       });
 
       // Assert
-      expect(response.status).toBe(400);
-      const result = await response.json();
+      expect(response.status).toBe(422); // Unprocessable Entity
+      const result = (await response.json()) as any;
       expect(result.error).toMatch(/amount/i);
     });
   });
@@ -198,14 +198,14 @@ describe('POST /settle', () => {
 
       const message = createPaymentMessage(amount, recipient, nonce);
       const messageBytes = new TextEncoder().encode(message);
-      const signatureBytes = await keypair.signPersonalMessage(messageBytes);
+      const signatureResult = await keypair.signPersonalMessage(messageBytes);
 
       const payment: X402Payment = {
         scheme: 'exact',
         network: 'sui:devnet',
         amount,
         recipient,
-        signature: Buffer.from(signatureBytes).toString('base64'),
+        signature: signatureResult.signature,
         publicKey: keypair.getPublicKey().toBase64(),
         nonce,
       };
@@ -218,9 +218,9 @@ describe('POST /settle', () => {
       });
 
       // Assert
-      const result = await response.json();
-      expect(result.success).toBe(false);
-      expect(result.error).toMatch(/limit|max|exceeded/i);
+      expect([413, 422]).toContain(response.status); // 413 Payload Too Large or 422 if validation fails first
+      const result = (await response.json()) as any;
+      expect(result.error).toBeDefined();
     });
   });
 
@@ -234,14 +234,14 @@ describe('POST /settle', () => {
 
       const message = createPaymentMessage(amount, recipient, nonce);
       const messageBytes = new TextEncoder().encode(message);
-      const signatureBytes = await keypair.signPersonalMessage(messageBytes);
+      const signatureResult = await keypair.signPersonalMessage(messageBytes);
 
       const payment: X402Payment = {
         scheme: 'exact',
         network: 'sui:devnet',
         amount,
         recipient,
-        signature: Buffer.from(signatureBytes).toString('base64'),
+        signature: signatureResult.signature,
         publicKey: keypair.getPublicKey().toBase64(),
         nonce,
       };

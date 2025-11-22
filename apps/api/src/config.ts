@@ -8,7 +8,7 @@ import { z } from "zod"
 const envSchema = z.object({
   // Server
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-  API_PORT: z.string().default("3001"),
+  API_PORT: z.string().default("3600"),
   API_HOST: z.string().default("0.0.0.0"),
 
   // Sui
@@ -29,7 +29,7 @@ const envSchema = z.object({
   CACHE_TTL_QUOTES: z.string().default("30"),
 
   // CORS
-  CORS_ORIGIN: z.string().default("http://localhost:3000"),
+  CORS_ORIGIN: z.string().default("http://localhost:3601"),
 
   // Features
   ENABLE_INDEXER: z.string().default("true"),

@@ -22,6 +22,15 @@ tooling/
 │   ├── package.json
 │   └── src/
 │       └── cleanup-ports.sh
+├── e2e/                         # ⭐ End-to-end tests
+│   ├── package.json
+│   ├── playwright.config.ts
+│   └── e2e/
+│       ├── pages/              # Page Object Models
+│       ├── navigation.spec.ts
+│       ├── swap.spec.ts
+│       ├── pools.spec.ts
+│       └── analytics.spec.ts
 ├── testing/                     # ⭐ Testing utilities
 │   ├── package.json
 │   └── src/
@@ -202,6 +211,40 @@ Sui network operations (placeholder for future scripts).
 ```bash
 cd tooling/sui && bun run <script>
 ```
+
+### `@carapace/e2e`
+
+End-to-end testing suite using Playwright.
+
+**Tests:**
+- `navigation.spec.ts` - Page routing and navigation
+- `swap.spec.ts` - Token swap interface
+- `pools.spec.ts` - Liquidity pools management
+- `analytics.spec.ts` - Analytics dashboard
+
+**Usage:**
+```bash
+# Via npm scripts
+cd tooling/e2e && bun run test
+cd tooling/e2e && bun run test:ui
+cd tooling/e2e && bun run test:headed
+
+# Via Task (recommended)
+task test:e2e              # Run all tests
+task test:e2e:ui           # UI mode
+task test:e2e:headed       # Headed mode
+task test:e2e:debug        # Debug mode
+task test:e2e:chromium     # Chromium only
+task test:e2e:report       # Show report
+```
+
+**Page Object Models:**
+- `BasePage` - Base page with common elements
+- `SwapPage` - Swap interface
+- `PoolsPage` - Pools listing
+- `AnalyticsPage` - Analytics dashboard
+
+See [tooling/e2e/README.md](./e2e/README.md) for detailed documentation.
 
 ## 🔧 Integration with Taskfile
 

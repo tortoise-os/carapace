@@ -1,0 +1,94 @@
+# Fly.io configuration for x402 Payment Facilitator
+# Deploy with: fly deploy
+# Docs: https://fly.io/docs/reference/configuration/
+
+app = "x402-facilitator"
+primary_region = "sjc"  # San Jose - closest to Sui RPC nodes
+
+# Build configuration
+# Build from monorepo root to access workspace dependencies
+[build]
+  dockerfile = "apps/x402-facilitator/Dockerfile"
+  ignorefile = "apps/x402-facilitator/.dockerignore"
+
+# Environment variables (non-sensitive)
+[env]
+  PORT = "3606"
+  NODE_ENV = "production"
+  # Set these via: fly secrets set KEY=value
+  # FACILITATOR_PRIVATE_KEY - Required (secret)
+  # SUI_RPC_URL - Required (can be public or secret)
+  # ALLOWED_ORIGINS - Required for CORS
+
+# HTTP service configuration
+[[services]]
+  internal_port = 3606
+  protocol = "tcp"
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  # HTTP on port 80
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+    force_https = true  # Redirect HTTP to HTTPS
+
+  # HTTPS on port 443
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  # Concurrency limits
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 1000
+    soft_limit = 750
+
+  # TCP health check (fast, minimal overhead)
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
+    grace_period = "10s"  # Allow time for startup
+
+  # HTTP health check (validates application health)
+  [[services.http_checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/health"
+    protocol = "http"
+    
+    # Expected response
+    [services.http_checks.headers]
+      X-Health-Check = "fly.io"
+
+# VM resources
+[vm]
+  size = "shared-cpu-1x"  # 1 vCPU, 256MB RAM (can upgrade to performance-1x for production)
+  memory = "256mb"
+
+# Metrics - expose for Prometheus scraping
+[metrics]
+  port = 3606
+  path = "/metrics"
+
+# Fly.io Postgres (optional - not currently needed)
+# Uncomment if you add database persistence in the future
+# [[statics]]
+#   guest_path = "/app/public"
+#   url_prefix = "/public"
+
+# Deployment strategy
+[deploy]
+  strategy = "rolling"  # Zero-downtime deployments
+
+# Auto-scaling (optional - enable for production)
+# [[services.scale]]
+#   min = 1
+#   max = 3
+#   
+#   [[services.scale.rules]]
+#     type = "cpu"
+#     target = 80  # Scale up when CPU > 80%

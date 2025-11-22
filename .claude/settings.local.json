@@ -60,7 +60,8 @@
       "WebFetch(domain:www.linkedin.com)",
       "mcp__context7__resolve-library-id",
       "mcp__context7__get-library-docs",
-      "WebFetch(domain:docs.cdp.coinbase.com)"
+      "WebFetch(domain:docs.cdp.coinbase.com)",
+      "Bash(bunx playwright install:*)"
     ],
     "deny": [],
     "ask": []

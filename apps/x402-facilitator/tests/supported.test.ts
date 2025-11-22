@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'bun:test';
 
-const BASE_URL = 'http://localhost:3402';
+const BASE_URL = 'http://localhost:3606';
 
 describe('GET /supported', () => {
   it('should return supported schemes and networks', async () => {
@@ -13,7 +13,7 @@ describe('GET /supported', () => {
 
     // Assert
     expect(response.status).toBe(200);
-    const result = await response.json();
+    const result = (await response.json()) as { schemes: string[]; networks: string[] };
 
     expect(result.schemes).toBeDefined();
     expect(Array.isArray(result.schemes)).toBe(true);
